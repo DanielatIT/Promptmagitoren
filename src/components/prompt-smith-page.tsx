@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { useForm, FormProvider, useWatch, useFormContext } from 'react-hook-form';
+import { useState } from 'react';
+import { useForm, FormProvider, useFormContext } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { generateInitialPrompt, type GenerateInitialPromptInput } from '@/lib/prompt-generator';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,6 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Clipboard } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast"
 import { PromptForm, formSchema, defaultValues, type FormValues } from './prompt-form';
-import { Skeleton } from './ui/skeleton';
 
 const taskTypeMap = {
     'Artikel': 'Skriv en artikel för en av våra bloggar där du inte nämner kundens namn eller företag utan utgår från att vi bara vill ge läsaren ett värde',
@@ -27,17 +26,9 @@ const writingForMap = {
 function PageContent() {
     const [generatedPrompt, setGeneratedPrompt] = useState('');
     const { toast } = useToast();
-    const { control, getValues } = useFormContext<FormValues>();
-    const watchedValues = useWatch({ control });
+    const { handleSubmit } = useFormContext<FormValues>();
 
-    useEffect(() => {
-        const data = getValues();
-
-        if (!data.aiRole || !data.topicInformation) {
-            setGeneratedPrompt('');
-            return;
-        }
-
+    const onGenerate = (data: FormValues) => {
         const rules: string[] = [];
         if (data.rules.avoidSuperlatives) rules.push('Undvik superlativ');
         if (data.rules.avoidPraise) rules.push('Undvik lovord');
@@ -54,19 +45,16 @@ function PageContent() {
         }
 
         const taskType = data.taskTypeRadio === 'custom' ? data.taskTypeCustom : taskTypeMap[data.taskTypeRadio as keyof typeof taskTypeMap];
-        if (!taskType) {
-            setGeneratedPrompt('');
-            return;
-        }
-
+        const writingFor = data.writingForRadio === 'custom' ? data.writingForCustom : writingForMap[data.writingForRadio as keyof typeof writingForMap];
+        
         const payload: GenerateInitialPromptInput = {
             aiRole: data.aiRole,
-            taskType: taskType,
+            taskType: taskType!,
             tonality: data.tonality,
             textLength: data.textLength ? parseInt(data.textLength, 10) : undefined,
             numberOfLists: data.excludeLists ? undefined : (data.numberOfLists ? parseInt(data.numberOfLists, 10) : undefined),
             language: data.language,
-            writingFor: data.writingForRadio === 'custom' ? data.writingForCustom : writingForMap[data.writingForRadio as keyof typeof writingForMap],
+            writingFor: writingFor,
             rules: rules,
             links: data.links?.filter(link => link.url && link.anchorText),
             primaryKeyword: data.primaryKeyword,
@@ -76,9 +64,7 @@ function PageContent() {
 
         const result = generateInitialPrompt(payload);
         setGeneratedPrompt(result.prompt);
-
-    }, [watchedValues, getValues]);
-
+    };
 
     const handleCopy = () => {
         if (!generatedPrompt) {
@@ -102,40 +88,42 @@ function PageContent() {
                 <h1 className="text-4xl lg:text-5xl font-headline font-bold text-primary">PromptSmith</h1>
                 <p className="text-muted-foreground mt-2 text-lg">Craft the perfect AI prompt for your needs</p>
             </header>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-                <div>
-                    <ScrollArea className="h-[calc(100vh-12rem)] pr-4 -mr-4">
-                        <PromptForm />
-                    </ScrollArea>
+            <form onSubmit={handleSubmit(onGenerate)} className="w-full">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                    <div>
+                        <ScrollArea className="h-[calc(100vh-12rem)] pr-4 -mr-4">
+                            <PromptForm />
+                        </ScrollArea>
+                    </div>
+                    
+                    <div className="lg:sticky lg:top-8">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="font-headline text-lg">Preview</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="space-y-4">
+                                    <Button onClick={handleCopy} type="button" className="w-full" variant="outline">
+                                        <Clipboard className="mr-2 h-4 w-4" /> Copy Text
+                                    </Button>
+                                    <ScrollArea className="h-[calc(100vh-25rem)] lg:h-[calc(100vh-18rem)] rounded-md border p-4 bg-muted/20">
+                                        {generatedPrompt ? (
+                                            <pre className="text-sm whitespace-pre-wrap font-body leading-relaxed">{generatedPrompt}</pre>
+                                        ) : (
+                                            <div className="flex items-center justify-center h-full text-muted-foreground">
+                                                <p>Your generated prompt will appear here as you fill out the form.</p>
+                                            </div>
+                                        )}
+                                    </ScrollArea>
+                                     <Button onClick={handleCopy} type="button" className="w-full" variant="outline">
+                                        <Clipboard className="mr-2 h-4 w-4" /> Copy Text
+                                    </Button>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
                 </div>
-                
-                <div className="lg:sticky lg:top-8">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="font-headline text-lg">Preview</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="space-y-4">
-                                <Button onClick={handleCopy} className="w-full" variant="outline">
-                                    <Clipboard className="mr-2 h-4 w-4" /> Copy Text
-                                </Button>
-                                <ScrollArea className="h-[calc(100vh-25rem)] lg:h-[calc(100vh-18rem)] rounded-md border p-4 bg-muted/20">
-                                    {generatedPrompt ? (
-                                        <pre className="text-sm whitespace-pre-wrap font-body leading-relaxed">{generatedPrompt}</pre>
-                                    ) : (
-                                        <div className="flex items-center justify-center h-full text-muted-foreground">
-                                            <p>Your generated prompt will appear here as you fill out the form.</p>
-                                        </div>
-                                    )}
-                                </ScrollArea>
-                                 <Button onClick={handleCopy} className="w-full" variant="outline">
-                                    <Clipboard className="mr-2 h-4 w-4" /> Copy Text
-                                </Button>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
-            </div>
+            </form>
         </div>
     );
 }

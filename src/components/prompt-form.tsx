@@ -70,7 +70,23 @@ export const formSchema = z.object({
   primaryKeyword: z.string().optional(),
   author: z.string().optional(),
   topicInformation: z.string().min(1, 'This field is required.'),
-});
+}).superRefine((data, ctx) => {
+    if (data.taskTypeRadio === 'custom' && (!data.taskTypeCustom || data.taskTypeCustom.trim() === '')) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Detta fält är obligatoriskt när 'Annan uppgift...' är valt.",
+        path: ['taskTypeCustom'],
+      });
+    }
+    if (data.writingForRadio === 'custom' && (!data.writingForCustom || data.writingForCustom.trim() === '')) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Detta fält är obligatoriskt när 'Annan...' är valt.",
+        path: ['writingForCustom'],
+      });
+    }
+  });
+
 
 export type FormValues = z.infer<typeof formSchema>;
 
@@ -107,7 +123,6 @@ export const defaultValues: Partial<FormValues> = {
 
 function TaskTypeSection() {
     const { control } = useFormContext<FormValues>();
-    const taskTypeRadio = useWatch({ control, name: 'taskTypeRadio' });
     
     return (
         <FormSection title="Vad skall AIn aggera som?" required>
@@ -330,7 +345,7 @@ export function PromptForm() {
                         control={control}
                         name="writingForCustom"
                         render={({ field }) => (
-                            <FormItem className="mt-4"><FormControl><Textarea placeholder="Beskriv målgruppen..." {...field} /></FormControl></FormItem>
+                            <FormItem className="mt-4"><FormControl><Textarea placeholder="Beskriv målgruppen..." {...field} /></FormControl><FormMessage/></FormItem>
                         )}
                     />
                 )}
@@ -409,6 +424,9 @@ export function PromptForm() {
                 <FormField control={control} name="topicInformation" render={({ field }) => (<FormItem><FormControl><Textarea placeholder="All information som AI:n behöver för att kunna skriva texten..." {...field} rows={6} /></FormControl><FormMessage /></FormItem>)} />
             </FormSection>
 
+            <Button type="submit" className="w-full">
+                Förhandsgranska
+            </Button>
         </div>
     );
 }
