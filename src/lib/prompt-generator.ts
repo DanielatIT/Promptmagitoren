@@ -1,6 +1,7 @@
 import type { FormValues } from '@/components/prompt-form';
 
 export interface GenerateInitialPromptInput {
+  topicGuideline: string;
   aiRole: 'Copywriter' | 'SEO expert' | 'Skribent för bloggar' | 'Korrekturläsare' | 'Programmerare för HTML, CSS och Javascript' | 'Researcher';
   taskType: string;
   tonality?: string[];
@@ -34,7 +35,11 @@ const languageOutputs: { [key: string]: string } = {
 };
 
 export function generateInitialPrompt(input: GenerateInitialPromptInput): { prompt: string } {
-  let prompt = '';
+  let prompt = "Dessa regler nedan skall följas väldigt strikt, kolla konstant att du alltid följer det instruktioner jag ger dig här och återkom med en fråga om vad du skall göra istället för att göra något annat än vad instruktioner hänvisar. \n\n";
+
+  if (input.topicGuideline) {
+    prompt += `Texten nedan skall handla om ${input.topicGuideline}, använd detta som guideline på hur du skall vrida texten.\n\n`;
+  }
 
   prompt += roleOutputs[input.aiRole] + '\n\n';
   prompt += `Din uppgift är att: ${input.taskType}\n\n`;

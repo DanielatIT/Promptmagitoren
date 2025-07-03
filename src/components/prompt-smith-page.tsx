@@ -48,6 +48,7 @@ function PageContent() {
         const writingFor = data.writingForRadio === 'custom' ? data.writingForCustom : writingForMap[data.writingForRadio as keyof typeof writingForMap];
         
         const payload: GenerateInitialPromptInput = {
+            topicGuideline: data.topicGuideline,
             aiRole: data.aiRole,
             taskType: taskType!,
             tonality: data.tonality,
@@ -111,7 +112,7 @@ function PageContent() {
                                             <pre className="text-sm whitespace-pre-wrap font-body leading-relaxed">{generatedPrompt}</pre>
                                         ) : (
                                             <div className="flex items-center justify-center h-full text-muted-foreground">
-                                                <p>Your generated prompt will appear here as you fill out the form.</p>
+                                                <p>Your generated prompt will appear here once you click "Förhandsgranska".</p>
                                             </div>
                                         )}
                                     </ScrollArea>
@@ -132,7 +133,7 @@ export default function PromptSmithPage() {
     const methods = useForm<FormValues>({
         resolver: zodResolver(formSchema),
         defaultValues,
-        mode: 'onChange'
+        mode: 'onSubmit'
     });
 
     return (

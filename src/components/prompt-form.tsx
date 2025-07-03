@@ -42,6 +42,7 @@ const avoidWordsOptions = [
 ];
 
 export const formSchema = z.object({
+  topicGuideline: z.string().min(1, 'Detta fält är obligatoriskt.'),
   aiRole: z.enum(aiRoleOptions),
   taskTypeRadio: z.enum([...taskTypeRadioOptions, 'custom']),
   taskTypeCustom: z.string().optional(),
@@ -74,7 +75,7 @@ export const formSchema = z.object({
     if (data.taskTypeRadio === 'custom' && (!data.taskTypeCustom || data.taskTypeCustom.trim() === '')) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Detta fält är obligatoriskt när 'Annan uppgift...' är valt.",
+        message: "Beskrivning av texttyp är obligatoriskt när 'Annan...' är valt.",
         path: ['taskTypeCustom'],
       });
     }
@@ -91,6 +92,7 @@ export const formSchema = z.object({
 export type FormValues = z.infer<typeof formSchema>;
 
 export const defaultValues: Partial<FormValues> = {
+  topicGuideline: '',
   aiRole: 'Copywriter',
   taskTypeRadio: 'Artikel',
   taskTypeCustom: '',
@@ -160,7 +162,7 @@ function AIActionSection() {
     const taskTypeRadio = useWatch({ control, name: "taskTypeRadio" });
     
     return (
-         <FormSection title="Va för uppgift skall utföras?" required>
+         <FormSection title="Vilken typ av text som skall produceras" required>
             <FormField
                 control={control}
                 name="taskTypeRadio"
@@ -177,7 +179,7 @@ function AIActionSection() {
                                         <FormControl>
                                             <RadioGroupItem value={task} />
                                         </FormControl>
-                                        <FormLabel className="font-normal">{task === 'custom' ? 'Annan uppgift...' : task}</FormLabel>
+                                        <FormLabel className="font-normal">{task === 'custom' ? 'Annan...' : task}</FormLabel>
                                     </FormItem>
                                 ))}
                             </RadioGroup>
@@ -193,7 +195,7 @@ function AIActionSection() {
                     render={({ field }) => (
                         <FormItem className="mt-4">
                             <FormControl>
-                                <Textarea placeholder="Beskriv uppgiften..." {...field} />
+                                <Textarea placeholder="Beskriv typen av text..." {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -216,6 +218,21 @@ export function PromptForm() {
 
     return (
         <div className="space-y-6">
+            <FormSection title="Förklara vad texten skall handla om" required>
+                <FormField
+                    control={control}
+                    name="topicGuideline"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormControl>
+                                <Textarea placeholder="Beskriv vad texten ska handla om..." {...field} rows={4} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+            </FormSection>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <TaskTypeSection />
                 <AIActionSection />
