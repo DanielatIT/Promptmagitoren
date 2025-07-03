@@ -120,7 +120,7 @@ function TaskTypeSection() {
                             <RadioGroup
                                 onValueChange={field.onChange}
                                 defaultValue={field.value}
-                                className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                                className="grid grid-cols-1 gap-4"
                             >
                                 {aiRoleOptions.map((role) => (
                                     <FormItem key={role} className="flex items-center space-x-3 space-y-0">
@@ -201,8 +201,10 @@ export function PromptForm() {
 
     return (
         <div className="space-y-6">
-            <TaskTypeSection />
-            <AIActionSection />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <TaskTypeSection />
+                <AIActionSection />
+            </div>
 
             <FormSection title="Vilken tonalitet ska texten ha?" onReset={() => setValue('tonality', [])}>
                 <FormField
