@@ -1,5 +1,3 @@
-import type { FormValues } from '@/components/prompt-form';
-
 export interface GenerateInitialPromptInput {
   topicGuideline: string;
   aiRole: 'Copywriter' | 'SEO expert' | 'Skribent för bloggar' | 'Korrekturläsare' | 'Programmerare för HTML, CSS och Javascript' | 'Researcher';
