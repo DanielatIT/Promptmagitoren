@@ -3,22 +3,21 @@
 'use server';
 
 /**
- * @fileOverview This file defines a Genkit flow for generating an initial prompt based on user selections.
+ * @fileOverview This file defines a function for generating an initial prompt based on user selections.
  *
- * The flow takes user inputs related to the desired characteristics of a text, such as the AI's role, the task to perform,
+ * The function takes user inputs related to the desired characteristics of a text, such as the AI's role, the task to perform,
  * the desired tonality, and other constraints. It then constructs an initial prompt string that can be used as a starting
  * point for further refinement.
  *
  * @param {GenerateInitialPromptInput} input - The input to the flow, containing various parameters for prompt generation.
  * @returns {Promise<GenerateInitialPromptOutput>} - A promise that resolves to the generated initial prompt.
  *
- * @exports generateInitialPrompt - The exported function that triggers the prompt generation flow.
+ * @exports generateInitialPrompt - The exported function that triggers the prompt generation.
  * @exports GenerateInitialPromptInput - The input type for the generateInitialPrompt function.
  * @exports GenerateInitialPromptOutput - The return type for the generateInitialPrompt function.
  */
 
-import { ai } from '@/ai/genkit';
-import { z } from 'genkit';
+import { z } from 'zod';
 
 const GenerateInitialPromptInputSchema = z.object({
   aiRole: z.enum([
@@ -58,10 +57,6 @@ const GenerateInitialPromptOutputSchema = z.object({
 
 export type GenerateInitialPromptOutput = z.infer<typeof GenerateInitialPromptOutputSchema>;
 
-export async function generateInitialPrompt(input: GenerateInitialPromptInput): Promise<GenerateInitialPromptOutput> {
-  return generateInitialPromptFlow(input);
-}
-
 const roleOutputs: { [key: string]: string } = {
   Copywriter: 'Agera som en professionell copywriter med expertis inom att skapa övertygande och engagerande text för en mängd olika plattformar och målgrupper. Ditt mål är att producera text som inte bara informerar, utan också inspirerar, underhåller och motiverar till handling. Du förstår vikten av att anpassa ton, stil och budskap baserat på syftet med texten, målgruppen och den kanal den ska publiceras i (t.ex. webbsidor, sociala medier, annonser, e-postutskick). När du får en uppgift, kommer du att analysera målet med kommunikationen, identifiera den primära målgruppen och föreslå de bästa sätten att fånga deras uppmärksamhet och driva önskat resultat. Din text ska vara tydlig, koncis och slagkraftig, med ett starkt fokus på att leverera värde och lösa problem för läsaren. Du är också skicklig på att integrera relevanta sökord naturligt och effektivt för SEO-ändamål, samtidigt som du bibehåller ett flytande och engagerande språk. När du skriver, tänk på att använda aktiva verb, starka adjektiv och fängslande rubriker för att maximera effekte',
   'SEO expert': 'Agera som en expert på att skriva SEO-vänlig text. Din uppgift är att skapa engagerande och högkvalitativt innehåll som inte bara rankar väl i sökmotorerna, utan också resonerar med den avsedda målgruppen och uppmuntrar till handling. Du förstår att modern SEO-textning handlar om att balansera optimering för algoritmer med att leverera genuint värde till läsaren.\n\nDu kan skickligt integrera relevanta sökord och semantiskt relaterade termer naturligt i texten, utan att det känns forcerat eller repetitivt. Din förmåga att skapa fängslande rubriker, engagerande inledningar och sammanfattande avslutningar är central. Du vet hur man strukturerar text med underrubriker, punktlistor och korta stycken för att förbättra läsbarheten och skanna-förmågan, vilket både sökmotorer och användare uppskattar. Du kan också optimera meta-titlar och meta-beskrivningar för att maximera klickfrekvensen från sökresultaten.\n\nNär du får en uppgift, kommer du att analysera målgruppens sökintention, identifiera de viktigaste sökorden och sedan producera en text som är informativ, övertygande och optimerad för maximal synlighet. Din text kommer att vara tydlig, koncis och slagkraftig, med fokus på att lösa användarens problem och positionera innehållet som en auktoritet inom ämnet.',
@@ -77,62 +72,55 @@ const languageOutputs: { [key: string]: string } = {
   Svenska: 'Skriv en text på svenska. Se till att texten följer svensk grammatik, interpunktion och stavning. Använd korrekt meningsbyggnad och idiomatiska uttryck som är naturliga för svenskan. Följ rekommendationer från instanser som Språkrådet och publikationer som Svenska Akademiens ordlista (SAOL), Svenska Akademiens grammatik (SAG) och Svenska skrivregler.',
 };
 
-const generateInitialPromptFlow = ai.defineFlow(
-  {
-    name: 'generateInitialPromptFlow',
-    inputSchema: GenerateInitialPromptInputSchema,
-    outputSchema: GenerateInitialPromptOutputSchema,
-  },
-  async input => {
-    let prompt = '';
+export async function generateInitialPrompt(input: GenerateInitialPromptInput): Promise<GenerateInitialPromptOutput> {
+  let prompt = '';
 
-    prompt += roleOutputs[input.aiRole] + '\n\n';
-    prompt += `Din uppgift är att: ${input.taskType}\n\n`;
+  prompt += roleOutputs[input.aiRole] + '\n\n';
+  prompt += `Din uppgift är att: ${input.taskType}\n\n`;
 
-    if (input.tonality && input.tonality.length > 0) {
-      prompt += `Tonaliteten ska vara: ${input.tonality.join(', ')}\n\n`;
-    }
-
-    if (input.textLength) {
-      const lowerBound = input.textLength - 50;
-      const upperBound = input.textLength + 20;
-      prompt += `Längd på denna text skall vara ${input.textLength}, och skall hållas till detta så gott det går. Texten får ej överskridas mer än med 20 ord och får ej vara mindre än ${lowerBound} ord.\n\n`;
-    }
-
-    if (input.numberOfLists) {
-      prompt += `Texten får bara ha ${input.numberOfLists} antal listor i alla dess former\n\n`;
-    }
-
-    prompt += languageOutputs[input.language] + '\n\n';
-
-    if (input.writingFor) {
-      prompt += `Vi skriver denna text för: ${input.writingFor}\n\n`;
-    }
-
-    if (input.rules && input.rules.length > 0) {
-      prompt += `Regler för texten: ${input.rules.join(', ')}\n\n`;
-    }
-
-    if (input.links && input.links.length > 0) {
-      input.links.forEach(link => {
-        prompt += `Lägg in hyperlänkar i texten, länken är: ${link.url}. På detta sökord: ${link.anchorText}\n\n`;
-      });
-    }
-
-    if (input.primaryKeyword) {
-      prompt += `Denna text skall innehålla ${input.primaryKeyword} 1% av textens totala antal ord.\n\n`;
-    }
-
-    if (input.author) {
-      prompt += `Denna texten är skriven av ${input.author} och kan nämnas i en CTA.\n\n`;
-    } else {
-      prompt += 'Texten skall skrivas ut ett neutralt perspektiv där vi som skriver inte benämns.\n\n';
-    }
-
-    if (input.topicInformation) {
-      prompt += `Förhåll dig till denna information när du skriver texten: ${input.topicInformation}\n\n`;
-    }
-
-    return { prompt };
+  if (input.tonality && input.tonality.length > 0) {
+    prompt += `Tonaliteten ska vara: ${input.tonality.join(', ')}\n\n`;
   }
-);
+
+  if (input.textLength) {
+    const lowerBound = input.textLength - 50;
+    const upperBound = input.textLength + 20;
+    prompt += `Längd på denna text skall vara ${input.textLength}, och skall hållas till detta så gott det går. Texten får ej överskridas mer än med 20 ord och får ej vara mindre än ${lowerBound} ord.\n\n`;
+  }
+
+  if (input.numberOfLists) {
+    prompt += `Texten får bara ha ${input.numberOfLists} antal listor i alla dess former\n\n`;
+  }
+
+  prompt += languageOutputs[input.language] + '\n\n';
+
+  if (input.writingFor) {
+    prompt += `Vi skriver denna text för: ${input.writingFor}\n\n`;
+  }
+
+  if (input.rules && input.rules.length > 0) {
+    prompt += `Regler för texten: ${input.rules.join(', ')}\n\n`;
+  }
+
+  if (input.links && input.links.length > 0) {
+    input.links.forEach(link => {
+      prompt += `Lägg in hyperlänkar i texten, länken är: ${link.url}. På detta sökord: ${link.anchorText}\n\n`;
+    });
+  }
+
+  if (input.primaryKeyword) {
+    prompt += `Denna text skall innehålla ${input.primaryKeyword} 1% av textens totala antal ord.\n\n`;
+  }
+
+  if (input.author) {
+    prompt += `Denna texten är skriven av ${input.author} och kan nämnas i en CTA.\n\n`;
+  } else {
+    prompt += 'Texten skall skrivas ut ett neutralt perspektiv där vi som skriver inte benämns.\n\n';
+  }
+
+  if (input.topicInformation) {
+    prompt += `Förhåll dig till denna information när du skriver texten: ${input.topicInformation}\n\n`;
+  }
+
+  return { prompt };
+}
