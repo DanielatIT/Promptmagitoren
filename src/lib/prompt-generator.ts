@@ -1,61 +1,22 @@
-// This is an auto-generated file from Firebase Studio.
+import type { FormValues } from '@/components/prompt-form';
 
-'use server';
-
-/**
- * @fileOverview This file defines a function for generating an initial prompt based on user selections.
- *
- * The function takes user inputs related to the desired characteristics of a text, such as the AI's role, the task to perform,
- * the desired tonality, and other constraints. It then constructs an initial prompt string that can be used as a starting
- * point for further refinement.
- *
- * @param {GenerateInitialPromptInput} input - The input to the flow, containing various parameters for prompt generation.
- * @returns {Promise<GenerateInitialPromptOutput>} - A promise that resolves to the generated initial prompt.
- *
- * @exports generateInitialPrompt - The exported function that triggers the prompt generation.
- * @exports GenerateInitialPromptInput - The input type for the generateInitialPrompt function.
- * @exports GenerateInitialPromptOutput - The return type for the generateInitialPrompt function.
- */
-
-import { z } from 'zod';
-
-const GenerateInitialPromptInputSchema = z.object({
-  aiRole: z.enum([
-    'Copywriter',
-    'SEO expert',
-    'Skribent för bloggar',
-    'Korrekturläsare',
-    'Programmerare för HTML, CSS och Javascript',
-    'Researcher',
-  ]).describe('What role should the AI agent assume?'),
-  taskType: z.string().describe('What specific task should the AI perform?'),
-  tonality: z.array(z.string()).optional().describe('Desired tonality of the text (e.g., Professional, Friendly).'),
-  textLength: z.number().optional().describe('Maximum length of the text.'),
-  numberOfLists: z.number().optional().describe('Maximum number of lists in the text.'),
-  language: z.enum(['Engelska', 'Svenska']).describe('The language for the generated text.'),
-  writingFor: z.string().optional().describe('Who is the text written for (Kund, Vår blogg, etc.)?'),
-  rules: z.array(z.string()).optional().describe('Specific rules or constraints for the text.'),
-  links: z
-    .array(
-      z.object({
-        url: z.string(),
-        anchorText: z.string(),
-      })
-    )
-    .optional()
-    .describe('Links to include in the text.'),
-  primaryKeyword: z.string().optional().describe('Primary keyword/phrase for the text.'),
-  author: z.string().optional().describe('Who is writing the text?'),
-  topicInformation: z.string().optional().describe('Information about the topic.'),
-});
-
-export type GenerateInitialPromptInput = z.infer<typeof GenerateInitialPromptInputSchema>;
-
-const GenerateInitialPromptOutputSchema = z.object({
-  prompt: z.string().describe('The generated initial prompt.'),
-});
-
-export type GenerateInitialPromptOutput = z.infer<typeof GenerateInitialPromptOutputSchema>;
+export interface GenerateInitialPromptInput {
+  aiRole: 'Copywriter' | 'SEO expert' | 'Skribent för bloggar' | 'Korrekturläsare' | 'Programmerare för HTML, CSS och Javascript' | 'Researcher';
+  taskType: string;
+  tonality?: string[];
+  textLength?: number;
+  numberOfLists?: number;
+  language: 'Engelska' | 'Svenska';
+  writingFor?: string;
+  rules?: string[];
+  links?: {
+    url: string;
+    anchorText: string;
+  }[];
+  primaryKeyword?: string;
+  author?: string;
+  topicInformation?: string;
+}
 
 const roleOutputs: { [key: string]: string } = {
   Copywriter: 'Agera som en professionell copywriter med expertis inom att skapa övertygande och engagerande text för en mängd olika plattformar och målgrupper. Ditt mål är att producera text som inte bara informerar, utan också inspirerar, underhåller och motiverar till handling. Du förstår vikten av att anpassa ton, stil och budskap baserat på syftet med texten, målgruppen och den kanal den ska publiceras i (t.ex. webbsidor, sociala medier, annonser, e-postutskick). När du får en uppgift, kommer du att analysera målet med kommunikationen, identifiera den primära målgruppen och föreslå de bästa sätten att fånga deras uppmärksamhet och driva önskat resultat. Din text ska vara tydlig, koncis och slagkraftig, med ett starkt fokus på att leverera värde och lösa problem för läsaren. Du är också skicklig på att integrera relevanta sökord naturligt och effektivt för SEO-ändamål, samtidigt som du bibehåller ett flytande och engagerande språk. När du skriver, tänk på att använda aktiva verb, starka adjektiv och fängslande rubriker för att maximera effekte',
@@ -72,7 +33,7 @@ const languageOutputs: { [key: string]: string } = {
   Svenska: 'Skriv en text på svenska. Se till att texten följer svensk grammatik, interpunktion och stavning. Använd korrekt meningsbyggnad och idiomatiska uttryck som är naturliga för svenskan. Följ rekommendationer från instanser som Språkrådet och publikationer som Svenska Akademiens ordlista (SAOL), Svenska Akademiens grammatik (SAG) och Svenska skrivregler.',
 };
 
-export async function generateInitialPrompt(input: GenerateInitialPromptInput): Promise<GenerateInitialPromptOutput> {
+export function generateInitialPrompt(input: GenerateInitialPromptInput): { prompt: string } {
   let prompt = '';
 
   prompt += roleOutputs[input.aiRole] + '\n\n';
@@ -104,7 +65,8 @@ export async function generateInitialPrompt(input: GenerateInitialPromptInput): 
 
   if (input.links && input.links.length > 0) {
     input.links.forEach(link => {
-      prompt += `Lägg in hyperlänkar i texten, länken är: ${link.url}. På detta sökord: ${link.anchorText}\n\n`;
+      if (link.url && link.anchorText)
+        prompt += `Lägg in hyperlänkar i texten, länken är: ${link.url}. På detta sökord: ${link.anchorText}\n\n`;
     });
   }
 

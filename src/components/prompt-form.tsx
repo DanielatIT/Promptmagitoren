@@ -236,52 +236,54 @@ export function PromptForm() {
                     )}
                 />
             </FormSection>
-
-            <FormSection title="Längd på texten" onReset={() => setValue('textLength', '')}>
-                <FormField
-                    control={control}
-                    name="textLength"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Maximalt antal ord</FormLabel>
-                            <FormControl>
-                                <Input type="number" placeholder="t.ex. 500" {...field} />
-                            </FormControl>
-                        </FormItem>
-                    )}
-                />
-            </FormSection>
             
-            <FormSection title="Antal listor" onReset={() => { setValue('numberOfLists', ''); setValue('excludeLists', false); }}>
-                <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormSection title="Längd på texten" onReset={() => setValue('textLength', '')}>
                     <FormField
                         control={control}
-                        name="numberOfLists"
+                        name="textLength"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Maximalt antal listor</FormLabel>
+                                <FormLabel>Maximalt antal ord</FormLabel>
                                 <FormControl>
-                                    <Input type="number" placeholder="t.ex. 2" {...field} disabled={getValues('excludeLists')} />
+                                    <Input type="number" placeholder="t.ex. 500" {...field} />
                                 </FormControl>
                             </FormItem>
                         )}
                     />
-                    <FormField
-                        control={control}
-                        name="excludeLists"
-                        render={({ field }) => (
-                            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                                <div className="space-y-0.5">
-                                    <FormLabel>Exkludera listor helt</FormLabel>
-                                </div>
-                                <FormControl>
-                                    <Switch checked={field.value} onCheckedChange={field.onChange} />
-                                </FormControl>
-                            </FormItem>
-                        )}
-                    />
-                </div>
-            </FormSection>
+                </FormSection>
+                
+                <FormSection title="Antal listor" onReset={() => { setValue('numberOfLists', ''); setValue('excludeLists', false); }}>
+                    <div className="space-y-4">
+                        <FormField
+                            control={control}
+                            name="numberOfLists"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Maximalt antal listor</FormLabel>
+                                    <FormControl>
+                                        <Input type="number" placeholder="t.ex. 2" {...field} disabled={getValues('excludeLists')} />
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={control}
+                            name="excludeLists"
+                            render={({ field }) => (
+                                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                                    <div className="space-y-0.5">
+                                        <FormLabel>Exkludera listor helt</FormLabel>
+                                    </div>
+                                    <FormControl>
+                                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+                </FormSection>
+            </div>
 
             <FormSection title="Språk">
                 <FormField
@@ -391,13 +393,15 @@ export function PromptForm() {
                 </div>
             </FormSection>
             
-            <FormSection title="Primärt sökord/sökfras" onReset={() => setValue('primaryKeyword', '')}>
-                <FormField control={control} name="primaryKeyword" render={({ field }) => (<FormItem><FormControl><Input placeholder="t.ex. bästa SEO-tipsen" {...field} /></FormControl></FormItem>)} />
-            </FormSection>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormSection title="Primärt sökord/sökfras" onReset={() => setValue('primaryKeyword', '')}>
+                    <FormField control={control} name="primaryKeyword" render={({ field }) => (<FormItem><FormControl><Input placeholder="t.ex. bästa SEO-tipsen" {...field} /></FormControl></FormItem>)} />
+                </FormSection>
 
-            <FormSection title="Vem skriver texten?" onReset={() => setValue('author', '')}>
-                <FormField control={control} name="author" render={({ field }) => (<FormItem><FormControl><Input placeholder="Ditt namn eller företagsnamn" {...field} /></FormControl></FormItem>)} />
-            </FormSection>
+                <FormSection title="Vem skriver texten?" onReset={() => setValue('author', '')}>
+                    <FormField control={control} name="author" render={({ field }) => (<FormItem><FormControl><Input placeholder="Ditt namn eller företagsnamn" {...field} /></FormControl></FormItem>)} />
+                </FormSection>
+            </div>
 
             <FormSection title="Information kring ämnet" required>
                 <FormField control={control} name="topicInformation" render={({ field }) => (<FormItem><FormControl><Textarea placeholder="All information som AI:n behöver för att kunna skriva texten..." {...field} rows={6} /></FormControl><FormMessage /></FormItem>)} />

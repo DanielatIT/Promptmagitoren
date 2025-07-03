@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from 'react';
-import { useForm, FormProvider } from 'react-hook-form';
+import { useState, useEffect } from 'react';
+import { useForm, FormProvider, useWatch, useFormContext } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { generateInitialPrompt, type GenerateInitialPromptInput } from '@/ai/flows/generate-initial-prompt';
+import { generateInitialPrompt, type GenerateInitialPromptInput } from '@/lib/prompt-generator';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Clipboard, Sparkles } from 'lucide-react';
+import { Clipboard } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast"
 import { PromptForm, formSchema, defaultValues, type FormValues } from './prompt-form';
 import { Skeleton } from './ui/skeleton';
@@ -23,20 +23,20 @@ const writingForMap = {
     'Vår blogg': 'Vi skriver denna text för en av våra bloggar. Dessa bloggar har som syfte att bidra med informativ information kring ämne i denna text. Men även ha ett syfte av att inkludera viktiga externlänkar.'
 }
 
-export default function PromptSmithPage() {
+
+function PageContent() {
     const [generatedPrompt, setGeneratedPrompt] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
     const { toast } = useToast();
+    const { control, getValues } = useFormContext<FormValues>();
+    const watchedValues = useWatch({ control });
 
-    const methods = useForm<FormValues>({
-        resolver: zodResolver(formSchema),
-        defaultValues,
-    });
-    
-    const { handleSubmit, setError } = methods;
+    useEffect(() => {
+        const data = getValues();
 
-    const onSubmit = async (data: FormValues) => {
-        setIsLoading(true);
+        if (!data.aiRole || !data.topicInformation) {
+            setGeneratedPrompt('');
+            return;
+        }
 
         const rules: string[] = [];
         if (data.rules.avoidSuperlatives) rules.push('Undvik superlativ');
@@ -55,8 +55,7 @@ export default function PromptSmithPage() {
 
         const taskType = data.taskTypeRadio === 'custom' ? data.taskTypeCustom : taskTypeMap[data.taskTypeRadio as keyof typeof taskTypeMap];
         if (!taskType) {
-            setError('taskTypeCustom', { type: 'manual', message: 'This field is required when "Annan uppgift" is selected.' });
-            setIsLoading(false);
+            setGeneratedPrompt('');
             return;
         }
 
@@ -69,26 +68,17 @@ export default function PromptSmithPage() {
             language: data.language,
             writingFor: data.writingForRadio === 'custom' ? data.writingForCustom : writingForMap[data.writingForRadio as keyof typeof writingForMap],
             rules: rules,
-            links: data.links,
+            links: data.links?.filter(link => link.url && link.anchorText),
             primaryKeyword: data.primaryKeyword,
             author: data.author,
             topicInformation: data.topicInformation,
         };
 
-        try {
-            const result = await generateInitialPrompt(payload);
-            setGeneratedPrompt(result.prompt);
-        } catch (error) {
-            console.error("Failed to generate prompt:", error);
-            toast({
-                title: "Error",
-                description: "Failed to generate prompt. Please check the console for details.",
-                variant: "destructive"
-            })
-        } finally {
-            setIsLoading(false);
-        }
-    };
+        const result = generateInitialPrompt(payload);
+        setGeneratedPrompt(result.prompt);
+
+    }, [watchedValues, getValues]);
+
 
     const handleCopy = () => {
         if (!generatedPrompt) {
@@ -113,17 +103,11 @@ export default function PromptSmithPage() {
                 <p className="text-muted-foreground mt-2 text-lg">Craft the perfect AI prompt for your needs</p>
             </header>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-                <FormProvider {...methods}>
-                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                        <ScrollArea className="h-[calc(100vh-12rem)] pr-4 -mr-4">
-                            <PromptForm />
-                        </ScrollArea>
-                        <Button type="submit" size="lg" className="w-full font-bold" disabled={isLoading}>
-                             <Sparkles className="mr-2 h-5 w-5" />
-                            {isLoading ? 'Generating...' : 'Generate Prompt'}
-                        </Button>
-                    </form>
-                </FormProvider>
+                <div>
+                    <ScrollArea className="h-[calc(100vh-12rem)] pr-4 -mr-4">
+                        <PromptForm />
+                    </ScrollArea>
+                </div>
                 
                 <div className="lg:sticky lg:top-8">
                     <Card>
@@ -136,18 +120,11 @@ export default function PromptSmithPage() {
                                     <Clipboard className="mr-2 h-4 w-4" /> Copy Text
                                 </Button>
                                 <ScrollArea className="h-[calc(100vh-25rem)] lg:h-[calc(100vh-18rem)] rounded-md border p-4 bg-muted/20">
-                                    {isLoading ? (
-                                        <div className="space-y-2">
-                                            <Skeleton className="h-4 w-[80%]" />
-                                            <Skeleton className="h-4 w-[90%]" />
-                                            <Skeleton className="h-4 w-[70%]" />
-                                            <Skeleton className="h-4 w-[85%]" />
-                                        </div>
-                                    ) : generatedPrompt ? (
+                                    {generatedPrompt ? (
                                         <pre className="text-sm whitespace-pre-wrap font-body leading-relaxed">{generatedPrompt}</pre>
                                     ) : (
                                         <div className="flex items-center justify-center h-full text-muted-foreground">
-                                            <p>Your generated prompt will appear here.</p>
+                                            <p>Your generated prompt will appear here as you fill out the form.</p>
                                         </div>
                                     )}
                                 </ScrollArea>
@@ -160,5 +137,19 @@ export default function PromptSmithPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function PromptSmithPage() {
+    const methods = useForm<FormValues>({
+        resolver: zodResolver(formSchema),
+        defaultValues,
+        mode: 'onChange'
+    });
+
+    return (
+        <FormProvider {...methods}>
+            <PageContent />
+        </FormProvider>
     );
 }
