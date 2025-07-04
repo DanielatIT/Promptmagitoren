@@ -14,7 +14,6 @@ export interface GenerateInitialPromptInput {
   }[];
   primaryKeyword?: string;
   author?: string;
-  topicInformation?: string;
 }
 
 const roleOutputs: { [key: string]: string } = {
@@ -36,7 +35,7 @@ export function generateInitialPrompt(input: GenerateInitialPromptInput): { prom
   let prompt = "Dessa regler nedan skall följas väldigt strikt, kolla konstant att du alltid följer det instruktioner jag ger dig här och återkom med en fråga om vad du skall göra istället för att göra något annat än vad instruktioner hänvisar. \n\n";
 
   if (input.topicGuideline) {
-    prompt += `Texten nedan skall handla om ${input.topicGuideline}, använd detta som guideline på hur du skall vrida texten.\n\n`;
+    prompt += `Förhåll dig till denna information när du skriver texten: ${input.topicGuideline}\n\n`;
   }
 
   prompt += roleOutputs[input.aiRole] + '\n\n';
@@ -81,10 +80,6 @@ export function generateInitialPrompt(input: GenerateInitialPromptInput): { prom
     prompt += `Denna texten är skriven av ${input.author} och kan nämnas i en CTA.\n\n`;
   } else {
     prompt += 'Texten skall skrivas ut ett neutralt perspektiv där vi som skriver inte benämns.\n\n';
-  }
-
-  if (input.topicInformation) {
-    prompt += `Förhåll dig till denna information när du skriver texten: ${input.topicInformation}\n\n`;
   }
 
   return { prompt };

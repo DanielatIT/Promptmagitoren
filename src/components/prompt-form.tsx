@@ -70,7 +70,6 @@ export const formSchema = z.object({
   links: z.array(z.object({ url: z.string().url("Invalid URL format"), anchorText: z.string().min(1, "Anchor text is required") })).optional(),
   primaryKeyword: z.string().optional(),
   author: z.string().optional(),
-  topicInformation: z.string().min(1, 'This field is required.'),
 }).superRefine((data, ctx) => {
     if (data.taskTypeRadio === 'custom' && (!data.taskTypeCustom || data.taskTypeCustom.trim() === '')) {
       ctx.addIssue({
@@ -120,7 +119,6 @@ export const defaultValues: Partial<FormValues> = {
   links: [],
   primaryKeyword: '',
   author: '',
-  topicInformation: '',
 };
 
 function TaskTypeSection() {
@@ -225,7 +223,7 @@ export function PromptForm() {
                     render={({ field }) => (
                         <FormItem>
                             <FormControl>
-                                <Textarea placeholder="Beskriv vad texten ska handla om..." {...field} rows={4} />
+                                <Textarea placeholder="All information som AI:n behöver för att kunna skriva texten..." {...field} rows={6} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -436,10 +434,6 @@ export function PromptForm() {
                     <FormField control={control} name="author" render={({ field }) => (<FormItem><FormControl><Input placeholder="Ditt namn eller företagsnamn" {...field} /></FormControl></FormItem>)} />
                 </FormSection>
             </div>
-
-            <FormSection title="Information kring ämnet" required>
-                <FormField control={control} name="topicInformation" render={({ field }) => (<FormItem><FormControl><Textarea placeholder="All information som AI:n behöver för att kunna skriva texten..." {...field} rows={6} /></FormControl><FormMessage /></FormItem>)} />
-            </FormSection>
 
             <Button type="submit" className="w-full">
                 Förhandsgranska

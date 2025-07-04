@@ -60,7 +60,6 @@ function PageContent() {
             links: data.links?.filter(link => link.url && link.anchorText),
             primaryKeyword: data.primaryKeyword,
             author: data.author,
-            topicInformation: data.topicInformation,
         };
 
         const result = generateInitialPrompt(payload);
