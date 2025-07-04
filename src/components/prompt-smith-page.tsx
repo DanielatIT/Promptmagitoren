@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useForm, FormProvider, useFormContext } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { generateInitialPrompt, type GenerateInitialPromptInput } from '@/lib/prompt-generator';
+import { generateInitialPrompt } from '@/lib/prompt-generator';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -11,58 +11,13 @@ import { Clipboard } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast"
 import { PromptForm, formSchema, defaultValues, type FormValues } from './prompt-form';
 
-const taskTypeMap = {
-    'Artikel': 'Skriv en artikel för en av våra bloggar där du inte nämner kundens namn eller företag utan utgår från att vi bara vill ge läsaren ett värde',
-    'Seo onpage text': 'Skriv en SEO-optimerad on-page-text för en webbsida. Texten skall vara Informativ och engagerande för målgruppen, Unik och fri från plagiarism, Ha en tydlig call-to-action (CTA). Optimera för läsbarhet med korta stycken och enkla meningar. I slutet av texten skriv en meta-titel (max 60 tecken) och en meta-beskrivning (max 160 tecken) som är lockande och innehåller huvudnyckelordet.',
-    'Korrekturläsning': 'Korrekturläs följande text noggrant med fullt fokus på svensk grammatik och språkriktighet. Gå igenom texten för att identifiera och korrigera alla typer av fel. Detta inkluderar bland annat stavfel (även sär- och sammanskrivningar), grammatikfel som felaktig böjning av ord, otydlig satskonstruktion, ordföljd och tempusfel. Se också över interpunktionen och justera användningen av kommatecken, punkter, semikolon, kolon, tankstreck och bindestreck.\n\nVar uppmärksam på syftningsfel, så att pronomen och adverb otvetydigt syftar på rätt ord eller fras. Granska meningsbyggnaden för att försäkra att formuleringarna är klara och koncisa, och att det inte förekommer onödigt långa meningar eller anakoluter. Kontrollera även att det inte finns några inkonsekvenser i texten, exempelvis gällande stavning av namn, användning av siffror, förkortningar eller inkonsekvent terminologi. Fokusera även på språkriktighet och stil, vilket innefattar ordval, textens flyt och att tonen är anpassad till syftet. Slutligen, sök efter typografiska fel som dubbla mellanslag, felaktig användning av stora/små bokstäver eller indrag.\n\nMålet är att texten ska vara idiomatiskt korrekt, lättläst, begriplig och professionell på svenska. När du presenterar de föreslagna ändringarna kan du antingen visa den fullständigt korrigerade texten eller lista specifika ändringar med en kort förklaring för varje justering, exempelvis "Original: \'dom\' -> Korrigerat: \'de\' - grammatikfel, personligt pronomen". Sträva efter att bevara författarens ursprungliga stil och ton så långt det är möjligt, samtidigt som språkriktigheten garanteras.',
-};
-
-const writingForMap = {
-    'Kund': 'Vi skriver denna text för en av våra kunder som skall publiceras på något vis på deras webbplats.',
-    'Vår blogg': 'Vi skriver denna text för en av våra bloggar. Dessa bloggar har som syfte att bidra med informativ information kring ämne i denna text. Men även ha ett syfte av att inkludera viktiga externlänkar.'
-}
-
-
 function PageContent() {
     const [generatedPrompt, setGeneratedPrompt] = useState('');
     const { toast } = useToast();
     const { handleSubmit } = useFormContext<FormValues>();
 
     const onGenerate = (data: FormValues) => {
-        const rules: string[] = [];
-        if (data.rules.avoidSuperlatives) rules.push('Undvik superlativ');
-        if (data.rules.avoidPraise) rules.push('Undvik lovord');
-        if (data.rules.avoidAcclaim) rules.push('Undvik beröm.');
-        if (data.rules.isInformative) rules.push('Texten skall vara informativ med fokus på att ge läsaren kunskap för ämnet');
-        if (data.rules.useWeForm) rules.push('Skriv i vi-form, som att vi är företaget.');
-        if (data.rules.addressReaderAsYou) rules.push('Läsaren skall benämnas som ni.');
-        if (data.rules.avoidWords.enabled && data.rules.avoidWords.words.length > 0) {
-            rules.push(`Texten får aldrig innehålla orden: ${data.rules.avoidWords.words.join(', ')}`);
-        }
-        if (data.rules.avoidXYPhrase) rules.push('skriv aldrig en mening som liknar eller är i närheten av detta “...i en X värld/industri/område är “sökordet” värdefullt för Y anledning”');
-        if (data.rules.customRules) {
-            rules.push(...data.rules.customRules.split('\n').filter(rule => rule.trim() !== ''));
-        }
-
-        const taskType = data.taskTypeRadio === 'custom' ? data.taskTypeCustom : taskTypeMap[data.taskTypeRadio as keyof typeof taskTypeMap];
-        const writingFor = data.writingForRadio === 'custom' ? data.writingForCustom : writingForMap[data.writingForRadio as keyof typeof writingForMap];
-        
-        const payload: GenerateInitialPromptInput = {
-            topicGuideline: data.topicGuideline,
-            aiRole: data.aiRole,
-            taskType: taskType!,
-            tonality: data.tonality,
-            textLength: data.textLength ? parseInt(data.textLength, 10) : undefined,
-            numberOfLists: data.excludeLists ? undefined : (data.numberOfLists ? parseInt(data.numberOfLists, 10) : undefined),
-            language: data.language,
-            writingFor: writingFor,
-            rules: rules,
-            links: data.links?.filter(link => link.url && link.anchorText),
-            primaryKeyword: data.primaryKeyword,
-            author: data.author,
-        };
-
-        const result = generateInitialPrompt(payload);
+        const result = generateInitialPrompt(data);
         setGeneratedPrompt(result.prompt);
     };
 

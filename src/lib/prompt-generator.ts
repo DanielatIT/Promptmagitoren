@@ -1,20 +1,4 @@
-export interface GenerateInitialPromptInput {
-  topicGuideline: string;
-  aiRole: 'Copywriter' | 'SEO expert' | 'Skribent för bloggar' | 'Korrekturläsare' | 'Programmerare för HTML, CSS och Javascript' | 'Researcher';
-  taskType: string;
-  tonality?: string[];
-  textLength?: number;
-  numberOfLists?: number;
-  language: 'Engelska' | 'Svenska';
-  writingFor?: string;
-  rules?: string[];
-  links?: {
-    url: string;
-    anchorText: string;
-  }[];
-  primaryKeyword?: string;
-  author?: string;
-}
+import type { FormValues } from '@/components/prompt-form';
 
 const roleOutputs: { [key: string]: string } = {
   Copywriter: 'Agera som en professionell copywriter med expertis inom att skapa övertygande och engagerande text för en mängd olika plattformar och målgrupper. Ditt mål är att producera text som inte bara informerar, utan också inspirerar, underhåller och motiverar till handling. Du förstår vikten av att anpassa ton, stil och budskap baserat på syftet med texten, målgruppen och den kanal den ska publiceras i (t.ex. webbsidor, sociala medier, annonser, e-postutskick). När du får en uppgift, kommer du att analysera målet med kommunikationen, identifiera den primära målgruppen och föreslå de bästa sätten att fånga deras uppmärksamhet och driva önskat resultat. Din text ska vara tydlig, koncis och slagkraftig, med ett starkt fokus på att leverera värde och lösa problem för läsaren. Du är också skicklig på att integrera relevanta sökord naturligt och effektivt för SEO-ändamål, samtidigt som du bibehåller ett flytande och engagerande språk. När du skriver, tänk på att använda aktiva verb, starka adjektiv och fängslande rubriker för att maximera effekte',
@@ -31,53 +15,95 @@ const languageOutputs: { [key: string]: string } = {
   Svenska: 'Skriv en text på svenska. Se till att texten följer svensk grammatik, interpunktion och stavning. Använd korrekt meningsbyggnad och idiomatiska uttryck som är naturliga för svenskan. Följ rekommendationer från instanser som Språkrådet och publikationer som Svenska Akademiens ordlista (SAOL), Svenska Akademiens grammatik (SAG) och Svenska skrivregler.',
 };
 
-export function generateInitialPrompt(input: GenerateInitialPromptInput): { prompt: string } {
+const taskTypeMap: Record<string, string> = {
+    'Artikel': 'Skriv en artikel för en av våra bloggar där du inte nämner kundens namn eller företag utan utgår från att vi bara vill ge läsaren ett värde',
+    'Seo onpage text': 'Skriv en SEO-optimerad on-page-text för en webbsida. Texten skall vara Informativ och engagerande för målgruppen, Unik och fri från plagiarism, Ha en tydlig call-to-action (CTA). Optimera för läsbarhet med korta stycken och enkla meningar. I slutet av texten skriv en meta-titel (max 60 tecken) och en meta-beskrivning (max 160 tecken) som är lockande och innehåller huvudnyckelordet.',
+    'Korrekturläsning': 'Korrekturläs följande text noggrant med fullt fokus på svensk grammatik och språkriktighet. Gå igenom texten för att identifiera och korrigera alla typer av fel. Detta inkluderar bland annat stavfel (även sär- och sammanskrivningar), grammatikfel som felaktig böjning av ord, otydlig satskonstruktion, ordföljd och tempusfel. Se också över interpunktionen och justera användningen av kommatecken, punkter, semikolon, kolon, tankstreck och bindestreck.\n\nVar uppmärksam på syftningsfel, så att pronomen och adverb otvetydigt syftar på rätt ord eller fras. Granska meningsbyggnaden för att försäkra att formuleringarna är klara och koncisa, och att det inte förekommer onödigt långa meningar eller anakoluter. Kontrollera även att det inte finns några inkonsekvenser i texten, exempelvis gällande stavning av namn, användning av siffror, förkortningar eller inkonsekvent terminologi. Fokusera även på språkriktighet och stil, vilket innefattar ordval, textens flyt och att tonen är anpassad till syftet. Slutligen, sök efter typografiska fel som dubbla mellanslag, felaktig användning av stora/små bokstäver eller indrag.\n\nMålet är att texten ska vara idiomatiskt korrekt, lättläst, begriplig och professionell på svenska. När du presenterar de föreslagna ändringarna kan du antingen visa den fullständigt korrigerade texten eller lista specifika ändringar med en kort förklaring för varje justering, exempelvis "Original: \'dom\' -> Korrigerat: \'de\' - grammatikfel, personligt pronomen". Sträva efter att bevara författarens ursprungliga stil och ton så långt det är möjligt, samtidigt som språkriktigheten garanteras.',
+};
+
+const writingForMap: Record<string, string> = {
+    'Kund': 'Vi skriver denna text för en av våra kunder som skall publiceras på något vis på deras webbplats.',
+    'Vår blogg': 'Vi skriver denna text för en av våra bloggar. Dessa bloggar har som syfte att bidra med informativ information kring ämne i denna text. Men även ha ett syfte av att inkludera viktiga externlänkar.'
+};
+
+export function generateInitialPrompt(data: FormValues): { prompt: string } {
   let prompt = "Dessa regler nedan skall följas väldigt strikt, kolla konstant att du alltid följer det instruktioner jag ger dig här och återkom med en fråga om vad du skall göra istället för att göra något annat än vad instruktioner hänvisar. \n\n";
 
-  if (input.topicGuideline) {
-    prompt += `Förhåll dig till denna information när du skriver texten: ${input.topicGuideline}\n\n`;
+  if (data.topicGuideline) {
+    prompt += `Förhåll dig till denna information när du skriver texten: ${data.topicGuideline}\n\n`;
   }
 
-  prompt += roleOutputs[input.aiRole] + '\n\n';
-  prompt += `Din uppgift är att: ${input.taskType}\n\n`;
+  prompt += roleOutputs[data.aiRole] + '\n\n';
 
-  if (input.tonality && input.tonality.length > 0) {
-    prompt += `Tonaliteten ska vara: ${input.tonality.join(', ')}\n\n`;
+  const taskType = data.taskTypeRadio === 'custom'
+    ? data.taskTypeCustom
+    : taskTypeMap[data.taskTypeRadio];
+  if (taskType) {
+    prompt += `Din uppgift är att: ${taskType}\n\n`;
   }
 
-  if (input.textLength) {
-    const lowerBound = input.textLength - 50;
-    const upperBound = input.textLength + 20;
-    prompt += `Längd på denna text skall vara ${input.textLength}, och skall hållas till detta så gott det går. Texten får ej överskridas mer än med 20 ord och får ej vara mindre än ${lowerBound} ord.\n\n`;
+  if (data.tonality && data.tonality.length > 0) {
+    prompt += `Tonaliteten ska vara: ${data.tonality.join(', ')}\n\n`;
   }
 
-  if (input.numberOfLists) {
-    prompt += `Texten får bara ha ${input.numberOfLists} antal listor i alla dess former\n\n`;
+  if (data.textLength) {
+    const textLengthNum = parseInt(data.textLength, 10);
+    if (!isNaN(textLengthNum)) {
+      const lowerBound = textLengthNum - 50;
+      prompt += `Längd på denna text skall vara ${textLengthNum}, och skall hållas till detta så gott det går. Texten får ej överskridas mer än med 20 ord och får ej vara mindre än ${lowerBound} ord.\n\n`;
+    }
   }
 
-  prompt += languageOutputs[input.language] + '\n\n';
-
-  if (input.writingFor) {
-    prompt += `Vi skriver denna text för: ${input.writingFor}\n\n`;
+  if (data.excludeLists) {
+    prompt += 'Texten får inte innehålla några listor alls.\n\n';
+  } else if (data.numberOfLists) {
+    const numberOfListsNum = parseInt(data.numberOfLists, 10);
+    if (!isNaN(numberOfListsNum)) {
+      prompt += `Texten får bara ha ${numberOfListsNum} antal listor i alla dess former\n\n`;
+    }
   }
 
-  if (input.rules && input.rules.length > 0) {
-    prompt += `Regler för texten: ${input.rules.join(', ')}\n\n`;
+  prompt += languageOutputs[data.language] + '\n\n';
+
+  const writingFor = data.writingForRadio === 'custom'
+    ? data.writingForCustom
+    : writingForMap[data.writingForRadio];
+  if (writingFor) {
+    prompt += `Vi skriver denna text för: ${writingFor}\n\n`;
   }
 
-  if (input.links && input.links.length > 0) {
-    input.links.forEach(link => {
+  const rules: string[] = [];
+  if (data.rules.avoidSuperlatives) rules.push('Undvik superlativ');
+  if (data.rules.avoidPraise) rules.push('Undvik lovord');
+  if (data.rules.avoidAcclaim) rules.push('Undvik beröm.');
+  if (data.rules.isInformative) rules.push('Texten skall vara informativ med fokus på att ge läsaren kunskap för ämnet');
+  if (data.rules.useWeForm) rules.push('Skriv i vi-form, som att vi är företaget.');
+  if (data.rules.addressReaderAsYou) rules.push('Läsaren skall benämnas som ni.');
+  if (data.rules.avoidWords.enabled && data.rules.avoidWords.words.length > 0) {
+      rules.push(`Texten får aldrig innehålla orden: ${data.rules.avoidWords.words.join(', ')}`);
+  }
+  if (data.rules.avoidXYPhrase) rules.push('skriv aldrig en mening som liknar eller är i närheten av detta “...i en X värld/industri/område är “sökordet” värdefullt för Y anledning”');
+  if (data.rules.customRules) {
+      rules.push(...data.rules.customRules.split('\n').filter(rule => rule.trim() !== ''));
+  }
+
+  if (rules.length > 0) {
+    prompt += `Regler för texten: ${rules.join(', ')}\n\n`;
+  }
+
+  if (data.links && data.links.length > 0) {
+    data.links.forEach(link => {
       if (link.url && link.anchorText)
         prompt += `Lägg in hyperlänkar i texten, länken är: ${link.url}. På detta sökord: ${link.anchorText}\n\n`;
     });
   }
 
-  if (input.primaryKeyword) {
-    prompt += `Denna text skall innehålla ${input.primaryKeyword} 1% av textens totala antal ord.\n\n`;
+  if (data.primaryKeyword) {
+    prompt += `Denna text skall innehålla ${data.primaryKeyword} 1% av textens totala antal ord.\n\n`;
   }
 
-  if (input.author) {
-    prompt += `Denna texten är skriven av ${input.author} och kan nämnas i en CTA.\n\n`;
+  if (data.author) {
+    prompt += `Denna texten är skriven av ${data.author} och kan nämnas i en CTA.\n\n`;
   } else {
     prompt += 'Texten skall skrivas ut ett neutralt perspektiv där vi som skriver inte benämns.\n\n';
   }
