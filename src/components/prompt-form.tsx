@@ -46,13 +46,23 @@ export const formSchema = z.object({
   aiRole: z.enum(aiRoleOptions),
   taskTypeRadio: z.enum([...taskTypeRadioOptions, 'custom']),
   taskTypeCustom: z.string().optional(),
+  
   tonality: z.array(z.string()).optional(),
+  tonality_disabled: z.boolean().default(false),
+  
   textLength: z.string().optional(),
+  textLength_disabled: z.boolean().default(false),
+  
   numberOfLists: z.string().optional(),
   excludeLists: z.boolean().default(false),
+  lists_disabled: z.boolean().default(false),
+  
   language: z.enum(['Engelska', 'Svenska']),
+  
   writingForRadio: z.enum([...writingForRadioOptions, 'custom']),
   writingForCustom: z.string().optional(),
+  writingFor_disabled: z.boolean().default(false),
+
   rules: z.object({
     avoidSuperlatives: z.boolean().default(true),
     avoidPraise: z.boolean().default(true),
@@ -67,9 +77,17 @@ export const formSchema = z.object({
     avoidXYPhrase: z.boolean().default(true),
     customRules: z.string().optional(),
   }),
+  rules_disabled: z.boolean().default(false),
+  
   links: z.array(z.object({ url: z.string().url("Invalid URL format"), anchorText: z.string().min(1, "Anchor text is required") })).optional(),
+  links_disabled: z.boolean().default(false),
+
   primaryKeyword: z.string().optional(),
+  primaryKeyword_disabled: z.boolean().default(false),
+  
   author: z.string().optional(),
+  author_disabled: z.boolean().default(false),
+
 }).superRefine((data, ctx) => {
     if (data.taskTypeRadio === 'custom' && (!data.taskTypeCustom || data.taskTypeCustom.trim() === '')) {
       ctx.addIssue({
@@ -96,12 +114,16 @@ export const defaultValues: Partial<FormValues> = {
   taskTypeRadio: 'Artikel',
   taskTypeCustom: '',
   tonality: [],
+  tonality_disabled: false,
   textLength: '',
+  textLength_disabled: false,
   numberOfLists: '',
   excludeLists: false,
+  lists_disabled: false,
   language: 'Svenska',
   writingForRadio: 'Kund',
   writingForCustom: '',
+  writingFor_disabled: false,
   rules: {
     avoidSuperlatives: true,
     avoidPraise: true,
@@ -116,9 +138,13 @@ export const defaultValues: Partial<FormValues> = {
     avoidXYPhrase: true,
     customRules: '',
   },
+  rules_disabled: false,
   links: [],
+  links_disabled: false,
   primaryKeyword: '',
+  primaryKeyword_disabled: false,
   author: '',
+  author_disabled: false,
 };
 
 const roleOutputs: { [key: string]: string } = {
@@ -163,69 +189,76 @@ export function generateInitialPrompt(data: FormValues): { prompt: string } {
     prompt += `Din uppgift är att: ${taskType}\n\n`;
   }
 
-  if (data.tonality && data.tonality.length > 0) {
+  if (!data.tonality_disabled && data.tonality && data.tonality.length > 0) {
     prompt += `Tonaliteten ska vara: ${data.tonality.join(', ')}\n\n`;
   }
 
-  if (data.textLength) {
+  if (!data.textLength_disabled && data.textLength) {
     const textLengthNum = parseInt(data.textLength, 10);
     if (!isNaN(textLengthNum)) {
       const lowerBound = textLengthNum - 50;
       prompt += `Längd på denna text skall vara ${textLengthNum}, och skall hållas till detta så gott det går. Texten får ej överskridas mer än med 20 ord och får ej vara mindre än ${lowerBound} ord.\n\n`;
     }
   }
-
-  if (data.excludeLists) {
-    prompt += 'Texten får inte innehålla några listor alls.\n\n';
-  } else if (data.numberOfLists) {
-    const numberOfListsNum = parseInt(data.numberOfLists, 10);
-    if (!isNaN(numberOfListsNum)) {
-      prompt += `Texten får bara ha ${numberOfListsNum} antal listor i alla dess former\n\n`;
+  
+  if (!data.lists_disabled) {
+    if (data.excludeLists) {
+      prompt += 'Texten får inte innehålla några listor alls.\n\n';
+    } else if (data.numberOfLists) {
+      const numberOfListsNum = parseInt(data.numberOfLists, 10);
+      if (!isNaN(numberOfListsNum)) {
+        prompt += `Texten får bara ha ${numberOfListsNum} antal listor i alla dess former\n\n`;
+      }
     }
   }
 
+
   prompt += languageOutputs[data.language] + '\n\n';
 
-  const writingFor = data.writingForRadio === 'custom'
-    ? data.writingForCustom
-    : writingForMap[data.writingForRadio];
-  if (writingFor) {
-    prompt += `Vi skriver denna text för: ${writingFor}\n\n`;
+  if (!data.writingFor_disabled) {
+    const writingFor = data.writingForRadio === 'custom'
+      ? data.writingForCustom
+      : writingForMap[data.writingForRadio];
+    if (writingFor) {
+      prompt += `Vi skriver denna text för: ${writingFor}\n\n`;
+    }
   }
 
-  const rules: string[] = [];
-  if (data.rules.avoidSuperlatives) rules.push('Undvik superlativ');
-  if (data.rules.avoidPraise) rules.push('Undvik lovord');
-  if (data.rules.avoidAcclaim) rules.push('Undvik beröm.');
-  if (data.rules.isInformative) rules.push('Texten skall vara informativ med fokus på att ge läsaren kunskap för ämnet');
-  if (data.rules.useWeForm) rules.push('Skriv i vi-form, som att vi är företaget.');
-  if (data.rules.addressReaderAsYou) rules.push('Läsaren skall benämnas som ni.');
-  if (data.rules.avoidWords.enabled && data.rules.avoidWords.words.length > 0) {
-      rules.push(`Texten får aldrig innehålla orden: ${data.rules.avoidWords.words.join(', ')}`);
-  }
-  if (data.rules.avoidXYPhrase) rules.push('skriv aldrig en mening som liknar eller är i närheten av detta “...i en X värld/industri/område är “sökordet” värdefullt för Y anledning”');
-  if (data.rules.customRules) {
-      rules.push(...data.rules.customRules.split('\n').filter(rule => rule.trim() !== ''));
+  if (!data.rules_disabled) {
+    const rules: string[] = [];
+    if (data.rules.avoidSuperlatives) rules.push('Undvik superlativ');
+    if (data.rules.avoidPraise) rules.push('Undvik lovord');
+    if (data.rules.avoidAcclaim) rules.push('Undvik beröm.');
+    if (data.rules.isInformative) rules.push('Texten skall vara informativ med fokus på att ge läsaren kunskap för ämnet');
+    if (data.rules.useWeForm) rules.push('Skriv i vi-form, som att vi är företaget.');
+    if (data.rules.addressReaderAsYou) rules.push('Läsaren skall benämnas som ni.');
+    if (data.rules.avoidWords.enabled && data.rules.avoidWords.words.length > 0) {
+        rules.push(`Texten får aldrig innehålla orden: ${data.rules.avoidWords.words.join(', ')}`);
+    }
+    if (data.rules.avoidXYPhrase) rules.push('skriv aldrig en mening som liknar eller är i närheten av detta “...i en X värld/industri/område är “sökordet” värdefullt för Y anledning”');
+    if (data.rules.customRules) {
+        rules.push(...data.rules.customRules.split('\n').filter(rule => rule.trim() !== ''));
+    }
+
+    if (rules.length > 0) {
+      prompt += `Regler för texten: ${rules.join(', ')}\n\n`;
+    }
   }
 
-  if (rules.length > 0) {
-    prompt += `Regler för texten: ${rules.join(', ')}\n\n`;
-  }
-
-  if (data.links && data.links.length > 0) {
+  if (!data.links_disabled && data.links && data.links.length > 0) {
     data.links.forEach(link => {
       if (link.url && link.anchorText)
         prompt += `Lägg in hyperlänkar i texten, länken är: ${link.url}. På detta sökord: ${link.anchorText}\n\n`;
     });
   }
 
-  if (data.primaryKeyword) {
+  if (!data.primaryKeyword_disabled && data.primaryKeyword) {
     prompt += `Denna text skall innehålla ${data.primaryKeyword} 1% av textens totala antal ord.\n\n`;
   }
 
-  if (data.author) {
+  if (!data.author_disabled && data.author) {
     prompt += `Denna texten är skriven av ${data.author} och kan nämnas i en CTA.\n\n`;
-  } else {
+  } else if (!data.author_disabled) {
     prompt += 'Texten skall skrivas ut ett neutralt perspektiv där vi som skriver inte benämns.\n\n';
   }
 
@@ -324,6 +357,13 @@ export function PromptForm() {
     
     const writingForRadio = useWatch({ control, name: "writingForRadio" });
     const avoidWordsEnabled = useWatch({ control, name: "rules.avoidWords.enabled" });
+    
+    const values = useWatch({ control });
+
+    const toggleDisabled = (fieldName: keyof FormValues) => {
+        setValue(fieldName, !getValues(fieldName));
+    }
+
 
     return (
         <div className="space-y-6">
@@ -347,7 +387,7 @@ export function PromptForm() {
                 <AIActionSection />
             </div>
 
-            <FormSection title="Vilken tonalitet ska texten ha?" onReset={() => setValue('tonality', [])}>
+            <FormSection title="Vilken tonalitet ska texten ha?" onToggle={() => toggleDisabled('tonality_disabled')} isDisabled={values.tonality_disabled}>
                 <FormField
                     control={control}
                     name="tonality"
@@ -381,7 +421,7 @@ export function PromptForm() {
             </FormSection>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormSection title="Längd på texten" onReset={() => setValue('textLength', '')}>
+                <FormSection title="Längd på texten" onToggle={() => toggleDisabled('textLength_disabled')} isDisabled={values.textLength_disabled}>
                     <FormField
                         control={control}
                         name="textLength"
@@ -396,7 +436,7 @@ export function PromptForm() {
                     />
                 </FormSection>
                 
-                <FormSection title="Antal listor" onReset={() => { setValue('numberOfLists', ''); setValue('excludeLists', false); }}>
+                <FormSection title="Antal listor" onToggle={() => toggleDisabled('lists_disabled')} isDisabled={values.lists_disabled}>
                     <div className="space-y-4">
                         <FormField
                             control={control}
@@ -447,7 +487,7 @@ export function PromptForm() {
                 />
             </FormSection>
 
-            <FormSection title="Vilka skriver vi för?" onReset={() => { setValue('writingForRadio', 'custom'); setValue('writingForCustom', ''); }}>
+            <FormSection title="Vilka skriver vi för?" onToggle={() => toggleDisabled('writingFor_disabled')} isDisabled={values.writingFor_disabled}>
                 <FormField
                     control={control}
                     name="writingForRadio"
@@ -477,7 +517,7 @@ export function PromptForm() {
                 )}
             </FormSection>
 
-            <FormSection title="Regler på texten" onReset={() => setValue('rules', defaultValues.rules!)}>
+            <FormSection title="Regler på texten" onToggle={() => toggleDisabled('rules_disabled')} isDisabled={values.rules_disabled}>
                 <div className="space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <FormField control={control} name="rules.avoidSuperlatives" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Undvik superlativ</FormLabel></FormItem>)} />
@@ -523,7 +563,7 @@ export function PromptForm() {
                 </div>
             </FormSection>
 
-            <FormSection title="Länkar att inkludera" onReset={() => setValue('links', [])}>
+            <FormSection title="Länkar att inkludera" onToggle={() => toggleDisabled('links_disabled')} isDisabled={values.links_disabled}>
                 <div className="space-y-4">
                     {fields.map((field, index) => (
                         <div key={field.id} className="flex items-end gap-2 p-3 border rounded-md">
@@ -537,11 +577,11 @@ export function PromptForm() {
             </FormSection>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormSection title="Primärt sökord/sökfras" onReset={() => setValue('primaryKeyword', '')}>
+                <FormSection title="Primärt sökord/sökfras" onToggle={() => toggleDisabled('primaryKeyword_disabled')} isDisabled={values.primaryKeyword_disabled}>
                     <FormField control={control} name="primaryKeyword" render={({ field }) => (<FormItem><FormControl><Input placeholder="t.ex. bästa SEO-tipsen" {...field} /></FormControl></FormItem>)} />
                 </FormSection>
 
-                <FormSection title="Vem skriver texten?" onReset={() => setValue('author', '')}>
+                <FormSection title="Vem skriver texten?" onToggle={() => toggleDisabled('author_disabled')} isDisabled={values.author_disabled}>
                     <FormField control={control} name="author" render={({ field }) => (<FormItem><FormControl><Input placeholder="Ditt namn eller företagsnamn" {...field} /></FormControl></FormItem>)} />
                 </FormSection>
             </div>
