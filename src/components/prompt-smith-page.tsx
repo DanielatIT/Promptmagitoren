@@ -3,13 +3,12 @@
 import { useState } from 'react';
 import { useForm, FormProvider, useFormContext } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { generateInitialPrompt } from '@/lib/prompt-generator';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Clipboard } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast"
-import { PromptForm, formSchema, defaultValues, type FormValues } from './prompt-form';
+import { PromptForm, formSchema, defaultValues, type FormValues, generateInitialPrompt } from './prompt-form';
 
 function PageContent() {
     const [generatedPrompt, setGeneratedPrompt] = useState('');
