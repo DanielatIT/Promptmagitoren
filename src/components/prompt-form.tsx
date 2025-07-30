@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { X, Plus, Trash2 } from "lucide-react"
 import { FormSection } from './form-section';
+import { cn } from '@/lib/utils';
 
 const aiRoleOptions = [
     'Copywriter', 'SEO expert', 'Skribent för bloggar', 'Korrekturläsare', 'Programmerare för HTML, CSS och Javascript', 'Researcher'
@@ -149,10 +150,14 @@ export const defaultValues: Partial<FormValues> = {
 };
 
 function TaskTypeSection() {
-    const { control } = useFormContext<FormValues>();
+    const { control, getValues, setValue } = useFormContext<FormValues>();
+    const isDisabled = useWatch({ control, name: 'aiRole_disabled' });
     
+    const toggleDisabled = () => {
+        setValue('aiRole_disabled', !getValues('aiRole_disabled'));
+    }
     return (
-        <FormSection title="Vad skall AIn aggera som?" required>
+        <FormSection title="Vad skall AIn aggera som?" required onToggle={toggleDisabled} isDisabled={isDisabled}>
             <FormField
                 control={control}
                 name="aiRole"
@@ -183,11 +188,16 @@ function TaskTypeSection() {
 }
 
 function AIActionSection() {
-    const { control } = useFormContext<FormValues>();
+    const { control, getValues, setValue } = useFormContext<FormValues>();
     const taskTypeRadio = useWatch({ control, name: "taskTypeRadio" });
+    const isDisabled = useWatch({ control, name: 'taskTypeRadio_disabled' });
+
+    const toggleDisabled = () => {
+        setValue('taskTypeRadio_disabled', !getValues('taskTypeRadio_disabled'));
+    }
     
     return (
-         <FormSection title="Vilken typ av text som skall produceras" required>
+         <FormSection title="Vilken typ av text som skall produceras" required onToggle={toggleDisabled} isDisabled={isDisabled}>
             <FormField
                 control={control}
                 name="taskTypeRadio"
@@ -238,15 +248,15 @@ export function PromptForm() {
         name: "links",
     });
     
-    const writingForRadio = useWatch({ control, name: "writingForRadio" });
-    const avoidWordsEnabled = useWatch({ control, name: "rules.avoidWords.enabled" });
-    
     const values = useWatch({ control });
 
-    const toggleDisabled = (fieldName: keyof Omit<FormValues, 'rules' | 'links'> | 'rules_disabled' | 'links_disabled' ) => {
-        const currentVal = getValues(fieldName as keyof FormValues)
-        setValue(fieldName as any, !currentVal);
+    const toggleDisabled = (fieldName: keyof FormValues) => {
+        const currentVal = getValues(fieldName);
+        setValue(fieldName, !currentVal);
     }
+    
+    const writingForRadio = useWatch({ control, name: "writingForRadio" });
+    const avoidWordsEnabled = useWatch({ control, name: "rules.avoidWords.enabled" });
 
     return (
         <div className="space-y-6">
@@ -266,8 +276,76 @@ export function PromptForm() {
             </FormSection>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <TaskTypeSection />
-                <AIActionSection />
+                <FormSection title="Vad skall AIn aggera som?" required>
+                  <FormField
+                      control={control}
+                      name="aiRole"
+                      render={({ field }) => (
+                          <FormItem className="space-y-3">
+                              <FormControl>
+                                  <RadioGroup
+                                      onValueChange={field.onChange}
+                                      defaultValue={field.value}
+                                      className="grid grid-cols-1 gap-4"
+                                  >
+                                      {aiRoleOptions.map((role) => (
+                                          <FormItem key={role} className="flex items-center space-x-3 space-y-0">
+                                              <FormControl>
+                                                  <RadioGroupItem value={role} />
+                                              </FormControl>
+                                              <FormLabel className="font-normal">{role}</FormLabel>
+                                          </FormItem>
+                                      ))}
+                                  </RadioGroup>
+                              </FormControl>
+                              <FormMessage />
+                          </FormItem>
+                      )}
+                  />
+                </FormSection>
+                <FormSection title="Vilken typ av text som skall produceras" required>
+                  <Controller
+                      control={control}
+                      name="taskTypeRadio"
+                      render={({ field }) => (
+                          <FormItem className="space-y-3">
+                              <FormControl>
+                                  <RadioGroup
+                                      onValueChange={(value) => {
+                                          field.onChange(value);
+                                      }}
+                                      defaultValue={field.value}
+                                      className="space-y-2"
+                                  >
+                                      {[...taskTypeRadioOptions, 'custom'].map((task) => (
+                                          <FormItem key={task} className="flex items-center space-x-3 space-y-0">
+                                              <FormControl>
+                                                  <RadioGroupItem value={task} />
+                                              </FormControl>
+                                              <FormLabel className="font-normal">{task === 'custom' ? 'Annan...' : task}</FormLabel>
+                                          </FormItem>
+                                      ))}
+                                  </RadioGroup>
+                              </FormControl>
+                              <FormMessage />
+                          </FormItem>
+                      )}
+                  />
+                  {useWatch({ control, name: "taskTypeRadio" }) === 'custom' && (
+                      <FormField
+                          control={control}
+                          name="taskTypeCustom"
+                          render={({ field }) => (
+                              <FormItem className="mt-4">
+                                  <FormControl>
+                                      <Textarea placeholder="Beskriv typen av text..." {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                              </FormItem>
+                          )}
+                      />
+                  )}
+                </FormSection>
             </div>
 
             <FormSection title="Vilken tonalitet ska texten ha?" onToggle={() => toggleDisabled('tonality_disabled')} isDisabled={values.tonality_disabled}>
@@ -357,14 +435,14 @@ export function PromptForm() {
                     name="language"
                     render={({ field }) => (
                         <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                            <FormLabel className={field.value === 'Svenska' ? 'text-foreground' : 'text-muted-foreground'}>Svenska</FormLabel>
+                            <FormLabel className={cn(field.value === 'Svenska' ? 'text-foreground' : 'text-muted-foreground', 'transition-colors')}>Svenska</FormLabel>
                             <FormControl>
                                 <Switch
                                     checked={field.value === 'Engelska'}
                                     onCheckedChange={(checked) => field.onChange(checked ? 'Engelska' : 'Svenska')}
                                 />
                             </FormControl>
-                            <FormLabel className={field.value === 'Engelska' ? 'text-foreground' : 'text-muted-foreground'}>Engelska</FormLabel>
+                            <FormLabel className={cn(field.value === 'Engelska' ? 'text-foreground' : 'text-muted-foreground', 'transition-colors')}>Engelska</FormLabel>
                         </FormItem>
                     )}
                 />

@@ -1,33 +1,58 @@
 "use client";
 
 import { useState } from 'react';
-import { useForm, FormProvider, useFormContext } from 'react-hook-form';
+import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Clipboard, Loader2 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast"
-import { PromptForm, formSchema, defaultValues, type FormValues } from './prompt-form';
+import { PromptForm, formSchema as promptFormSchema, defaultValues as promptDefaultValues, type FormValues as PromptFormValues } from './prompt-form';
+import { SeoAnalysisForm, formSchema as seoFormSchema, defaultValues as seoDefaultValues, type FormValues as SeoFormValues } from './seo-analysis-form';
 import { adaptivePromptGeneration } from '@/ai/flows/adaptive-prompt-generation';
+import { seoAnalysis } from '@/ai/flows/seo-analysis';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+
+type AllFormValues = PromptFormValues | SeoFormValues;
 
 function PageContent() {
-    const [generatedPrompt, setGeneratedPrompt] = useState('');
+    const [activeTab, setActiveTab] = useState('prompt-generator');
+    const [generatedContent, setGeneratedContent] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const { toast } = useToast();
-    const { handleSubmit } = useFormContext<FormValues>();
+    
+    const promptMethods = useForm<PromptFormValues>({
+        resolver: zodResolver(promptFormSchema),
+        defaultValues: promptDefaultValues,
+        mode: 'onSubmit'
+    });
 
-    const onGenerate = async (data: FormValues) => {
+    const seoMethods = useForm<SeoFormValues>({
+        resolver: zodResolver(seoFormSchema),
+        defaultValues: seoDefaultValues,
+        mode: 'onSubmit'
+    });
+    
+    const methods = activeTab === 'prompt-generator' ? promptMethods : seoMethods;
+    const { handleSubmit } = methods;
+
+    const onGenerate = async (data: AllFormValues) => {
         setIsLoading(true);
-        setGeneratedPrompt('');
+        setGeneratedContent('');
         try {
-            const result = await adaptivePromptGeneration(data);
-            setGeneratedPrompt(result.prompt);
+            if (activeTab === 'prompt-generator') {
+                const result = await adaptivePromptGeneration(data as PromptFormValues);
+                setGeneratedContent(result.prompt);
+            } else {
+                const result = await seoAnalysis(data as SeoFormValues);
+                setGeneratedContent(result.analysis);
+            }
         } catch (error) {
             console.error(error);
             toast({
-                title: "Error generating prompt",
-                description: "An error occurred while generating the prompt. Please try again.",
+                title: "Error generating content",
+                description: "An error occurred while generating the content. Please try again.",
                 variant: "destructive"
             });
         } finally {
@@ -36,18 +61,18 @@ function PageContent() {
     };
 
     const handleCopy = () => {
-        if (!generatedPrompt) {
+        if (!generatedContent) {
             toast({
                 title: "Nothing to copy",
-                description: "Please generate a prompt first.",
+                description: "Please generate content first.",
                 variant: "destructive"
             })
             return;
         }
-        navigator.clipboard.writeText(generatedPrompt);
+        navigator.clipboard.writeText(generatedContent);
         toast({
             title: "Copied to clipboard!",
-            description: "The prompt is ready to be used.",
+            description: "The content is ready to be used.",
         })
     };
 
@@ -55,20 +80,36 @@ function PageContent() {
         <div className="container mx-auto p-4 md:py-8">
             <header className="text-center mb-8">
                 <h1 className="text-4xl lg:text-5xl font-headline font-bold text-primary">PromptSmith</h1>
-                <p className="text-muted-foreground mt-2 text-lg">Craft the perfect AI prompt for your needs</p>
+                <p className="text-muted-foreground mt-2 text-lg">Your AI-powered content and SEO toolkit</p>
             </header>
-            <form onSubmit={handleSubmit(onGenerate)} className="w-full">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+            
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
                     <div>
-                        <ScrollArea className="h-[calc(100vh-12rem)] pr-4 -mr-4">
-                           <div className="space-y-6">
-                             <PromptForm />
-                             <Button type="submit" className="w-full" disabled={isLoading}>
-                                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                                Förhandsgranska
-                            </Button>
-                           </div>
-                        </ScrollArea>
+                        <TabsList className="grid w-full grid-cols-2 mb-4">
+                            <TabsTrigger value="prompt-generator">Prompt Generator</TabsTrigger>
+                            <TabsTrigger value="seo-analysis">SEO Analysis</TabsTrigger>
+                        </TabsList>
+                        <form onSubmit={handleSubmit(onGenerate)} className="w-full">
+                            <ScrollArea className="h-[calc(100vh-14rem)] pr-4 -mr-4">
+                                <div className="space-y-6">
+                                    <TabsContent value="prompt-generator" className="mt-0">
+                                        <FormProvider {...promptMethods}>
+                                            <PromptForm />
+                                        </FormProvider>
+                                    </TabsContent>
+                                    <TabsContent value="seo-analysis" className="mt-0">
+                                        <FormProvider {...seoMethods}>
+                                            <SeoAnalysisForm />
+                                        </FormProvider>
+                                    </TabsContent>
+                                    <Button type="submit" className="w-full" disabled={isLoading}>
+                                        {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                                        {activeTab === 'prompt-generator' ? 'Förhandsgranska Prompt' : 'Analysera Sökord'}
+                                    </Button>
+                                </div>
+                            </ScrollArea>
+                        </form>
                     </div>
                     
                     <div className="lg:sticky lg:top-8">
@@ -87,12 +128,12 @@ function PageContent() {
                                                 <Loader2 className="h-8 w-8 animate-spin" />
                                             </div>
                                         )}
-                                        {generatedPrompt && !isLoading ? (
-                                            <pre className="text-sm whitespace-pre-wrap font-body leading-relaxed">{generatedPrompt}</pre>
+                                        {generatedContent && !isLoading ? (
+                                            <pre className="text-sm whitespace-pre-wrap font-body leading-relaxed">{generatedContent}</pre>
                                         ) : (
                                             !isLoading &&
                                             <div className="flex items-center justify-center h-full text-muted-foreground">
-                                                <p>Your generated prompt will appear here once you click "Förhandsgranska".</p>
+                                                <p>Your generated content will appear here.</p>
                                             </div>
                                         )}
                                     </ScrollArea>
@@ -104,21 +145,11 @@ function PageContent() {
                         </Card>
                     </div>
                 </div>
-            </form>
+            </Tabs>
         </div>
     );
 }
 
-export default function PromptSmithPage() {
-    const methods = useForm<FormValues>({
-        resolver: zodResolver(formSchema),
-        defaultValues,
-        mode: 'onSubmit'
-    });
-
-    return (
-        <FormProvider {...methods}>
-            <PageContent />
-        </FormProvider>
-    );
+export default function PromptSmithPageWrapper() {
+    return <PageContent />
 }
