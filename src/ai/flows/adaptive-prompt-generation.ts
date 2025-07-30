@@ -4,87 +4,19 @@
  * @fileOverview This file defines a Genkit flow for adaptive prompt generation.
  *
  * - adaptivePromptGeneration - A function that generates an AI prompt based on user input, intelligently including/excluding constraints and formatting.
- * - AdaptivePromptGenerationInput - The input type for the adaptivePromptGeneration function.
  * - AdaptivePromptGenerationOutput - The return type for the adaptivePromptGeneration function.
  */
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-
-export const formSchema = z.object({
-  topicGuideline: z.string().min(1, 'Detta fält är obligatoriskt.'),
-  aiRole: z.enum([
-    'Copywriter', 'SEO expert', 'Skribent för bloggar', 'Korrekturläsare', 'Programmerare för HTML, CSS och Javascript', 'Researcher'
-  ]),
-  taskTypeRadio: z.enum(['Artikel', 'Seo onpage text', 'Korrekturläsning', 'custom']),
-  taskTypeCustom: z.string().optional(),
-  
-  tonality: z.array(z.string()).optional(),
-  tonality_disabled: z.boolean().default(false),
-  
-  textLength: z.string().optional(),
-  textLength_disabled: z.boolean().default(false),
-  
-  numberOfLists: z.string().optional(),
-  excludeLists: z.boolean().default(false),
-  lists_disabled: z.boolean().default(false),
-  
-  language: z.enum(['Engelska', 'Svenska']),
-  
-  writingForRadio: z.enum(['Kund', 'Vår blogg', 'custom']),
-  writingForCustom: z.string().optional(),
-  writingFor_disabled: z.boolean().default(false),
-
-  rules: z.object({
-    avoidSuperlatives: z.boolean().default(true),
-    avoidPraise: z.boolean().default(true),
-    avoidAcclaim: z.boolean().default(true),
-    isInformative: z.boolean().default(true),
-    useWeForm: z.boolean().default(true),
-    addressReaderAsYou: z.boolean().default(true),
-    avoidWords: z.object({
-        enabled: z.boolean().default(true),
-        words: z.array(z.string()).default(['Upptäck', 'Utforska', 'Oumbärligt', 'Särskiljt', 'idealiskt']),
-    }),
-    avoidXYPhrase: z.boolean().default(true),
-    customRules: z.string().optional(),
-  }),
-  rules_disabled: z.boolean().default(false),
-  
-  links: z.array(z.object({ url: z.string().url("Invalid URL format"), anchorText: z.string().min(1, "Anchor text is required") })).optional(),
-  links_disabled: z.boolean().default(false),
-
-  primaryKeyword: z.string().optional(),
-  primaryKeyword_disabled: z.boolean().default(false),
-  
-  author: z.string().optional(),
-  author_disabled: z.boolean().default(false),
-
-}).superRefine((data, ctx) => {
-    if (data.taskTypeRadio === 'custom' && (!data.taskTypeCustom || data.taskTypeCustom.trim() === '')) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Beskrivning av texttyp är obligatoriskt när 'Annan...' är valt.",
-        path: ['taskTypeCustom'],
-      });
-    }
-    if (data.writingForRadio === 'custom' && (!data.writingForCustom || data.writingForCustom.trim() === '')) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Detta fält är obligatoriskt när 'Annan...' är valt.",
-        path: ['writingForCustom'],
-      });
-    }
-  });
-
-export type AdaptivePromptGenerationInput = z.infer<typeof formSchema>;
+import type { FormValues } from '@/components/prompt-form';
 
 const AdaptivePromptGenerationOutputSchema = z.object({
   prompt: z.string().describe('The generated AI prompt.'),
 });
 export type AdaptivePromptGenerationOutput = z.infer<typeof AdaptivePromptGenerationOutputSchema>;
 
-export async function adaptivePromptGeneration(input: AdaptivePromptGenerationInput): Promise<AdaptivePromptGenerationOutput> {
+export async function adaptivePromptGeneration(input: FormValues): Promise<AdaptivePromptGenerationOutput> {
   return adaptivePromptGenerationFlow(input);
 }
 
@@ -117,10 +49,10 @@ const writingForMap: Record<string, string> = {
 const adaptivePromptGenerationFlow = ai.defineFlow(
   {
     name: 'adaptivePromptGenerationFlow',
-    inputSchema: formSchema,
+    inputSchema: z.any(), // Using "any" because the schema is now defined and validated in the form component.
     outputSchema: AdaptivePromptGenerationOutputSchema,
   },
-  async (data) => {
+  async (data: FormValues) => {
     let promptText = "Dessa regler nedan skall följas väldigt strikt, kolla konstant att du alltid följer det instruktioner jag ger dig här och återkom med en fråga om vad du skall göra istället för att göra något annat än vad instruktioner hänvisar. \n\n";
 
     if (data.topicGuideline) {
@@ -208,6 +140,10 @@ const adaptivePromptGenerationFlow = ai.defineFlow(
       promptText += 'Texten skall skrivas ut ett neutralt perspektiv där vi som skriver inte benämns.\n\n';
     }
 
-    return { prompt: promptText };
+    const { output } = await ai.generate({
+        prompt: promptText
+    });
+    
+    return { prompt: output?.text || '' };
   }
 );
