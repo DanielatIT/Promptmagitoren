@@ -140,10 +140,11 @@ const adaptivePromptGenerationFlow = ai.defineFlow(
       promptText += 'Texten skall skrivas ut ett neutralt perspektiv där vi som skriver inte benämns.\n\n';
     }
 
-    const { output } = await ai.generate({
+    const { text } = await ai.generate({
+        model: 'googleai/gemini-1.5-flash-latest',
         prompt: promptText
     });
     
-    return { prompt: output?.text || '' };
+    return { prompt: text || '' };
   }
 );
