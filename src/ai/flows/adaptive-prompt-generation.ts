@@ -8,7 +8,7 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import {z} from 'zod';
 import type { FormValues } from '@/components/prompt-form';
 
 const AdaptivePromptGenerationOutputSchema = z.object({
@@ -141,7 +141,7 @@ const adaptivePromptGenerationFlow = ai.defineFlow(
     }
 
     const { text } = await ai.generate({
-        model: 'googleai/gemini-1.5-flash-latest',
+        model: 'googleai/gemini-pro',
         prompt: promptText
     });
     
