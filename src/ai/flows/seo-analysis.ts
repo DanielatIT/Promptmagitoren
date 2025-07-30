@@ -75,6 +75,7 @@ Utveckla en SEO-optimerad innehållsstruktur baserad på analysen av H-taggar i 
     `;
 
     const { output } = await ai.generate({
+        model: 'googleai/gemini-1.5-flash-latest',
         prompt: prompt,
     });
     
