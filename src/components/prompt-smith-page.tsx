@@ -6,18 +6,33 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Clipboard } from 'lucide-react';
+import { Clipboard, Loader2 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast"
-import { PromptForm, formSchema, defaultValues, type FormValues, generateInitialPrompt } from './prompt-form';
+import { PromptForm, formSchema, defaultValues, type FormValues } from './prompt-form';
+import { adaptivePromptGeneration } from '@/ai/flows/adaptive-prompt-generation';
 
 function PageContent() {
     const [generatedPrompt, setGeneratedPrompt] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
     const { toast } = useToast();
     const { handleSubmit } = useFormContext<FormValues>();
 
-    const onGenerate = (data: FormValues) => {
-        const result = generateInitialPrompt(data);
-        setGeneratedPrompt(result.prompt);
+    const onGenerate = async (data: FormValues) => {
+        setIsLoading(true);
+        setGeneratedPrompt('');
+        try {
+            const result = await adaptivePromptGeneration(data);
+            setGeneratedPrompt(result.prompt);
+        } catch (error) {
+            console.error(error);
+            toast({
+                title: "Error generating prompt",
+                description: "An error occurred while generating the prompt. Please try again.",
+                variant: "destructive"
+            });
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleCopy = () => {
@@ -46,7 +61,13 @@ function PageContent() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
                     <div>
                         <ScrollArea className="h-[calc(100vh-12rem)] pr-4 -mr-4">
-                            <PromptForm />
+                           <div className="space-y-6">
+                             <PromptForm />
+                             <Button type="submit" className="w-full" disabled={isLoading}>
+                                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                                Förhandsgranska
+                            </Button>
+                           </div>
                         </ScrollArea>
                     </div>
                     
@@ -61,9 +82,15 @@ function PageContent() {
                                         <Clipboard className="mr-2 h-4 w-4" /> Copy Text
                                     </Button>
                                     <ScrollArea className="h-[calc(100vh-25rem)] lg:h-[calc(100vh-18rem)] rounded-md border p-4 bg-muted/20">
-                                        {generatedPrompt ? (
+                                        {isLoading && (
+                                            <div className="flex items-center justify-center h-full text-muted-foreground">
+                                                <Loader2 className="h-8 w-8 animate-spin" />
+                                            </div>
+                                        )}
+                                        {generatedPrompt && !isLoading ? (
                                             <pre className="text-sm whitespace-pre-wrap font-body leading-relaxed">{generatedPrompt}</pre>
                                         ) : (
+                                            !isLoading &&
                                             <div className="flex items-center justify-center h-full text-muted-foreground">
                                                 <p>Your generated prompt will appear here once you click "Förhandsgranska".</p>
                                             </div>

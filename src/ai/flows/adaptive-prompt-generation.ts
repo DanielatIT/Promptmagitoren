@@ -11,41 +11,73 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-const AdaptivePromptGenerationInputSchema = z.object({
-  aiPersona: z.enum([
-    'Copywriter',
-    'SEO expert',
-    'Skribent för bloggar',
-    'Korrekturläsare',
-    'Programmerare för HTML, CSS och Javascript',
-    'Researcher',
-  ]).describe('The persona the AI should adopt.'),
-  taskType: z.union([
-    z.enum(['Artikel', 'Seo onpage text', 'Korrekturläsning']),
-    z.string(),
-  ]).describe('The type of task to be performed. Can be a predefined type or a custom description.'),
-  tone: z.array(z.enum(['Professionell/Formell', 'Vänlig/Tillgänglig', 'Informativ/Faktapresenterande', 'Övertygande/Säljande'])).optional().describe('The desired tone of the text.'),
-  textLength: z.number().optional().describe('The maximum length of the text in words.'),
-  maxLists: z.number().optional().describe('The maximum number of lists allowed in the text.'),
-  language: z.enum(['Engelska', 'Svenska']).describe('The language of the generated text.'),
-  targetAudienceType: z.union([
-    z.enum(['Kund', 'Vår blogg']),
-    z.string(),
-  ]).describe('The type of target audience. Can be a predefined type or a custom description.'),
-  avoidSuperlatives: z.boolean().optional().default(true).describe('Whether to avoid superlatives in the text.'),
-  avoidPraise: z.boolean().optional().default(true).describe('Whether to avoid praise in the text.'),
-  avoidAcclaim: z.boolean().optional().default(true).describe('Whether to avoid acclaim in the text.'),
-  isInformative: z.boolean().optional().default(false).describe('Whether the text should be informative.'),
-  useWeForm: z.boolean().optional().default(false).describe('Whether to write in the we-form.'),
-  addressReaderAsYou: z.boolean().optional().default(false).describe('Whether to address the reader as "you".'),
-  avoidWords: z.string().optional().describe('Words to avoid in the text, comma separated.'),
-  avoidXYPhrase: z.boolean().optional().default(true).describe('Whether to avoid the phrase "i en X är sökord värdefullt för Y".'),
-  links: z.array(z.object({url: z.string(), keyword: z.string()})).optional().describe('Links to include in the text.'),
-  primaryKeyword: z.string().optional().describe('The primary keyword to include in the text.'),
-  author: z.string().optional().describe('The author of the text.'),
-  topicInformation: z.string().describe('Information about the topic of the text.'),
-});
-export type AdaptivePromptGenerationInput = z.infer<typeof AdaptivePromptGenerationInputSchema>;
+export const formSchema = z.object({
+  topicGuideline: z.string().min(1, 'Detta fält är obligatoriskt.'),
+  aiRole: z.enum([
+    'Copywriter', 'SEO expert', 'Skribent för bloggar', 'Korrekturläsare', 'Programmerare för HTML, CSS och Javascript', 'Researcher'
+  ]),
+  taskTypeRadio: z.enum(['Artikel', 'Seo onpage text', 'Korrekturläsning', 'custom']),
+  taskTypeCustom: z.string().optional(),
+  
+  tonality: z.array(z.string()).optional(),
+  tonality_disabled: z.boolean().default(false),
+  
+  textLength: z.string().optional(),
+  textLength_disabled: z.boolean().default(false),
+  
+  numberOfLists: z.string().optional(),
+  excludeLists: z.boolean().default(false),
+  lists_disabled: z.boolean().default(false),
+  
+  language: z.enum(['Engelska', 'Svenska']),
+  
+  writingForRadio: z.enum(['Kund', 'Vår blogg', 'custom']),
+  writingForCustom: z.string().optional(),
+  writingFor_disabled: z.boolean().default(false),
+
+  rules: z.object({
+    avoidSuperlatives: z.boolean().default(true),
+    avoidPraise: z.boolean().default(true),
+    avoidAcclaim: z.boolean().default(true),
+    isInformative: z.boolean().default(true),
+    useWeForm: z.boolean().default(true),
+    addressReaderAsYou: z.boolean().default(true),
+    avoidWords: z.object({
+        enabled: z.boolean().default(true),
+        words: z.array(z.string()).default(['Upptäck', 'Utforska', 'Oumbärligt', 'Särskiljt', 'idealiskt']),
+    }),
+    avoidXYPhrase: z.boolean().default(true),
+    customRules: z.string().optional(),
+  }),
+  rules_disabled: z.boolean().default(false),
+  
+  links: z.array(z.object({ url: z.string().url("Invalid URL format"), anchorText: z.string().min(1, "Anchor text is required") })).optional(),
+  links_disabled: z.boolean().default(false),
+
+  primaryKeyword: z.string().optional(),
+  primaryKeyword_disabled: z.boolean().default(false),
+  
+  author: z.string().optional(),
+  author_disabled: z.boolean().default(false),
+
+}).superRefine((data, ctx) => {
+    if (data.taskTypeRadio === 'custom' && (!data.taskTypeCustom || data.taskTypeCustom.trim() === '')) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Beskrivning av texttyp är obligatoriskt när 'Annan...' är valt.",
+        path: ['taskTypeCustom'],
+      });
+    }
+    if (data.writingForRadio === 'custom' && (!data.writingForCustom || data.writingForCustom.trim() === '')) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Detta fält är obligatoriskt när 'Annan...' är valt.",
+        path: ['writingForCustom'],
+      });
+    }
+  });
+
+export type AdaptivePromptGenerationInput = z.infer<typeof formSchema>;
 
 const AdaptivePromptGenerationOutputSchema = z.object({
   prompt: z.string().describe('The generated AI prompt.'),
@@ -56,71 +88,126 @@ export async function adaptivePromptGeneration(input: AdaptivePromptGenerationIn
   return adaptivePromptGenerationFlow(input);
 }
 
-const prompt = ai.definePrompt({
-  name: 'adaptivePromptGenerationPrompt',
-  input: {schema: AdaptivePromptGenerationInputSchema},
-  output: {schema: AdaptivePromptGenerationOutputSchema},
-  prompt: `You are an AI prompt generator. Based on the user input, generate a prompt for an AI agent.
+const roleOutputs: { [key: string]: string } = {
+  Copywriter: 'Agera som en professionell copywriter med expertis inom att skapa övertygande och engagerande text för en mängd olika plattformar och målgrupper. Ditt mål är att producera text som inte bara informerar, utan också inspirerar, underhåller och motiverar till handling. Du förstår vikten av att anpassa ton, stil och budskap baserat på syftet med texten, målgruppen och den kanal den ska publiceras i (t.ex. webbsidor, sociala medier, annonser, e-postutskick). När du får en uppgift, kommer du att analysera målet med kommunikationen, identifiera den primära målgruppen och föreslå de bästa sätten att fånga deras uppmärksamhet och driva önskat resultat. Din text ska vara tydlig, koncis och slagkraftig, med ett starkt fokus på att leverera värde och lösa problem för läsaren. Du är också skicklig på att integrera relevanta sökord naturligt och effektivt för SEO-ändamål, samtidigt som du bibehåller ett flytande och engagerande språk. När du skriver, tänk på att använda aktiva verb, starka adjektiv och fängslande rubriker för att maximera effekte',
+  'SEO expert': 'Agera som en expert på att skriva SEO-vänlig text. Din uppgift är att skapa engagerande och högkvalitativt innehåll som inte bara rankar väl i sökmotorerna, utan också resonerar med den avsedda målgruppen och uppmuntrar till handling. Du förstår att modern SEO-textning handlar om att balansera optimering för algoritmer med att leverera genuint värde till läsaren.\n\nDu kan skickligt integrera relevanta sökord och semantiskt relaterade termer naturligt i texten, utan att det känns forcerat eller repetitivt. Din förmåga att skapa fängslande rubriker, engagerande inledningar och sammanfattande avslutningar är central. Du vet hur man strukturerar text med underrubriker, punktlistor och korta stycken för att förbättra läsbarheten och skanna-förmågan, vilket både sökmotorer och användare uppskattar. Du kan också optimera meta-titlar och meta-beskrivningar för att maximera klickfrekvensen från sökresultaten.\n\nNär du får en uppgift, kommer du att analysera målgruppens sökintention, identifiera de viktigaste sökorden och sedan producera en text som är informativ, övertygande och optimerad för maximal synlighet. Din text kommer att vara tydlig, koncis och slagkraftig, med fokus på att lösa användarens problem och positionera innehållet som en auktoritet inom ämnet.',
+  'Skribent för bloggar': 'Agera som en professionell skribent specialiserad på att skapa gästartiklar för externa bloggar. Din uppgift är att producera högkvalitativt, engagerande och strategiskt innehåll som inte bara informerar och underhåller läsaren, utan också bidrar till värd-bloggens auktoritet och synlighet, samt potentiellt driver trafik och bygger varumärke för dig eller den du representerar.\n\nDu är expert på att anpassa din röst och stil för att perfekt matcha värd-bloggens befintliga ton och målgrupp. Du kan identifiera ämnen som är relevanta och intressanta för deras läsare samtidigt som de ligger inom ditt expertområde. Din förmåga att utföra noggrann research och presentera komplex information på ett lättförståeligt och tilltalande sätt är avgörande. Du förstår vikten av att inkludera en välformulerad författarpresentation (bio) och eventuella relevanta länkar som följer värd-bloggens riktlinjer.\n\nNär du får en uppgift, kommer du att systematiskt undersöka värd-bloggens nisch och publik, föreslå ämnesidéer som passar deras innehållsstrategi och sedan leverera en artikel som är välskriven, korrekt, unik och optimerad för webben. Din text kommer att vara engagerande från första meningen, med ett flytande språk, tydliga underrubriker och en struktur som uppmuntrar till läsning. Du är medveten om att din artikel representerar både dig själv och värd-bloggen, och du strävar alltid efter att överträffa förväntningarna med ditt bidrag.',
+  Korrekturläsare: 'Agera som en professionell korrekturläsare. Din uppgift är att granska text med exceptionell noggrannhet för att identifiera och åtgärda fel inom grammatik, stavning, interpunktion, syntax och formatering. Du säkerställer att texten är felfri, konsekvent och professionell i sitt utförande.\n\nDu har ett skarpt öga för detaljer och en djupgående förståelse för språkets regler och nyanser. Du kan snabbt upptäcka inkonsekvenser i stil, terminologi eller layout, och du vet hur man korrigerar dem utan att förändra textens ursprungliga mening eller röst. Din förmåga att arbeta metodiskt och systematiskt genom större mängder text är avgörande. Du är också medveten om att anpassa dig till olika stilguider och krav som en specifik text eller klient kan ha.\n\nNär du får en text att korrekturläsa, kommer du att leverera ett dokument som är polerat, tydligt och redo för publicering. Du fokuserar på att förbättra läsbarheten och säkerställa att budskapet framgår utan störande fel, vilket bidrar till textens trovärdighet och professionalism.',
+  'Programmerare för HTML, CSS och Javascript':
+    'Agera som en senior fullstack-utvecklare med specialistkompetens inom HTML, CSS och JavaScript. Din uppgift är att skriva robust, effektiv och skalbar kod för webben, både på klientsidan och i integrationen med backend-system. Du har en djup förståelse för webbstandarder, bästa praxis och de senaste trenderna inom frontend-utveckling.\n\nDu kan arkitektera och implementera responsiva webbgränssnitt med ren HTML, styla dem med semantisk och modulär CSS (inklusive preprocessorer som SASS/LESS och moderna CSS-metoder som Flexbox/Grid), och lägga till dynamisk interaktivitet med avancerad JavaScript (inklusive ES6+ funktioner, ramverk/bibliotek som React/Vue/Angular, och asynkron programmering). Du förstår vikten av prestandaoptimering, tillgänglighet (WCAG) och SEO-vänlig kod.\n\nNär du får en uppgift, kommer du att leverera kod som är väldokumenterad, lätt att underhålla och optimerad för en utmärkt användarupplevelse. Du kan analysera problem, föreslå tekniska lösningar och implementera dem med precision, alltid med fokus på både funktionalitet och kodkvalitet. Din förmåga att felsöka och lösa komplexa problem i webbläsare är exceptionell.',
+  Researcher: 'Agera som en expert på informationsinsamling och research. Din uppgift är att systematiskt, effektivt och tillförlitligt hitta, bedöma och sammanställa information kring ett givet ämne. Du är skicklig på att navigera i komplexa informationslandskap, identifiera trovärdiga källor och skilja relevant information från brus.\n\nDu kan formulera effektiva sökfrågor, använda avancerade sökoperatorer och utnyttja en mångfald av källor, inklusive akademiska databaser, branschrapporter, nyhetsarkiv, officiella publikationer, expertintervjuer och sociala medier. Du är expert på källkritik och kan bedöma en källas auktoritet, aktualitet och objektivitet för att säkerställa att den information du presenterar är korrekt och väl underbyggd.\n\nNär du får ett ämne att undersöka, kommer du att systematiskt bryta ner det i delkomponenter, utföra grundlig research och presentera en sammanfattning av den mest relevanta och pålitliga informationen. Du kan också identifiera kunskapsluckor och föreslå ytterligare områden för utredning. Din leverans kommer att vara strukturerad, faktabaserad och lätt att förstå, med tydliga referenser till dina källor.',
+};
 
-  The AI agent should act as a {{aiPersona}}.
+const languageOutputs: { [key: string]: string } = {
+  Engelska: 'Trots att denna instruktion är på svenska, ska all text du producerar vara på engelska. Det är av största vikt att denna producerade texten måste följa engelska skrivregler, grammatik och stavning. Enligt Harvard Style principen.',
+  Svenska: 'Skriv en text på svenska. Se till att texten följer svensk grammatik, interpunktion och stavning. Använd korrekt meningsbyggnad och idiomatiska uttryck som är naturliga för svenskan. Följ rekommendationer från instanser som Språkrådet och publikationer som Svenska Akademiens ordlista (SAOL), Svenska Akademiens grammatik (SAG) och Svenska skrivregler.',
+};
 
-  The task to be performed is: {{taskType}}
+const taskTypeMap: Record<string, string> = {
+    'Artikel': 'Skriv en artikel för en av våra bloggar där du inte nämner kundens namn eller företag utan utgår från att vi bara vill ge läsaren ett värde',
+    'Seo onpage text': 'Skriv en SEO-optimerad on-page-text för en webbsida. Texten skall vara Informativ och engagerande för målgruppen, Unik och fri från plagiarism, Ha en tydlig call-to-action (CTA). Optimera för läsbarhet med korta stycken och enkla meningar. I slutet av texten skriv en meta-titel (max 60 tecken) och en meta-beskrivning (max 160 tecken) som är lockande och innehåller huvudnyckelordet.',
+    'Korrekturläsning': 'Korrekturläs följande text noggrant med fullt fokus på svensk grammatik och språkriktighet. Gå igenom texten för att identifiera och korrigera alla typer av fel. Detta inkluderar bland annat stavfel (även sär- och sammanskrivningar), grammatikfel som felaktig böjning av ord, otydlig satskonstruktion, ordföljd och tempusfel. Se också över interpunktionen och justera användningen av kommatecken, punkter, semikolon, kolon, tankstreck och bindestreck.\n\nVar uppmärksam på syftningsfel, så att pronomen och adverb otvetydigt syftar på rätt ord eller fras. Granska meningsbyggnaden för att försäkra att formuleringarna är klara och koncisa, och att det inte förekommer onödigt långa meningar eller anakoluter. Kontrollera även att det inte finns några inkonsekvenser i texten, exempelvis gällande stavning av namn, användning av siffror, förkortningar eller inkonsekvent terminologi. Fokusera även på språkriktighet och stil, vilket innefattar ordval, textens flyt och att tonen är anpassad till syftet. Slutligen, sök efter typografiska fel som dubbla mellanslag, felaktig användning av stora/små bokstäver eller indrag.\n\nMålet är att texten ska vara idiomatiskt korrekt, lättläst, begriplig och professionell på svenska. När du presenterar de föreslagna ändringarna kan du antingen visa den fullständigt korrigerade texten eller lista specifika ändringar med en kort förklaring för varje justering, exempelvis "Original: \'dom\' -> Korrigerat: \'de\' - grammatikfel, personligt pronomen". Sträva efter att bevara författarens ursprungliga stil och ton så långt det är möjligt, samtidigt som språkriktigheten garanteras.',
+};
 
-  {{#if tone}}
-  The tone of the text should be: {{tone}}
-  {{/if}}
-
-  {{#if textLength}}
-  The length of the text should be approximately {{textLength}} words.
-  {{/if}}
-
-  {{#if maxLists}}
-  The text should have a maximum of {{maxLists}} lists.
-  {{/if}}
-
-  The language of the text should be {{language}}.
-
-  We are writing this text for {{targetAudienceType}}.
-
-  Here are some rules to follow:
-  {{#if avoidSuperlatives}} Do not use superlatives. {{/if}}
-  {{#if avoidPraise}} Avoid praise. {{/if}}
-  {{#if avoidAcclaim}} Avoid acclaim. {{/if}}
-  {{#if isInformative}} The text should be informative. {{/if}}
-  {{#if useWeForm}} Write in the we-form. {{/if}}
-  {{#if addressReaderAsYou}} Address the reader as "you". {{/if}}
-  {{#if avoidWords}} Avoid the following words: {{avoidWords}}. {{/if}}
-  {{#if avoidXYPhrase}} Avoid the phrase "i en X är sökord värdefullt för Y". {{/if}}
-
-  {{#if links}}
-  Include the following links:
-  {{#each links}}
-  Link: {{url}}, Keyword: {{keyword}}
-  {{/each}}
-  {{/if}}
-
-  {{#if primaryKeyword}}
-  The primary keyword is: {{primaryKeyword}}. Use it 1% of the time.
-  {{/if}}
-
-  {{#if author}}
-  This text is written by {{author}}.
-  {{else}}
-  The text should be written from a neutral perspective.
-  {{/if}}
-
-  Please adhere to the following information when writing the text: {{topicInformation}}
-  `,
-});
+const writingForMap: Record<string, string> = {
+    'Kund': 'Vi skriver denna text för en av våra kunder som skall publiceras på något vis på deras webbplats.',
+    'Vår blogg': 'Vi skriver denna text för en av våra bloggar. Dessa bloggar har som syfte att bidra med informativ information kring ämne i denna text. Men även ha ett syfte av att inkludera viktiga externlänkar.'
+};
 
 const adaptivePromptGenerationFlow = ai.defineFlow(
   {
     name: 'adaptivePromptGenerationFlow',
-    inputSchema: AdaptivePromptGenerationInputSchema,
+    inputSchema: formSchema,
     outputSchema: AdaptivePromptGenerationOutputSchema,
   },
-  async input => {
-    const {output} = await prompt(input);
-    return {prompt: output!.prompt};
+  async (data) => {
+    let promptText = "Dessa regler nedan skall följas väldigt strikt, kolla konstant att du alltid följer det instruktioner jag ger dig här och återkom med en fråga om vad du skall göra istället för att göra något annat än vad instruktioner hänvisar. \n\n";
+
+    if (data.topicGuideline) {
+      promptText += `Förhåll dig till denna information när du skriver texten: ${data.topicGuideline}\n\n`;
+    }
+
+    promptText += roleOutputs[data.aiRole] + '\n\n';
+
+    const taskType = data.taskTypeRadio === 'custom'
+      ? data.taskTypeCustom
+      : taskTypeMap[data.taskTypeRadio];
+    if (taskType) {
+      promptText += `Din uppgift är att: ${taskType}\n\n`;
+    }
+
+    if (!data.tonality_disabled && data.tonality && data.tonality.length > 0) {
+      promptText += `Tonaliteten ska vara: ${data.tonality.join(', ')}\n\n`;
+    }
+
+    if (!data.textLength_disabled && data.textLength) {
+      const textLengthNum = parseInt(data.textLength, 10);
+      if (!isNaN(textLengthNum)) {
+        const lowerBound = textLengthNum - 50;
+        promptText += `Längd på denna text skall vara ${textLengthNum}, och skall hållas till detta så gott det går. Texten får ej överskridas mer än med 20 ord och får ej vara mindre än ${lowerBound} ord.\n\n`;
+      }
+    }
+    
+    if (!data.lists_disabled) {
+      if (data.excludeLists) {
+        promptText += 'Texten får inte innehålla några listor alls.\n\n';
+      } else if (data.numberOfLists) {
+        const numberOfListsNum = parseInt(data.numberOfLists, 10);
+        if (!isNaN(numberOfListsNum)) {
+          promptText += `Texten får bara ha ${numberOfListsNum} antal listor i alla dess former\n\n`;
+        }
+      }
+    }
+
+    promptText += languageOutputs[data.language] + '\n\n';
+
+    if (!data.writingFor_disabled) {
+      const writingFor = data.writingForRadio === 'custom'
+        ? data.writingForCustom
+        : writingForMap[data.writingForRadio];
+      if (writingFor) {
+        promptText += `Vi skriver denna text för: ${writingFor}\n\n`;
+      }
+    }
+
+    if (!data.rules_disabled) {
+      const rules: string[] = [];
+      if (data.rules.avoidSuperlatives) rules.push('Undvik superlativ');
+      if (data.rules.avoidPraise) rules.push('Undvik lovord');
+      if (data.rules.avoidAcclaim) rules.push('Undvik beröm.');
+      if (data.rules.isInformative) rules.push('Texten skall vara informativ med fokus på att ge läsaren kunskap för ämnet');
+      if (data.rules.useWeForm) rules.push('Skriv i vi-form, som att vi är företaget.');
+      if (data.rules.addressReaderAsYou) rules.push('Läsaren skall benämnas som ni.');
+      if (data.rules.avoidWords.enabled && data.rules.avoidWords.words.length > 0) {
+          rules.push(`Texten får aldrig innehålla orden: ${data.rules.avoidWords.words.join(', ')}`);
+      }
+      if (data.rules.avoidXYPhrase) rules.push('skriv aldrig en mening som liknar eller är i närheten av detta “...i en X värld/industri/område är “sökordet” värdefullt för Y anledning”');
+      if (data.rules.customRules) {
+          rules.push(...data.rules.customRules.split('\n').filter(rule => rule.trim() !== ''));
+      }
+
+      if (rules.length > 0) {
+        promptText += `Regler för texten: ${rules.join(', ')}\n\n`;
+      }
+    }
+
+    if (!data.links_disabled && data.links && data.links.length > 0) {
+      data.links.forEach(link => {
+        if (link.url && link.anchorText)
+          promptText += `Lägg in hyperlänkar i texten, länken är: ${link.url}. På detta sökord: ${link.anchorText}\n\n`;
+      });
+    }
+
+    if (!data.primaryKeyword_disabled && data.primaryKeyword) {
+      promptText += `Denna text skall innehålla ${data.primaryKeyword} 1% av textens totala antal ord.\n\n`;
+    }
+
+    if (!data.author_disabled && data.author) {
+      promptText += `Denna texten är skriven av ${data.author} och kan nämnas i en CTA.\n\n`;
+    } else if (!data.author_disabled) {
+      promptText += 'Texten skall skrivas ut ett neutralt perspektiv där vi som skriver inte benämns.\n\n';
+    }
+
+    return { prompt: promptText };
   }
 );
