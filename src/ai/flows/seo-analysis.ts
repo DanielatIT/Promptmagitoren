@@ -82,3 +82,5 @@ Utveckla en SEO-optimerad innehållsstruktur baserad på analysen av H-taggar i 
     return { analysis: text || '' };
   }
 );
+
+    
