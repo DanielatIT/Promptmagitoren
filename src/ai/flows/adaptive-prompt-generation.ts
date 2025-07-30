@@ -17,7 +17,8 @@ const AdaptivePromptGenerationOutputSchema = z.object({
 export type AdaptivePromptGenerationOutput = z.infer<typeof AdaptivePromptGenerationOutputSchema>;
 
 export async function adaptivePromptGeneration(input: FormValues): Promise<AdaptivePromptGenerationOutput> {
-  return adaptivePromptGenerationFlow(input);
+  const result = await adaptivePromptGenerationFlow(input);
+  return { prompt: result };
 }
 
 const roleOutputs: { [key: string]: string } = {
@@ -46,11 +47,18 @@ const writingForMap: Record<string, string> = {
     'Vår blogg': 'Vi skriver denna text för en av våra bloggar. Dessa bloggar har som syfte att bidra med informativ information kring ämne i denna text. Men även ha ett syfte av att inkludera viktiga externlänkar.'
 };
 
+const contentGenerationPrompt = ai.definePrompt({
+    name: 'contentGenerationPrompt',
+    input: { schema: z.string() },
+    output: { format: 'text' },
+    prompt: `{{{input}}}`,
+});
+
 const adaptivePromptGenerationFlow = ai.defineFlow(
   {
     name: 'adaptivePromptGenerationFlow',
     inputSchema: z.any(), // Using "any" because the schema is defined and validated in the form component.
-    outputSchema: AdaptivePromptGenerationOutputSchema,
+    outputSchema: z.string(),
   },
   async (data: FormValues) => {
     let promptText = "Dessa regler nedan skall följas väldigt strikt, kolla konstant att du alltid följer det instruktioner jag ger dig här och återkom med en fråga om vad du skall göra istället för att göra något annat än vad instruktioner hänvisar. \n\n";
@@ -140,13 +148,7 @@ const adaptivePromptGenerationFlow = ai.defineFlow(
       promptText += 'Texten skall skrivas ut ett neutralt perspektiv där vi som skriver inte benämns.\n\n';
     }
 
-    const { text } = await ai.generate({
-        model: 'googleai/gemini-1.5-flash-latest',
-        prompt: promptText
-    });
-    
-    return { prompt: text || '' };
+    const { output } = await contentGenerationPrompt(promptText);
+    return output || '';
   }
 );
-
-    
