@@ -74,11 +74,11 @@ Mål:
 Utveckla en SEO-optimerad innehållsstruktur baserad på analysen av H-taggar i toppresultaten för "${keyword}", med fokus på att möta användarens behov inom den svenska industrin. Innehållet ska vara konkret och detaljerat för att effektivt adressera sökintentionen och förbättra sidans rankning på Google.
     `;
 
-    const { output } = await ai.generate({
+    const { text } = await ai.generate({
         model: 'googleai/gemini-1.5-flash-latest',
         prompt: prompt,
     });
     
-    return { analysis: output?.text || '' };
+    return { analysis: text || '' };
   }
 );
