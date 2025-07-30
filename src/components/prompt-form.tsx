@@ -149,98 +149,6 @@ export const defaultValues: Partial<FormValues> = {
   author_disabled: false,
 };
 
-function TaskTypeSection() {
-    const { control, getValues, setValue } = useFormContext<FormValues>();
-    const isDisabled = useWatch({ control, name: 'aiRole_disabled' });
-    
-    const toggleDisabled = () => {
-        setValue('aiRole_disabled', !getValues('aiRole_disabled'));
-    }
-    return (
-        <FormSection title="Vad skall AIn aggera som?" required onToggle={toggleDisabled} isDisabled={isDisabled}>
-            <FormField
-                control={control}
-                name="aiRole"
-                render={({ field }) => (
-                    <FormItem className="space-y-3">
-                        <FormControl>
-                            <RadioGroup
-                                onValueChange={field.onChange}
-                                defaultValue={field.value}
-                                className="grid grid-cols-1 gap-4"
-                            >
-                                {aiRoleOptions.map((role) => (
-                                    <FormItem key={role} className="flex items-center space-x-3 space-y-0">
-                                        <FormControl>
-                                            <RadioGroupItem value={role} />
-                                        </FormControl>
-                                        <FormLabel className="font-normal">{role}</FormLabel>
-                                    </FormItem>
-                                ))}
-                            </RadioGroup>
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}
-            />
-        </FormSection>
-    )
-}
-
-function AIActionSection() {
-    const { control, getValues, setValue } = useFormContext<FormValues>();
-    const taskTypeRadio = useWatch({ control, name: "taskTypeRadio" });
-    const isDisabled = useWatch({ control, name: 'taskTypeRadio_disabled' });
-
-    const toggleDisabled = () => {
-        setValue('taskTypeRadio_disabled', !getValues('taskTypeRadio_disabled'));
-    }
-    
-    return (
-         <FormSection title="Vilken typ av text som skall produceras" required onToggle={toggleDisabled} isDisabled={isDisabled}>
-            <FormField
-                control={control}
-                name="taskTypeRadio"
-                render={({ field }) => (
-                    <FormItem className="space-y-3">
-                        <FormControl>
-                             <RadioGroup
-                                onValueChange={field.onChange}
-                                defaultValue={field.value}
-                                className="space-y-2"
-                            >
-                                {[...taskTypeRadioOptions, 'custom'].map((task) => (
-                                    <FormItem key={task} className="flex items-center space-x-3 space-y-0">
-                                        <FormControl>
-                                            <RadioGroupItem value={task} />
-                                        </FormControl>
-                                        <FormLabel className="font-normal">{task === 'custom' ? 'Annan...' : task}</FormLabel>
-                                    </FormItem>
-                                ))}
-                            </RadioGroup>
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}
-            />
-            {taskTypeRadio === 'custom' && (
-                <FormField
-                    control={control}
-                    name="taskTypeCustom"
-                    render={({ field }) => (
-                        <FormItem className="mt-4">
-                            <FormControl>
-                                <Textarea placeholder="Beskriv typen av text..." {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-            )}
-        </FormSection>
-    )
-}
-
 export function PromptForm() {
     const { control, setValue, getValues } = useFormContext<FormValues>();
     const { fields, append, remove } = useFieldArray({
@@ -546,7 +454,6 @@ export function PromptForm() {
                     <FormField control={control} name="author" render={({ field }) => (<FormItem><FormControl><Input placeholder="Ditt namn eller företagsnamn" {...field} /></FormControl></FormItem>)} />
                 </FormSection>
             </div>
-
         </div>
     );
 }
