@@ -49,7 +49,7 @@ const writingForMap: Record<string, string> = {
 const adaptivePromptGenerationFlow = ai.defineFlow(
   {
     name: 'adaptivePromptGenerationFlow',
-    inputSchema: z.any(), // Using "any" because the schema is now defined and validated in the form component.
+    inputSchema: z.any(), // Using "any" because the schema is defined and validated in the form component.
     outputSchema: AdaptivePromptGenerationOutputSchema,
   },
   async (data: FormValues) => {
@@ -141,7 +141,7 @@ const adaptivePromptGenerationFlow = ai.defineFlow(
     }
 
     const { text } = await ai.generate({
-        model: 'googleai/gemini-pro',
+        model: 'googleai/gemini-1.5-flash-latest',
         prompt: promptText
     });
     
