@@ -67,17 +67,17 @@ function PageContent() {
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
                 <div>
-                    <form onSubmit={handleSubmit(onGenerate)} className="w-full">
-                        <ScrollArea className="h-[calc(100vh-14rem)] pr-4 -mr-4">
-                            <FormProvider {...methods}>
+                    <FormProvider {...methods}>
+                        <form onSubmit={handleSubmit(onGenerate)} className="w-full">
+                            <ScrollArea className="h-[calc(100vh-14rem)] pr-4 -mr-4">
                                 <PromptForm />
-                            </FormProvider>
+                            </ScrollArea>
                             <Button type="submit" className="w-full mt-6" disabled={isLoading}>
                                 {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                                 Generera Innehåll
                             </Button>
-                        </ScrollArea>
-                    </form>
+                        </form>
+                    </FormProvider>
                 </div>
                 
                 <div className="lg:sticky lg:top-8">
