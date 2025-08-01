@@ -14,7 +14,7 @@ import { adaptivePromptGeneration } from '@/lib/prompt-generator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 
 
-export default function PromptSmithPage() {
+export default function PromptomagitorenPage() {
     const [promptText, setPromptText] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isInitial, setIsInitial] = useState(true);
@@ -119,7 +119,7 @@ export default function PromptSmithPage() {
     return (
         <div className="container mx-auto p-4 md:py-8">
             <header className="relative text-center mb-8">
-                <h1 className="text-4xl lg:text-5xl font-headline font-bold text-primary">PromptSmithy</h1>
+                <h1 className="text-4xl lg:text-5xl font-headline font-bold text-primary">Promptomagitören</h1>
                  <div className="absolute top-0 right-0">
                     <TooltipProvider>
                         <Tooltip>
@@ -133,7 +133,7 @@ export default function PromptSmithPage() {
                                     <h3 className="font-bold font-headline mb-2">Version 0.3</h3>
                                     <h4 className="font-semibold text-foreground mb-1 mt-3">Rättighetsförklaring</h4>
                                     <p className="text-muted-foreground text-xs leading-relaxed">
-                                        PromptSmithy är utvecklad av Daniel Wölfing för Industritorget. Alla immateriella rättigheter, inklusive men inte begränsat till upphovsrätt och varumärkesrätt, tillhör Industritorget. Ingen del av denna applikation får reproduceras, distribueras eller användas i kommersiellt eller icke-kommersiellt syfte utan skriftligt medgivande från Industritorget.
+                                        Promptomagitören är utvecklad av Daniel Wölfing för Industritorget. Alla immateriella rättigheter, inklusive men inte begränsat till upphovsrätt och varumärkesrätt, tillhör Industritorget. Ingen del av denna applikation får reproduceras, distribueras eller användas i kommersiellt eller icke-kommersiellt syfte utan skriftligt medgivande från Industritorget.
                                     </p>
                                     <p className="text-muted-foreground text-xs mt-2">
                                         Vid frågor eller behov av kontakt hänvisar vi till vår support: support@industritorget.se.
