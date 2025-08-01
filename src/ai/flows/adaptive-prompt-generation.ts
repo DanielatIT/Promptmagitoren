@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -92,13 +93,6 @@ Använd storytelling för att engagera läsaren. Modellen består av tre delar: 
 3.  **Solution:** Avsluta med att visa hur din produkt eller tjänst hjälper stjärnan att lösa problemet och uppnå sina mål.`
 };
 
-
-const contentGenerationPrompt = ai.definePrompt({
-    name: 'contentGenerationPrompt',
-    input: { schema: z.string() },
-    output: { format: 'text' },
-    prompt: `{{{input}}}`,
-});
 
 const adaptivePromptGenerationFlow = ai.defineFlow(
   {
@@ -198,7 +192,11 @@ const adaptivePromptGenerationFlow = ai.defineFlow(
       promptText += 'Texten skall skrivas ut ett neutralt perspektiv där vi som skriver inte benämns.\n\n';
     }
 
-    const { output } = await contentGenerationPrompt(promptText);
-    return output || '';
+    const result = await ai.generate({
+      prompt: promptText,
+    });
+    
+    return result.text;
   }
 );
+
