@@ -56,7 +56,7 @@ export default function PromptomagitorenPage() {
             delete cleanedData.links;
         }
         if (cleanedData.primaryKeyword_disabled) {
-            delete cleanedData.primaryKeyword;
+             delete cleanedData.primaryKeyword;
         }
         if (cleanedData.author_disabled) {
             delete cleanedData.author;
@@ -154,7 +154,7 @@ export default function PromptomagitorenPage() {
                             </ScrollArea>
                             <Button type="submit" className="w-full mt-6" disabled={isLoading}>
                                 {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                                Generera Innehåll
+                                Magitera prompt
                             </Button>
                         </form>
                     </FormProvider>
@@ -170,6 +170,7 @@ export default function PromptomagitorenPage() {
                                 <Button onClick={handleCopy} type="button" className="w-full" variant="outline">
                                     <Clipboard className="mr-2 h-4 w-4" /> Copy Text
                                 </Button>
+
                                 <ScrollArea className="h-[calc(100vh-25rem)] lg:h-[calc(100vh-18rem)] rounded-md border p-4 bg-muted/20">
                                     {renderContent()}
                                 </ScrollArea>

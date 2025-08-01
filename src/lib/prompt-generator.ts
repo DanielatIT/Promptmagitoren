@@ -189,31 +189,31 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
 
   promptText += languageOutputs[validatedData.language] + '\n\n';
 
-  const rules: string[] = [];
   if (validatedData.rules) {
-      if (validatedData.rules.avoidSuperlatives) rules.push('Undvik superlativ');
-      if (validatedData.rules.avoidPraise) rules.push('Undvik lovord');
-      if (validatedData.rules.avoidAcclaim) rules.push('Undvik beröm.');
-      if (validatedData.rules.isInformative) rules.push('Texten skall vara informativ med fokus på att ge läsaren kunskap för ämnet');
-      if (validatedData.rules.useWeForm) rules.push('Skriv i vi-form, som att vi är företaget.');
-      if (validatedData.rules.addressReaderAsYou) rules.push('Läsaren skall benämnas som ni.');
-      if (validatedData.rules.avoidWords.enabled && validatedData.rules.avoidWords.words && validatedData.rules.avoidWords.words.length > 0) {
-          const wordsToAvoid = validatedData.rules.avoidWords.words.map(id => avoidWordsMap[id]).filter(Boolean);
-          if (wordsToAvoid.length > 0) {
-            rules.push(`Texten får aldrig innehålla orden: ${wordsToAvoid.join(', ')}`);
-          }
-      }
-      if (validatedData.rules.avoidXYPhrase) rules.push('skriv aldrig en mening som liknar eller är i närheten av detta “...i en X värld/industri/område är “sökordet” värdefullt för Y anledning”');
-      if (validatedData.rules.avoidVilket) rules.push('Undvik att använda ",vilket..." och använd bara den där det mest passar. ", vilket" får bara finnas i texten 1 gång och ersätts med "och" "som" "detta" och andra ord');
-      if (validatedData.rules.customRules) {
-          rules.push(...validatedData.rules.customRules.split('\n').filter(rule => rule.trim() !== ''));
-      }
+    const rules: string[] = [];
+    if (validatedData.rules.avoidSuperlatives) rules.push('Undvik superlativ');
+    if (validatedData.rules.avoidPraise) rules.push('Undvik lovord');
+    if (validatedData.rules.avoidAcclaim) rules.push('Undvik beröm.');
+    if (validatedData.rules.isInformative) rules.push('Texten skall vara informativ med fokus på att ge läsaren kunskap för ämnet');
+    if (validatedData.rules.useWeForm) rules.push('Skriv i vi-form, som att vi är företaget.');
+    if (validatedData.rules.addressReaderAsYou) rules.push('Läsaren skall benämnas som ni.');
+    if (validatedData.rules.avoidWords.enabled && validatedData.rules.avoidWords.words && validatedData.rules.avoidWords.words.length > 0) {
+        const wordsToAvoid = validatedData.rules.avoidWords.words.map(id => avoidWordsMap[id]).filter(Boolean);
+        if (wordsToAvoid.length > 0) {
+          rules.push(`Texten får aldrig innehålla orden: ${wordsToAvoid.join(', ')}`);
+        }
+    }
+    if (validatedData.rules.avoidXYPhrase) rules.push('skriv aldrig en mening som liknar eller är i närheten av detta “...i en X värld/industri/område är “sökordet” värdefullt för Y anledning”');
+    if (validatedData.rules.avoidVilket) rules.push('Undvik att använda ",vilket..." och använd bara den där det mest passar. ", vilket" får bara finnas i texten 1 gång och ersätts med "och" "som" "detta" och andra ord');
+    if (validatedData.rules.customRules) {
+        rules.push(...validatedData.rules.customRules.split('\n').filter(rule => rule.trim() !== ''));
+    }
+
+    if (rules.length > 0) {
+        promptText += `Regler för texten: ${rules.join('. ')}\n\n`;
+    }
   }
 
-
-  if (rules.length > 0) {
-    promptText += `Regler för texten: ${rules.join(', ')}\n\n`;
-  }
 
   if (validatedData.links && validatedData.links.length > 0) {
     validatedData.links.forEach(link => {
@@ -234,5 +234,3 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
   
   return { prompt: promptText };
 }
-
-    
