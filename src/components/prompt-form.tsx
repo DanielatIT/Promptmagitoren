@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
-import { X, Plus, Trash2, Info } from "lucide-react"
+import { X, Plus, Trash2, Info, CheckCircle, XCircle } from "lucide-react"
 import { FormSection } from './form-section';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
@@ -47,135 +47,102 @@ const copywritingStyles = [
     {
         id: 'AIDA',
         label: 'AIDA-modellen',
-        tooltip: `AIDA kommer från de engelska orden Attention, Interest, Desire och Action. Med AIDA lär du dig skriva på ett klassiskt vis med en beprövad struktur. Detta betyder varje bokstav i AIDA:
+        tooltip: `**AIDA-modellen**
 
-Attention (uppmärksamhet): Fånga dina läsares uppmärksamhet med en intressant introduktion.
-Interest (intresse): Berätta varför läsaren borde fortsätta läsa.
-Desire (begär): Skapa ett begär hos läsaren att göra något. Det kan till exempel vara att följa din sida, köpa en produkt eller prenumerera på ett nyhetsbrev.
-Action (handling): Nu kan du använda en CTA-knapp för att dra nytta av läsarens intresse.
-Exempel med AIDA-modellen
-För att göra AIDA-modellen lite enklare att förstå ska vi ta ett exempel. Säg att du driver en webshop där du säljer växter och trädgårdstillbehör. Du har lanserat en ny självvattnande balkonglåda som du vill sälja. Såhär kan din hemsida se ut:
+AIDA står för Attention, Interest, Desire och Action. En klassisk och beprövad struktur.
 
-Attention: Vem vattnar växterna på din balkong när du är på semester?
+*   **Attention:** Fånga läsarens uppmärksamhet.
+*   **Interest:** Skapa intresse för att fortsätta läsa.
+*   **Desire:** Bygg ett begär för produkten/tjänsten.
+*   **Action:** Avsluta med en tydlig uppmaning.
 
-Interest: Här är vår nya serie av självvattnande balkonglådor! De håller dina växter fina och gröna i upp till en månad, utan att du behöver röra ett finger. Kom aldrig hem till vissna blommor igen!
+**Fördelar:**
+*   Enkel att komma ihåg och använda.
+*   Fångar effektivt läsarens intresse.
+*   Tydlig väg till handling (CTA).
 
-Desire: Tänk dig en sommar på en båt mellan öar i Grekland. Du kan njuta utan att oroa dig för din fina hortensia, som njuter av sommaren på din balkong. Om grannen också är på semester och inte kan hjälpa till att vattna gör det inget – din självbevattnande blomlåda gör jobbet!
-
-Action: Bli aldrig besviken på vissna blommor igen – beställ din självvattnande balkonglåda idag!
-
-Fördelar
-✅ Enkel att komma ihåg och jobba med.
-✅ Fångar läsarens intresse.
-✅ Gör det tydligt för läsaren vilken handling de ska göra.
-
-Nackdelar
-❌ Kan vara svår att använda för nyanserad kommunikation.
-❌ Kan vara ineffektiv vid mer komplex kommunikation.`,
+**Nackdelar:**
+*   Kan vara för simpel för nyanserad kommunikation.
+*   Kan vara ineffektiv vid komplexa budskap.`
     },
     {
         id: 'Fyra P',
         label: 'Fyra P-modellen',
-        tooltip: `Här kommer ännu en klassisk skrivmodell! Fyra P används på flera sätt inom marknadsföring. Fyra P kan dels handla om en modell för marknadsföringsmix men i detta fallet pratar vi om Fyra P för copywriting. Dessa Fyra P är engelskans: Picture, Promise, Prove och Push. Vi ska förklara:
+        tooltip: `**Fyra P-modellen (Picture, Promise, Prove, Push)**
 
-Picture (föreställ): Du börjar med att skapa en bild av ett positivt resultat eller en bra framtid för ett nuvarande problem.
-Promise (utlova): Du fortsätter genom att berätta hur din produkt eller tjänst kan ge det positiva resultat som läsaren föreställer sig.
-Prove (bevisa): Bevisa att ditt löfte stämmer. Presentera konkreta bevis på att du kan uppfylla dina löften och att din produkt eller tjänst kan leverera det du lovar.
-Push (driv): Använd en CTA för att ta läsaren till handling.
-Exempel med Fyra P
-I detta exempel ska vi ta en titt på en restaurang som nyligen lanserade sin sommarmeny. Restaurangen skickar ut marknadsföringsmail och använder Fyra P som skrivmodell för sin copy.
+En modell som bygger förtroende genom att måla en bild och bevisa löftet.
 
-Picture: Ämnesrad: Njut av sommarmenyn på vår soliga takterrass
-Du, dina närmaste vänner, handskalade räkor, eftermiddagssol, bra musik och en kall rosé. Kan du se det framför dig?
+*   **Picture:** Skapa en mental bild av ett önskat resultat.
+*   **Promise:** Lova att din lösning kan leverera resultatet.
+*   **Prove:** Bevisa löftet med fakta, statistik eller sociala bevis.
+*   **Push:** Driv läsaren till handling med en CTA.
 
-Promise: Nu har vi lanserat vår helt nya sommarmeny med härligt somriga rätter såsom handskalade räkor med aioli, vit sparris med vitlökssmör och moules frites. Sommarfavoriten laxburgare är dessutom tillbaka på menyn och du kan sätta ihop din egen trerätters-middag för bara 375 kronor. Ja, NU är det sommar!
+**Fördelar:**
+*   Visar snabbt fördelarna.
+*   Bygger starkt varumärkesförtroende med sociala bevis.
+*   Användbar för både text och video.
 
-Prove: Våra gäster älskar oss och särskilt vår sommarterrass! Läs gärna några av våra omdömen från Google Maps, där vi har 4,8 av 5 i betyg från 338 gäster.
-
-Push: Terrassen blir snabbt full så skynda dig att boka nu. Om du bokar senast 2 juni får du dessutom 10 procent rabatt på en trerättersmeny.
-
-Fördelar
-✅ Det är enkelt för läsaren att snabbt se fördelarna med något.
-✅ Sociala bevis fungerar bra för att skapa varumärkesförtroende.
-✅ Kan användas för både texter och videor.
-
-Nackdelar
-❌ Kräver att du vet något om målgrupper.
-❌ Fungerar bäst för etablerade företag som redan har sociala bevis.`,
+**Nackdelar:**
+*   Kräver viss kunskap om målgruppen.
+*   Fungerar bäst med befintliga sociala bevis.`
     },
     {
         id: 'Före-Efter-Bro',
         label: 'Före-efter-bro-modellen',
-        tooltip: `Med denna skrivmodell är det enkelt att skriva och den kan vara mycket effektiv. Namnet ”Före – efter – bro” kommer av att skribenten presenterar ett problem, visar hur bra livet blir efter lösningen och berättar sedan hur läsaren kan ta del av lösningen. Såhär fungerar den:
+        tooltip: `**Före-Efter-Bro-modellen**
 
-Före: Beskriv läsarens nuvarande verklighet och de problem som hen har.
-Efter: Berätta hur bra framtiden kan vara när problemet är löst.
-Bro: Berätta hur din produkt eller tjänst kan ta läsaren till en ljus framtid.
-Exempel med Före – efter – bro
-I detta exempel ska vi ta en titt på en webshop som säljer prenumerationer på grönsakslådor som levereras varje vecka. Butiken har skapat en annons för Facebook med hjälp av Före – efter – bro-modellen.
+En enkel och effektiv modell som visar en tydlig transformation.
 
-Före: Du vet nog vad vi pratar om. Du står på ICA efter en lång arbetsdag och behöver välja grönsaker för hela veckan. Inspirationen är inte på topp så det blir som vanligt: gurka, tomat, paprika och ett salladshuvud.
+*   **Före:** Beskriv problemet eller den nuvarande situationen.
+*   **Efter:** Måla upp en bild av den ideala situationen när problemet är löst.
+*   **Bro:** Presentera din produkt/tjänst som bron mellan "före" och "efter".
 
-Efter: Tänk dig istället att när du kommer hem från jobbet på måndag eftermiddag så får du en låda med färska grönsaker levererade till din dörr. Utöver tomater och en gurka får du lokalt odlad pak choi, spenat, kålrabbi, vitkål, sallat och mycket mer!
+**Fördelar:**
+*   Mycket enkel att förstå och applicera.
+*   Relaterbar för läsaren.
+*   Tydliggör värdet av lösningen.
 
-Bro: Prenumerera på Baras Mångfaldsodling för att få din första leverans inom bara två veckor. CTA: Välj din grönsakslåda.
-
-Fördelar
-✅ Enkelt för copywritern.
-✅ Läsaren får läsa om ett problem som de kan relatera till.
-✅ Det är enkelt för läsaren att förstå.
-
-Nackdelar
-❌ Inte särskilt anpassningsbart.`,
+**Nackdelar:**
+*   Mindre flexibel och inte särskilt anpassningsbar.`
     },
     {
         id: 'PAS',
-        label: 'PAS-modellen',
-        tooltip: `PAS står för engelskans Pain, Agitation och Solution. Detta är en skrivmodell som används flitigt inom marknadsföring. Såhär fungerar PAS:
+        label: 'PAS-modellen (Pain, Agitate, Solution)',
+        tooltip: `**PAS-modellen (Pain, Agitate, Solution)**
 
-Pain (smärta): Du börjar med att beskriva din målgrupps största och viktigaste problem.
-Agitation (reta): Du fortsätter med att konkretisera problemet genom att använda ord som associeras med problemet för läsaren. Det ökar behovet av en lösning.
-Solution (lösning): Slutligen presenteras lösningen. Berätta hur din produkt eller tjänst löser deras problem och hur ”smärtan” kan försvinna.
-Exempel med PAS-modellen
-Pain: Är du trött på trötta fötter och dåliga joggingturer?
+En kraftfull modell som fokuserar på att förstärka ett problem innan lösningen presenteras.
 
-Agitation: Det är svårt att sätta personbästa när man har blåsor på fötterna. Det blir lätt att hitta ursäkter och ligga kvar i soffan.
+*   **Pain:** Identifiera och beskriv läsarens "smärta" eller problem.
+*   **Agitate:** Förstärk problemet. Gör det mer påtagligt och akut.
+*   **Solution:** Presentera din produkt/tjänst som den ultimata lösningen.
 
-Solution: Med högteknologiska sulor som var specifikt designade för dig och dina steg blir du av med trötta fötter för alltid. Spring längre, snabbare och utan blåsor. CTA: Skapa anpassade sulor för dina fötter
+**Fördelar:**
+*   Gör det enkelt att vara konkret.
+*   Lösningen blir mer tillfredsställande efter agitationen.
+*   Kan användas i många olika sammanhang.
 
-Fördelar
-✅ Modellen gör det enkelt att vara konkret.
-✅ Lösningen är mer tillfredsställande när problemet känns större.
-✅ Kan användas för många olika situationer.
-
-Nackdelar
-❌ Ett stort fokus på problem kan överskugga fördelarna med en lösning.`,
+**Nackdelar:**
+*   Stort fokus på det negativa kan ibland överskugga fördelarna.`
     },
     {
         id: 'Star-Story-Solution',
         label: 'Star Story Solution-modellen',
-        tooltip: `Star Story Solution är en skrivmodell som gör det enkelt att skapa texter som fokuserar på storytelling. Det är detta fokus som gör denna skrivmodell så bra. Såhär fungerar den:
+        tooltip: `**Star Story Solution-modellen**
 
-Star (stjärna): Introducera stjärnan i berättelsen. Det kan vara en verklig person eller påhittad karaktär som har ett problem som läsaren kan känna igen sig i.
-Story (berättelse): En berättelse presenteras, med stjärnan i centrum.
-Solution (lösning): Här är ditt mål att visa hur stjärnan löser sitt problem med hjälp av en produkt eller tjänst.
-Exempel med Star Story Solution
-Vi kan ta ett exempel med ett företag som erbjuder anpassade måltider för personer med allergier eller andra specialdieter. Företaget har intervjuat nöjda kunder och har skapat en kundberättelse med bilder och texter.
+Använder storytelling för att engagera och skapa en personlig koppling.
 
-Star: Detta är Sara. Sara är vegetarian och är allergisk mot nötter, baljväxter, tomater och soja.
+*   **Star:** Introducera en karaktär ("stjärna") som målgruppen kan relatera till.
+*   **Story:** Berätta en historia om karaktärens problem och kamp.
+*   **Solution:** Visa hur din produkt/tjänst hjälper "stjärnan" att lösa problemet.
 
-Story: Det är viktigt för Sara att leva ett hälsosamt liv med en balanserad kost. Hon äter därför ofta samma rätt, om och om igen. Hon lägger flera timmar varje vecka på att se till att hon får vad hon behöver. Hon är trött på att känna att varje måltid är en närmast omöjlig uppgift. Nu har hon hittat MealHacker.
+**Fördelar:**
+*   Skapar en personlig och emotionell koppling.
+*   Storytelling fångar uppmärksamheten effektivt.
+*   Möjliggör mer nyanserade och komplexa budskap.
 
-Solution: Med en prenumeration på MealHacker får Sara ett paket varje månad med måltidsförslag och testade recept som passar hennes allergier och preferenser. Bakom hennes måltidsförslag står dietister, läkare och kockar som jobbar tillsammans för att skapa goda, näringsrika och säkra recept för Sara. Sara är särskilt nöjd med att MealHacker kan anpassa hennes måltid för att öka hennes proteinintag, vilket hjälper för att uppnå hennes träningsmål.
-
-Fördelar
-✅ Personen i berättelsen får texten att kännas mer personlig.
-✅ Storytelling fångar läsarens uppmärksamhet.
-✅ Det är enkelt att skapa en mer nyanserad berättelse.
-
-Nackdelar
-❌ Passar inte lika bra för korta texter.
-❌ Valet av person kan ha stor betydelse för målgruppen.`,
+**Nackdelar:**
+*   Passar sämre för korta texter.
+*   Valet av "stjärna" är avgörande för målgruppen.`
     },
 ] as const;
 
@@ -303,11 +270,12 @@ export function PromptForm() {
 
     const toggleDisabled = (fieldName: keyof FormValues) => {
         const currentVal = getValues(fieldName);
-        setValue(fieldName, !currentVal);
+        setValue(fieldName, !currentVal, { shouldValidate: true, shouldDirty: true });
     }
     
     const writingForRadio = useWatch({ control, name: "writingForRadio" });
     const avoidWordsEnabled = useWatch({ control, name: "rules.avoidWords.enabled" });
+    const taskType = useWatch({ control, name: "taskTypeRadio" });
 
     return (
         <div className="space-y-6">
@@ -362,27 +330,31 @@ export function PromptForm() {
                           <FormItem className="space-y-3">
                               <FormControl>
                                   <RadioGroup
-                                      onValueChange={(value) => {
-                                          field.onChange(value);
-                                      }}
+                                      onValueChange={field.onChange}
                                       defaultValue={field.value}
                                       className="space-y-2"
                                   >
-                                      {[...taskTypeRadioOptions, 'custom'].map((task) => (
+                                      {taskTypeRadioOptions.map((task) => (
                                           <FormItem key={task} className="flex items-center space-x-3 space-y-0">
                                               <FormControl>
                                                   <RadioGroupItem value={task} />
                                               </FormControl>
-                                              <FormLabel className="font-normal">{task === 'custom' ? 'Annan...' : task}</FormLabel>
+                                              <FormLabel className="font-normal">{task}</FormLabel>
                                           </FormItem>
                                       ))}
+                                      <FormItem className="flex items-center space-x-3 space-y-0">
+                                          <FormControl>
+                                              <RadioGroupItem value="custom" />
+                                          </FormControl>
+                                          <FormLabel className="font-normal">Annan...</FormLabel>
+                                      </FormItem>
                                   </RadioGroup>
                               </FormControl>
                               <FormMessage />
                           </FormItem>
                       )}
                   />
-                  {useWatch({ control, name: "taskTypeRadio" }) === 'custom' && (
+                  {taskType === 'custom' && (
                       <FormField
                           control={control}
                           name="taskTypeCustom"
@@ -426,8 +398,21 @@ export function PromptForm() {
                                                             <Info className="h-4 w-4" />
                                                         </Button>
                                                     </TooltipTrigger>
-                                                    <TooltipContent className="max-w-md whitespace-pre-wrap">
-                                                        <p>{style.tooltip}</p>
+                                                    <TooltipContent className="max-w-md p-4 bg-background border-border shadow-lg rounded-lg" side="bottom" align="start">
+                                                        <div className="space-y-3 text-popover-foreground">
+                                                            {style.tooltip.split('\n\n').map((section, i) => (
+                                                                <div key={i}>
+                                                                    {section.startsWith('**') && <h4 className="font-bold text-base mb-1">{section.replace(/\*\*/g, '')}</h4>}
+                                                                    {section.startsWith('*') && <ul className="list-disc list-inside space-y-1">{section.split('\n').map((item, j) => <li key={j}>{item.replace('* ', '')}</li>)}</ul>}
+                                                                    {section.startsWith('**Fördelar:**') && <h5 className="font-semibold text-sm mt-2 mb-1">Fördelar</h5>}
+                                                                    {section.startsWith('**Nackdelar:**') && <h5 className="font-semibold text-sm mt-2 mb-1">Nackdelar</h5>}
+                                                                    {
+                                                                        !section.startsWith('**') && !section.startsWith('*') &&
+                                                                        <p className="text-sm">{section}</p>
+                                                                    }
+                                                                </div>
+                                                            ))}
+                                                        </div>
                                                     </TooltipContent>
                                                 </Tooltip>
                                             </TooltipProvider>
@@ -550,12 +535,16 @@ export function PromptForm() {
                         <FormItem className="space-y-3">
                             <FormControl>
                                  <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2">
-                                    {[...writingForRadioOptions, 'custom'].map((item) => (
+                                    {writingForRadioOptions.map((item) => (
                                         <FormItem key={item} className="flex items-center space-x-3 space-y-0">
                                             <FormControl><RadioGroupItem value={item} /></FormControl>
-                                            <FormLabel className="font-normal">{item === 'custom' ? 'Annan...' : item}</FormLabel>
+                                            <FormLabel className="font-normal">{item}</FormLabel>
                                         </FormItem>
                                     ))}
+                                    <FormItem className="flex items-center space-x-3 space-y-0">
+                                        <FormControl><RadioGroupItem value="custom" /></FormControl>
+                                        <FormLabel className="font-normal">Annan...</FormLabel>
+                                    </FormItem>
                                 </RadioGroup>
                             </FormControl>
                         </FormItem>
