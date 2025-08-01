@@ -2,16 +2,16 @@
 'use server';
 
 /**
- * @fileOverview This file defines a Genkit flow for adaptive prompt generation.
+ * @fileOverview This file defines a function for adaptive prompt generation.
  *
- * - adaptivePromptGeneration - A function that generates an AI prompt based on user input, intelligently including/excluding constraints and formatting.
+ * - adaptivePromptGeneration - A function that generates a prompt string based on user input, intelligently including/excluding constraints and formatting.
+ * - FormValues - The input type for the adaptivePromptGeneration function.
  * - AdaptivePromptGenerationOutput - The return type for the adaptivePromptGeneration function.
  */
 
-import {ai} from '@/ai/genkit';
-import {z} from 'zod';
+import { z } from 'zod';
 
-// Define a strict schema for the flow input, mirroring the frontend form schema.
+// Define a strict schema for the form input.
 const AdaptivePromptGenerationInputSchema = z.object({
   topicGuideline: z.string().min(1),
   aiRole: z.enum([
@@ -65,14 +65,8 @@ const AdaptivePromptGenerationInputSchema = z.object({
 export type FormValues = z.infer<typeof AdaptivePromptGenerationInputSchema>;
 
 
-const AdaptivePromptGenerationOutputSchema = z.object({
-  prompt: z.string().describe('The generated AI prompt.'),
-});
-export type AdaptivePromptGenerationOutput = z.infer<typeof AdaptivePromptGenerationOutputSchema>;
-
-export async function adaptivePromptGeneration(input: FormValues): Promise<AdaptivePromptGenerationOutput> {
-  const result = await adaptivePromptGenerationFlow(input);
-  return { prompt: result };
+export interface AdaptivePromptGenerationOutput {
+  prompt: string;
 }
 
 const roleOutputs: { [key: string]: string } = {
@@ -151,103 +145,97 @@ const avoidWordsMap: Record<string, string> = {
     idealiskt: 'idealiskt',
 };
 
+export async function adaptivePromptGeneration(data: FormValues): Promise<AdaptivePromptGenerationOutput> {
+  // Validate input data
+  AdaptivePromptGenerationInputSchema.parse(data);
 
-const adaptivePromptGenerationFlow = ai.defineFlow(
-  {
-    name: 'adaptivePromptGenerationFlow',
-    inputSchema: AdaptivePromptGenerationInputSchema,
-    outputSchema: z.string(),
-  },
-  async (data) => {
-    let promptText = "Dessa regler nedan skall följas väldigt strikt, kolla konstant att du alltid följer det instruktioner jag ger dig här och återkom med en fråga om vad du skall göra istället för att göra något annat än vad instruktioner hänvisar. \n\n";
+  let promptText = "Dessa regler nedan skall följas väldigt strikt, kolla konstant att du alltid följer det instruktioner jag ger dig här och återkom med en fråga om vad du skall göra istället för att göra något annat än vad instruktioner hänvisar. \n\n";
 
-    if (data.topicGuideline) {
-      promptText += `Förhåll dig till denna information när du skriver texten: ${data.topicGuideline}\n\n`;
-    }
-
-    promptText += roleOutputs[data.aiRole] + '\n\n';
-
-    const taskType = data.taskTypeRadio === 'custom' && data.taskTypeCustom
-      ? data.taskTypeCustom
-      : taskTypeMap[data.taskTypeRadio];
-    if (taskType) {
-      promptText += `Din uppgift är att: ${taskType}\n\n`;
-    }
-
-    if (data.copywritingStyle && data.copywritingStyle !== 'none') {
-        promptText += `Använd följande copywriting-stil: \n${copywritingStyleMap[data.copywritingStyle]}\n\n`;
-    }
-
-    if (data.tonality && data.tonality.length > 0) {
-      const tonalityDescriptions = data.tonality
-        .map(t => tonalityMap[t])
-        .filter(Boolean)
-        .join('\n');
-      if (tonalityDescriptions) {
-        promptText += `Tonaliteten ska följa dessa riktlinjer:\n${tonalityDescriptions}\n\n`;
-      }
-    }
-
-    if (data.textLength) {
-      const textLengthNum = parseInt(data.textLength, 10);
-      if (!isNaN(textLengthNum)) {
-        const lowerBound = textLengthNum - 50;
-        promptText += `Längd på denna text skall vara ${textLengthNum}, och skall hållas till detta så gott det går. Texten får ej överskridas mer än med 20 ord och får ej vara mindre än ${lowerBound} ord.\n\n`;
-      }
-    }
-    
-    if (data.excludeLists) {
-      promptText += 'Texten får inte innehålla några listor alls.\n\n';
-    } else if (data.numberOfLists) {
-      const numberOfListsNum = parseInt(data.numberOfLists, 10);
-      if (!isNaN(numberOfListsNum)) {
-        promptText += `Texten får bara ha ${numberOfListsNum} antal listor i alla dess former\n\n`;
-      }
-    }
-
-    promptText += languageOutputs[data.language] + '\n\n';
-
-    const rules: string[] = [];
-    if (data.rules.avoidSuperlatives) rules.push('Undvik superlativ');
-    if (data.rules.avoidPraise) rules.push('Undvik lovord');
-    if (data.rules.avoidAcclaim) rules.push('Undvik beröm.');
-    if (data.rules.isInformative) rules.push('Texten skall vara informativ med fokus på att ge läsaren kunskap för ämnet');
-    if (data.rules.useWeForm) rules.push('Skriv i vi-form, som att vi är företaget.');
-    if (data.rules.addressReaderAsYou) rules.push('Läsaren skall benämnas som ni.');
-    if (data.rules.avoidWords.enabled && data.rules.avoidWords.words && data.rules.avoidWords.words.length > 0) {
-        const wordsToAvoid = data.rules.avoidWords.words.map(id => avoidWordsMap[id]).filter(Boolean);
-        if (wordsToAvoid.length > 0) {
-          rules.push(`Texten får aldrig innehålla orden: ${wordsToAvoid.join(', ')}`);
-        }
-    }
-    if (data.rules.avoidXYPhrase) rules.push('skriv aldrig en mening som liknar eller är i närheten av detta “...i en X värld/industri/område är “sökordet” värdefullt för Y anledning”');
-    if (data.rules.avoidVilket) rules.push('Undvik att använda ",vilket..." och använd bara den där det mest passar. ", vilket" får bara finnas i texten 1 gång och ersätts med "och" "som" "detta" och andra ord');
-    if (data.rules.customRules) {
-        rules.push(...data.rules.customRules.split('\n').filter(rule => rule.trim() !== ''));
-    }
-
-    if (rules.length > 0) {
-      promptText += `Regler för texten: ${rules.join(', ')}\n\n`;
-    }
-
-    if (data.links && data.links.length > 0) {
-      data.links.forEach(link => {
-        if (link.url && link.anchorText)
-          promptText += `Lägg in hyperlänkar i texten, länken är: ${link.url}. På detta sökord: ${link.anchorText}\n\n`;
-      });
-    }
-
-    if (data.primaryKeyword) {
-      promptText += `Denna text skall innehålla ${data.primaryKeyword} 1% av textens totala antal ord.\n\n`;
-    }
-
-    if (data.author) {
-      promptText += `Denna texten är skriven av ${data.author} och kan nämnas i en CTA.\n\n`;
-    } else {
-      promptText += 'Texten skall skrivas ut ett neutralt perspektiv där vi som skriver inte benämns.\n\n';
-    }
-    
-    // Just return the constructed prompt text
-    return promptText;
+  if (data.topicGuideline) {
+    promptText += `Förhåll dig till denna information när du skriver texten: ${data.topicGuideline}\n\n`;
   }
-);
+
+  promptText += roleOutputs[data.aiRole] + '\n\n';
+
+  const taskType = data.taskTypeRadio === 'custom' && data.taskTypeCustom
+    ? data.taskTypeCustom
+    : taskTypeMap[data.taskTypeRadio];
+  if (taskType) {
+    promptText += `Din uppgift är att: ${taskType}\n\n`;
+  }
+
+  if (data.copywritingStyle && data.copywritingStyle !== 'none') {
+      promptText += `Använd följande copywriting-stil: \n${copywritingStyleMap[data.copywritingStyle]}\n\n`;
+  }
+
+  if (data.tonality && data.tonality.length > 0) {
+    const tonalityDescriptions = data.tonality
+      .map(t => tonalityMap[t])
+      .filter(Boolean)
+      .join('\n');
+    if (tonalityDescriptions) {
+      promptText += `Tonaliteten ska följa dessa riktlinjer:\n${tonalityDescriptions}\n\n`;
+    }
+  }
+
+  if (data.textLength) {
+    const textLengthNum = parseInt(data.textLength, 10);
+    if (!isNaN(textLengthNum)) {
+      const lowerBound = textLengthNum - 50;
+      promptText += `Längd på denna text skall vara ${textLengthNum}, och skall hållas till detta så gott det går. Texten får ej överskridas mer än med 20 ord och får ej vara mindre än ${lowerBound} ord.\n\n`;
+    }
+  }
+  
+  if (data.excludeLists) {
+    promptText += 'Texten får inte innehålla några listor alls.\n\n';
+  } else if (data.numberOfLists) {
+    const numberOfListsNum = parseInt(data.numberOfLists, 10);
+    if (!isNaN(numberOfListsNum)) {
+      promptText += `Texten får bara ha ${numberOfListsNum} antal listor i alla dess former\n\n`;
+    }
+  }
+
+  promptText += languageOutputs[data.language] + '\n\n';
+
+  const rules: string[] = [];
+  if (data.rules.avoidSuperlatives) rules.push('Undvik superlativ');
+  if (data.rules.avoidPraise) rules.push('Undvik lovord');
+  if (data.rules.avoidAcclaim) rules.push('Undvik beröm.');
+  if (data.rules.isInformative) rules.push('Texten skall vara informativ med fokus på att ge läsaren kunskap för ämnet');
+  if (data.rules.useWeForm) rules.push('Skriv i vi-form, som att vi är företaget.');
+  if (data.rules.addressReaderAsYou) rules.push('Läsaren skall benämnas som ni.');
+  if (data.rules.avoidWords.enabled && data.rules.avoidWords.words && data.rules.avoidWords.words.length > 0) {
+      const wordsToAvoid = data.rules.avoidWords.words.map(id => avoidWordsMap[id]).filter(Boolean);
+      if (wordsToAvoid.length > 0) {
+        rules.push(`Texten får aldrig innehålla orden: ${wordsToAvoid.join(', ')}`);
+      }
+  }
+  if (data.rules.avoidXYPhrase) rules.push('skriv aldrig en mening som liknar eller är i närheten av detta “...i en X värld/industri/område är “sökordet” värdefullt för Y anledning”');
+  if (data.rules.avoidVilket) rules.push('Undvik att använda ",vilket..." och använd bara den där det mest passar. ", vilket" får bara finnas i texten 1 gång och ersätts med "och" "som" "detta" och andra ord');
+  if (data.rules.customRules) {
+      rules.push(...data.rules.customRules.split('\n').filter(rule => rule.trim() !== ''));
+  }
+
+  if (rules.length > 0) {
+    promptText += `Regler för texten: ${rules.join(', ')}\n\n`;
+  }
+
+  if (data.links && data.links.length > 0) {
+    data.links.forEach(link => {
+      if (link.url && link.anchorText)
+        promptText += `Lägg in hyperlänkar i texten, länken är: ${link.url}. På detta sökord: ${link.anchorText}\n\n`;
+    });
+  }
+
+  if (data.primaryKeyword) {
+    promptText += `Denna text skall innehålla ${data.primaryKeyword} 1% av textens totala antal ord.\n\n`;
+  }
+
+  if (data.author) {
+    promptText += `Denna texten är skriven av ${data.author} och kan nämnas i en CTA.\n\n`;
+  } else {
+    promptText += 'Texten skall skrivas ut ett neutralt perspektiv där vi som skriver inte benämns.\n\n';
+  }
+  
+  return { prompt: promptText };
+}
