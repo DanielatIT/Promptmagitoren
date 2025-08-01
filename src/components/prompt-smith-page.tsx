@@ -61,7 +61,7 @@ function PageContent() {
     return (
         <div className="container mx-auto p-4 md:py-8">
             <header className="text-center mb-8">
-                <h1 className="text-4xl lg:text-5xl font-headline font-bold text-primary">PromptSmithy!</h1>
+                <h1 className="text-4xl lg:text-5xl font-headline font-bold text-primary">PromptSmithy</h1>
                 <p className="text-muted-foreground mt-2 text-lg">
                     Ett verktyg skapat av: <a href="http://www.industritorget.se" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">Industritorget.se</a>
                 </p>
