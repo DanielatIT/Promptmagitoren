@@ -35,8 +35,6 @@ const tonalityOptions = [
     { id: 'persuasive', label: 'Övertygande/Säljande' },
 ] as const;
 
-const writingForRadioOptions = ['Kund', 'Vår blogg'] as const;
-
 const avoidWordsOptions = [
     { id: 'Upptäck', label: 'Upptäck' },
     { id: 'Utforska', label: 'Utforska' },
@@ -198,10 +196,6 @@ export const formSchema = z.object({
   
   language: z.enum(['Engelska', 'Svenska']),
   
-  writingForRadio: z.enum(['Kund', 'Vår blogg', 'custom']),
-  writingForCustom: z.string().optional(),
-  writingFor_disabled: z.boolean().default(false),
-
   rules: z.object({
     avoidSuperlatives: z.boolean().default(true),
     avoidPraise: z.boolean().default(true),
@@ -214,6 +208,7 @@ export const formSchema = z.object({
         words: z.array(z.string()).default(['Upptäck', 'Utforska', 'Oumbärligt', 'Särskiljt', 'idealiskt']),
     }),
     avoidXYPhrase: z.boolean().default(true),
+    avoidVilket: z.boolean().default(true),
     customRules: z.string().optional(),
   }),
   rules_disabled: z.boolean().default(false),
@@ -235,13 +230,6 @@ export const formSchema = z.object({
         path: ['taskTypeCustom'],
       });
     }
-    if (data.writingForRadio === 'custom' && (!data.writingForCustom || data.writingForCustom.trim() === '')) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Detta fält är obligatoriskt när 'Annan...' är valt.",
-        path: ['writingForCustom'],
-      });
-    }
   });
 
 export type FormValues = z.infer<typeof formSchema>;
@@ -261,9 +249,6 @@ export const defaultValues: Partial<FormValues> = {
   excludeLists: false,
   lists_disabled: false,
   language: 'Svenska',
-  writingForRadio: 'Kund',
-  writingForCustom: '',
-  writingFor_disabled: false,
   rules: {
     avoidSuperlatives: true,
     avoidPraise: true,
@@ -276,6 +261,7 @@ export const defaultValues: Partial<FormValues> = {
         words: ['Upptäck', 'Utforska', 'Oumbärligt', 'Särskiljt', 'idealiskt'],
     },
     avoidXYPhrase: true,
+    avoidVilket: true,
     customRules: '',
   },
   rules_disabled: false,
@@ -301,7 +287,6 @@ export function PromptForm() {
         setValue(fieldName, !currentVal, { shouldValidate: true, shouldDirty: true });
     }
     
-    const writingForRadio = useWatch({ control, name: "writingForRadio" });
     const avoidWordsEnabled = useWatch({ control, name: "rules.avoidWords.enabled" });
     const taskType = useWatch({ control, name: "taskTypeRadio" });
 
@@ -548,40 +533,6 @@ export function PromptForm() {
                 />
             </FormSection>
 
-            <FormSection title="Vilka skriver vi för?" onToggle={() => toggleDisabled('writingFor_disabled')} isDisabled={values.writingFor_disabled}>
-                <FormField
-                    control={control}
-                    name="writingForRadio"
-                    render={({ field }) => (
-                        <FormItem className="space-y-3">
-                            <FormControl>
-                                 <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2">
-                                    {writingForRadioOptions.map((item) => (
-                                        <FormItem key={item} className="flex items-center space-x-3 space-y-0">
-                                            <FormControl><RadioGroupItem value={item} /></FormControl>
-                                            <FormLabel className="font-normal">{item}</FormLabel>
-                                        </FormItem>
-                                    ))}
-                                    <FormItem className="flex items-center space-x-3 space-y-0">
-                                        <FormControl><RadioGroupItem value="custom" /></FormControl>
-                                        <FormLabel className="font-normal">Annan...</FormLabel>
-                                    </FormItem>
-                                </RadioGroup>
-                            </FormControl>
-                        </FormItem>
-                    )}
-                />
-                {writingForRadio === 'custom' && (
-                    <FormField
-                        control={control}
-                        name="writingForCustom"
-                        render={({ field }) => (
-                            <FormItem className="mt-4"><FormControl><Textarea placeholder="Beskriv målgruppen..." {...field} /></FormControl><FormMessage/></FormItem>
-                        )}
-                    />
-                )}
-            </FormSection>
-
             <FormSection title="Regler på texten" onToggle={() => toggleDisabled('rules_disabled')} isDisabled={values.rules_disabled}>
                 <div className="space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -592,6 +543,7 @@ export function PromptForm() {
                         <FormField control={control} name="rules.useWeForm" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Skriv i vi-form</FormLabel></FormItem>)} />
                         <FormField control={control} name="rules.addressReaderAsYou" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Benämn läsaren som "ni"</FormLabel></FormItem>)} />
                         <FormField control={control} name="rules.avoidXYPhrase" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Undvik "i en X är Y värdefullt..."</FormLabel></FormItem>)} />
+                        <FormField control={control} name="rules.avoidVilket" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Undvik ", vilket..."</FormLabel></FormItem>)} />
                     </div>
                     <div>
                         <FormField control={control} name="rules.avoidWords.enabled" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Undvik specifika ord</FormLabel></FormItem>)} />
@@ -653,3 +605,5 @@ export function PromptForm() {
         </div>
     );
 }
+
+    

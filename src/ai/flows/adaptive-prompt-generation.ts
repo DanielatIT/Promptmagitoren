@@ -43,11 +43,6 @@ const taskTypeMap: Record<string, string> = {
     'Korrekturläsning': 'Korrekturläs följande text noggrant med fullt fokus på svensk grammatik och språkriktighet. Gå igenom texten för att identifiera och korrigera alla typer av fel. Detta inkluderar bland annat stavfel (även sär- och sammanskrivningar), grammatikfel som felaktig böjning av ord, otydlig satskonstruktion, ordföljd och tempusfel. Se också över interpunktionen och justera användningen av kommatecken, punkter, semikolon, kolon, tankstreck och bindestreck.\n\nVar uppmärksam på syftningsfel, så att pronomen och adverb otvetydigt syftar på rätt ord eller fras. Granska meningsbyggnaden för att försäkra att formuleringarna är klara och koncisa, och att det inte förekommer onödigt långa meningar eller anakoluter. Kontrollera även att det inte finns några inkonsekvenser i texten, exempelvis gällande stavning av namn, användning av siffror, förkortningar eller inkonsekvent terminologi. Fokusera även på språkriktighet och stil, vilket innefattar ordval, textens flyt och att tonen är anpassad till syftet. Slutligen, sök efter typografiska fel som dubbla mellanslag, felaktig användning av stora/små bokstäver eller indrag.\n\nMålet är att texten ska vara idiomatiskt korrekt, lättläst, begriplig och professionell på svenska. När du presenterar de föreslagna ändringarna kan du antingen visa den fullständigt korrigerade texten eller lista specifika ändringar med en kort förklaring för varje justering, exempelvis "Original: \'dom\' -> Korrigerat: \'de\' - grammatikfel, personligt pronomen". Sträva efter att bevara författarens ursprungliga stil och ton så långt det är möjligt, samtidigt som språkriktigheten garanteras.',
 };
 
-const writingForMap: Record<string, string> = {
-    'Kund': 'Vi skriver denna text för en av våra kunder som skall publiceras på något vis på deras webbplats.',
-    'Vår blogg': 'Vi skriver denna text för en av våra bloggar. Dessa bloggar har som syfte att bidra med informativ information kring ämne i denna text. Men även ha ett syfte av att inkludera viktiga externlänkar.'
-};
-
 const copywritingStyleMap: Record<string, string> = {
     'AIDA': `AIDA-modellen
 Jag vill att denna text ska använda sig av AIDA-modellen.
@@ -158,15 +153,6 @@ const adaptivePromptGenerationFlow = ai.defineFlow(
 
     promptText += languageOutputs[data.language] + '\n\n';
 
-    if (!data.writingFor_disabled) {
-      const writingFor = data.writingForRadio === 'custom'
-        ? data.writingForCustom
-        : writingForMap[data.writingForRadio];
-      if (writingFor) {
-        promptText += `Vi skriver denna text för: ${writingFor}\n\n`;
-      }
-    }
-
     if (!data.rules_disabled) {
       const rules: string[] = [];
       if (data.rules.avoidSuperlatives) rules.push('Undvik superlativ');
@@ -179,6 +165,7 @@ const adaptivePromptGenerationFlow = ai.defineFlow(
           rules.push(`Texten får aldrig innehålla orden: ${data.rules.avoidWords.words.join(', ')}`);
       }
       if (data.rules.avoidXYPhrase) rules.push('skriv aldrig en mening som liknar eller är i närheten av detta “...i en X värld/industri/område är “sökordet” värdefullt för Y anledning”');
+      if (data.rules.avoidVilket) rules.push('Undvik att använda ",vilket..." och använd bara den där det mest passar. ", vilket" får bara finnas i texten 1 gång och ersätts med "och" "som" "detta" och andra ord');
       if (data.rules.customRules) {
           rules.push(...data.rules.customRules.split('\n').filter(rule => rule.trim() !== ''));
       }
