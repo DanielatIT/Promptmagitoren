@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
@@ -30,8 +30,26 @@ export default function PromptSmithPage() {
         setIsLoading(true);
         setIsInitial(false);
         setPromptText('');
+
+        // Clean up data based on disabled flags before sending to the flow.
+        const cleanedData = { ...data };
+        if (cleanedData.copywritingStyle_disabled) cleanedData.copywritingStyle = 'none';
+        if (cleanedData.tonality_disabled) cleanedData.tonality = [];
+        if (cleanedData.textLength_disabled) cleanedData.textLength = '';
+        if (cleanedData.lists_disabled) {
+            cleanedData.numberOfLists = '';
+            cleanedData.excludeLists = false;
+        }
+        if (cleanedData.rules_disabled) {
+            cleanedData.rules = defaultValues.rules!;
+            cleanedData.rules.avoidWords.words = []; // Keep avoidWords object but clear words
+        }
+        if (cleanedData.links_disabled) cleanedData.links = [];
+        if (cleanedData.primaryKeyword_disabled) cleanedData.primaryKeyword = '';
+        if (cleanedData.author_disabled) cleanedData.author = '';
+
         try {
-            const result = await adaptivePromptGeneration(data);
+            const result = await adaptivePromptGeneration(cleanedData);
             setPromptText(result.prompt);
         } catch (error) {
             console.error(error);
@@ -46,8 +64,8 @@ export default function PromptSmithPage() {
     };
 
     const handleCopy = () => {
-        if (!promptText || isInitial) {
-            toast({
+        if (!promptText || isLoading) {
+             toast({
                 title: "Inget att kopiera",
                 description: "Vänligen generera en prompt först.",
                 variant: "destructive"
