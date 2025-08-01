@@ -20,7 +20,8 @@ const aiRoleOptions = [
 const AdaptivePromptGenerationInputSchema = z.object({
   topicGuideline: z.string().min(1),
   aiRole: z.enum(aiRoleOptions),
-  taskType: z.string().min(1),
+  taskTypeRadio: z.enum(['Artikel', 'Seo onpage text', 'Korrekturläsning', 'custom']).optional(),
+  taskTypeCustom: z.string().optional(),
   
   copywritingStyle: z.string().optional(),
   
@@ -151,10 +152,13 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
 
   promptText += roleOutputs[validatedData.aiRole] + '\n\n';
 
-  const taskTypeInstruction = taskTypeMap[validatedData.taskType] || validatedData.taskType;
-    if (taskTypeInstruction) {
-        promptText += `Din uppgift är att: ${taskTypeInstruction}\n\n`;
-    }
+  const taskTypeInstruction = validatedData.taskTypeRadio === 'custom'
+    ? validatedData.taskTypeCustom
+    : validatedData.taskTypeRadio ? taskTypeMap[validatedData.taskTypeRadio] : '';
+    
+  if (taskTypeInstruction) {
+      promptText += `Din uppgift är att: ${taskTypeInstruction}\n\n`;
+  }
 
   if (validatedData.copywritingStyle && validatedData.copywritingStyle !== 'none') {
       promptText += `Använd följande copywriting-stil: \n${copywritingStyleMap[validatedData.copywritingStyle]}\n\n`;
@@ -197,7 +201,7 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
     if (validatedData.rules.isInformative) rules.push('Texten skall vara informativ med fokus på att ge läsaren kunskap för ämnet');
     if (validatedData.rules.useWeForm) rules.push('Skriv i vi-form, som att vi är företaget.');
     if (validatedData.rules.addressReaderAsYou) rules.push('Läsaren skall benämnas som ni.');
-    if (validatedData.rules.avoidWords.enabled && validatedData.rules.avoidWords.words && validatedData.rules.avoidWords.words.length > 0) {
+    if (validatedData.rules.avoidWords?.enabled && validatedData.rules.avoidWords.words && validatedData.rules.avoidWords.words.length > 0) {
         const wordsToAvoid = validatedData.rules.avoidWords.words.map(id => avoidWordsMap[id]).filter(Boolean);
         if (wordsToAvoid.length > 0) {
           rules.push(`Texten får aldrig innehålla orden: ${wordsToAvoid.join(', ')}`);

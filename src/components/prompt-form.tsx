@@ -175,8 +175,7 @@ const FormattedCopywritingInfo = ({ styleId }: { styleId: string }) => {
 export const formSchema = z.object({
   topicGuideline: z.string().min(1, 'Detta fält är obligatoriskt.'),
   aiRole: z.enum(aiRoleOptions),
-  taskType: z.string().min(1, 'Texttyp är obligatoriskt.'),
-  taskTypeRadio: z.enum([...taskTypeRadioOptions, 'custom']),
+  taskTypeRadio: z.enum([...taskTypeRadioOptions, 'custom']).optional(),
   taskTypeCustom: z.string().optional(),
   
   copywritingStyle: z.string().optional(),
@@ -228,20 +227,12 @@ export const formSchema = z.object({
         path: ['taskTypeCustom'],
       });
     }
-}).transform(data => {
-    if (data.taskTypeRadio === 'custom') {
-        data.taskType = data.taskTypeCustom || '';
-    } else {
-        data.taskType = data.taskTypeRadio;
-    }
-    const { taskTypeRadio, taskTypeCustom, ...rest } = data;
-    return rest;
 });
 
 
 export type FormValues = z.infer<typeof formSchema>;
 
-export const defaultValues: Partial<FormValues> & { taskTypeRadio: 'Artikel' | 'Seo onpage text' | 'Korrekturläsning' | 'custom' } = {
+export const defaultValues: Partial<FormValues> = {
   topicGuideline: '',
   aiRole: 'Copywriter',
   taskTypeRadio: 'Artikel',
@@ -281,7 +272,7 @@ export const defaultValues: Partial<FormValues> & { taskTypeRadio: 'Artikel' | '
 };
 
 export function PromptForm() {
-    const { control, setValue, getValues } = useFormContext<FormValues & { taskTypeRadio: string }>();
+    const { control, setValue, getValues } = useFormContext<FormValues>();
     const { fields, append, remove } = useFieldArray({
         control,
         name: "links",
@@ -617,5 +608,3 @@ export function PromptForm() {
         </div>
     );
 }
-
-    
