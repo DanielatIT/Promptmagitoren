@@ -15,7 +15,7 @@ interface FormSectionProps {
 
 export function FormSection({ title, description, onToggle, children, required, isDisabled }: FormSectionProps) {
     return (
-        <Card className={cn("bg-card/80 backdrop-blur-sm transition-opacity", isDisabled && "opacity-50")}>
+        <Card className={cn("bg-card/80 transition-opacity", isDisabled && "opacity-50")}>
             <CardHeader>
                 <div className="flex justify-between items-start gap-4">
                     <div className={cn(isDisabled && "line-through")}>

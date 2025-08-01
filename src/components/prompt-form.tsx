@@ -304,7 +304,6 @@ export function PromptForm() {
     const writingForRadio = useWatch({ control, name: "writingForRadio" });
     const avoidWordsEnabled = useWatch({ control, name: "rules.avoidWords.enabled" });
     const taskType = useWatch({ control, name: "taskTypeRadio" });
-    const selectedCopywritingStyle = useWatch({ control, name: "copywritingStyle" });
 
 
     return (
@@ -432,7 +431,7 @@ export function PromptForm() {
                                                             side="right" 
                                                             align="center" 
                                                             sideOffset={20}
-                                                            className="w-96 max-h-[calc(100vh-2rem)] overflow-y-auto bg-card/80 backdrop-blur-sm">
+                                                            className="w-96 max-h-[calc(100vh-2rem)] overflow-y-auto bg-card">
                                                             <FormattedCopywritingInfo styleId={style.id} />
                                                         </TooltipContent>
                                                     </Tooltip>
