@@ -47,6 +47,52 @@ const writingForMap: Record<string, string> = {
     'Vår blogg': 'Vi skriver denna text för en av våra bloggar. Dessa bloggar har som syfte att bidra med informativ information kring ämne i denna text. Men även ha ett syfte av att inkludera viktiga externlänkar.'
 };
 
+const copywritingStyleMap: Record<string, string> = {
+    'AIDA': `### **1. AIDA-modellen**
+Jag vill att denna text ska använda sig av AIDA-modellen.
+
+**Så här ska du följa stilen:**
+AIDA står för **Attention**, **Interest**, **Desire** och **Action**. Du ska strukturera texten i fyra delar:
+1.  **Attention:** Börja med att fånga läsarens uppmärksamhet med en intressant inledning eller en fråga.
+2.  **Interest:** Fortsätt med att förklara varför ämnet är relevant för läsaren och varför de bör fortsätta läsa.
+3.  **Desire:** Skapa ett begär genom att beskriva de positiva fördelarna och känslorna som läsaren kommer att uppleva.
+4.  **Action:** Avsluta med en tydlig uppmaning till handling, till exempel att köpa, prenumerera eller lära sig mer.`,
+    'Fyra P': `### **2. Fyra P-modellen**
+Jag vill att denna text ska använda sig av Fyra P-modellen.
+
+**Så här ska du följa stilen:**
+Modellen är baserad på **Picture**, **Promise**, **Prove** och **Push**. Använd denna struktur för att bygga upp texten:
+1.  **Picture:** Skapa en mental bild av ett önskvärt resultat eller en bättre framtid för läsaren.
+2.  **Promise:** Lova att din produkt eller tjänst kan leverera det positiva resultatet du just har beskrivit.
+3.  **Prove:** Stöd ditt löfte med konkreta bevis, som exempelvis kundomdömen, betyg eller statistik.
+4.  **Push:** Avsluta med en uppmaning till handling (**CTA**) för att driva läsaren att agera.`,
+    'Före-Efter-Bro': `### **3. Före-efter-bro-modellen**
+Jag vill att denna text ska använda sig av Före-efter-bro-modellen.
+
+**Så här ska du följa stilen:**
+Strukturen bygger på tre tydliga delar: **Före**, **Efter** och **Bro**. Texten ska följa denna logik:
+1.  **Före:** Beskriv läsarens nuvarande, problemfyllda situation.
+2.  **Efter:** Måla upp en bild av hur bra livet kan bli när problemet är löst.
+3.  **Bro:** Förklara hur din produkt eller tjänst fungerar som bron som tar läsaren från den problematiska "Före"-situationen till den idealiska "Efter"-situationen.`,
+    'PAS': `### **4. PAS-modellen**
+Jag vill att denna text ska använda sig av PAS-modellen.
+
+**Så här ska du följa stilen:**
+Denna modell, **Pain**, **Agitation** och **Solution**, fokuserar på att eskalera ett problem innan lösningen presenteras. Följ denna process:
+1.  **Pain:** Börja med att beskriva läsarens huvudproblem eller "smärta".
+2.  **Agitation:** Förstärk problemet genom att beskriva konsekvenserna och göra smärtan mer påtaglig.
+3.  **Solution:** Presentera din produkt eller tjänst som den ultimata lösningen som tar bort problemet helt och hållet.`,
+    'Star-Story-Solution': `### **5. Star Story Solution-modellen**
+Jag vill att denna text ska använda sig av Star Story Solution-modellen.
+
+**Så här ska du följa stilen:**
+Använd storytelling för att engagera läsaren. Modellen består av tre delar: **Star**, **Story** och **Solution**.
+1.  **Star:** Introducera en karaktär, en "stjärna", som har ett problem som målgruppen kan känna igen sig i.
+2.  **Story:** Berätta en historia som beskriver stjärnans kamp med problemet.
+3.  **Solution:** Avsluta med att visa hur din produkt eller tjänst hjälper stjärnan att lösa problemet och uppnå sina mål.`
+};
+
+
 const contentGenerationPrompt = ai.definePrompt({
     name: 'contentGenerationPrompt',
     input: { schema: z.string() },
@@ -74,6 +120,10 @@ const adaptivePromptGenerationFlow = ai.defineFlow(
       : taskTypeMap[data.taskTypeRadio];
     if (taskType) {
       promptText += `Din uppgift är att: ${taskType}\n\n`;
+    }
+
+    if (!data.copywritingStyle_disabled && data.copywritingStyle && data.copywritingStyle !== 'none') {
+        promptText += `Använd följande copywriting-stil: \n${copywritingStyleMap[data.copywritingStyle]}\n\n`;
     }
 
     if (!data.tonality_disabled && data.tonality && data.tonality.length > 0) {
