@@ -193,10 +193,10 @@ const adaptivePromptGenerationFlow = ai.defineFlow(
     }
 
     const result = await ai.generate({
+      model: 'googleai/gemini-pro',
       prompt: promptText,
     });
     
     return result.text;
   }
 );
-
