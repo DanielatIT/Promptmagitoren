@@ -49,7 +49,7 @@ const writingForMap: Record<string, string> = {
 };
 
 const copywritingStyleMap: Record<string, string> = {
-    'AIDA': `1. AIDA-modellen
+    'AIDA': `AIDA-modellen
 Jag vill att denna text ska använda sig av AIDA-modellen.
 
 Så här ska du följa stilen:
@@ -58,7 +58,7 @@ AIDA står för Attention, Interest, Desire och Action. Du ska strukturera texte
 2.  Interest: Fortsätt med att förklara varför ämnet är relevant för läsaren och varför de bör fortsätta läsa.
 3.  Desire: Skapa ett begär genom att beskriva de positiva fördelarna och känslorna som läsaren kommer att uppleva.
 4.  Action: Avsluta med en tydlig uppmaning till handling, till exempel att köpa, prenumerera eller lära sig mer.`,
-    'Fyra P': `2. Fyra P-modellen
+    'Fyra P': `Fyra P-modellen
 Jag vill att denna text ska använda sig av Fyra P-modellen.
 
 Så här ska du följa stilen:
@@ -67,7 +67,7 @@ Modellen är baserad på Picture, Promise, Prove och Push. Använd denna struktu
 2.  Promise: Lova att din produkt eller tjänst kan leverera det positiva resultatet du just har beskrivit.
 3.  Prove: Stöd ditt löfte med konkreta bevis, som exempelvis kundomdömen, betyg eller statistik.
 4.  Push: Avsluta med en uppmaning till handling (CTA) för att driva läsaren att agera.`,
-    'Före-Efter-Bro': `3. Före-efter-bro-modellen
+    'Före-Efter-Bro': `Före-efter-bro-modellen
 Jag vill att denna text ska använda sig av Före-efter-bro-modellen.
 
 Så här ska du följa stilen:
@@ -75,7 +75,7 @@ Strukturen bygger på tre tydliga delar: Före, Efter och Bro. Texten ska följa
 1.  Före: Beskriv läsarens nuvarande, problemfyllda situation.
 2.  Efter: Måla upp en bild av hur bra livet kan bli när problemet är löst.
 3.  Bro: Förklara hur din produkt eller tjänst fungerar som bron som tar läsaren från den problematiska "Före"-situationen till den idealiska "Efter"-situationen.`,
-    'PAS': `4. PAS-modellen
+    'PAS': `PAS-modellen
 Jag vill att denna text ska använda sig av PAS-modellen.
 
 Så här ska du följa stilen:
@@ -83,7 +83,7 @@ Denna modell, Pain, Agitation och Solution, fokuserar på att eskalera ett probl
 1.  Pain: Börja med att beskriva läsarens huvudproblem eller "smärta".
 2.  Agitation: Förstärk problemet genom att beskriva konsekvenserna och göra smärtan mer påtaglig.
 3.  Solution: Presentera din produkt eller tjänst som den ultimata lösningen som tar bort problemet helt och hållet.`,
-    'Star-Story-Solution': `5. Star Story Solution-modellen
+    'Star-Story-Solution': `Star Story Solution-modellen
 Jag vill att denna text ska använda sig av Star Story Solution-modellen.
 
 Så här ska du följa stilen:
@@ -91,6 +91,13 @@ Använd storytelling för att engagera läsaren. Modellen består av tre delar: 
 1.  Star: Introducera en karaktär, en "stjärna", som har ett problem som målgruppen kan känna igen sig i.
 2.  Story: Berätta en historia som beskriver stjärnans kamp med problemet.
 3.  Solution: Avsluta med att visa hur din produkt eller tjänst hjälper stjärnan att lösa problemet och uppnå sina mål.`
+};
+
+const tonalityMap: Record<string, string> = {
+    'Professionell/Formell': 'Denna tonalitet ska vara saklig, objektiv och använder ofta ett mer avancerat ordförråd. undviker slang och förkortningar. för B2B-kommunikation, juridiska texter, vetenskapliga rapporter och officiella meddelanden.',
+    'Vänlig/Tillgänglig': 'Skriv inbjudande och lättsam tonalitet som använder ett vardagligt språk och ofta tilltalar läsaren direkt. skapa en känsla av samhörighet.',
+    'Informativ/Faktapresenterande': 'använd en tonalitet som Fokuserar på att presentera fakta och data på ett tydligt och koncist sätt. Syftet är att utbilda eller upplysa läsaren, utan att vara för säljig eller personlig.',
+    'Övertygande/Säljande': 'Använd en tonalitet som engagera läsaren känslomässigt och intellektuellt för att motivera dem till en specifik handling (köp, anmälan etc.). Använder ofta starka verb, fördelar snarare än funktioner och call-to-actions.',
 };
 
 
@@ -121,7 +128,13 @@ const adaptivePromptGenerationFlow = ai.defineFlow(
     }
 
     if (!data.tonality_disabled && data.tonality && data.tonality.length > 0) {
-      promptText += `Tonaliteten ska vara: ${data.tonality.join(', ')}\n\n`;
+      const tonalityDescriptions = data.tonality
+        .map(t => tonalityMap[t])
+        .filter(Boolean)
+        .join('\n');
+      if (tonalityDescriptions) {
+        promptText += `Tonaliteten ska följa dessa riktlinjer:\n${tonalityDescriptions}\n\n`;
+      }
     }
 
     if (!data.textLength_disabled && data.textLength) {
