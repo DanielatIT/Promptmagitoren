@@ -174,11 +174,11 @@ const adaptivePromptGenerationFlow = ai.defineFlow(
       promptText += `Din uppgift är att: ${taskType}\n\n`;
     }
 
-    if (!data.copywritingStyle_disabled && data.copywritingStyle && data.copywritingStyle !== 'none') {
+    if (data.copywritingStyle && data.copywritingStyle !== 'none') {
         promptText += `Använd följande copywriting-stil: \n${copywritingStyleMap[data.copywritingStyle]}\n\n`;
     }
 
-    if (!data.tonality_disabled && data.tonality && data.tonality.length > 0) {
+    if (data.tonality && data.tonality.length > 0) {
       const tonalityDescriptions = data.tonality
         .map(t => tonalityMap[t])
         .filter(Boolean)
@@ -188,7 +188,7 @@ const adaptivePromptGenerationFlow = ai.defineFlow(
       }
     }
 
-    if (!data.textLength_disabled && data.textLength) {
+    if (data.textLength) {
       const textLengthNum = parseInt(data.textLength, 10);
       if (!isNaN(textLengthNum)) {
         const lowerBound = textLengthNum - 50;
@@ -196,58 +196,54 @@ const adaptivePromptGenerationFlow = ai.defineFlow(
       }
     }
     
-    if (!data.lists_disabled) {
-      if (data.excludeLists) {
-        promptText += 'Texten får inte innehålla några listor alls.\n\n';
-      } else if (data.numberOfLists) {
-        const numberOfListsNum = parseInt(data.numberOfLists, 10);
-        if (!isNaN(numberOfListsNum)) {
-          promptText += `Texten får bara ha ${numberOfListsNum} antal listor i alla dess former\n\n`;
-        }
+    if (data.excludeLists) {
+      promptText += 'Texten får inte innehålla några listor alls.\n\n';
+    } else if (data.numberOfLists) {
+      const numberOfListsNum = parseInt(data.numberOfLists, 10);
+      if (!isNaN(numberOfListsNum)) {
+        promptText += `Texten får bara ha ${numberOfListsNum} antal listor i alla dess former\n\n`;
       }
     }
 
     promptText += languageOutputs[data.language] + '\n\n';
 
-    if (!data.rules_disabled) {
-      const rules: string[] = [];
-      if (data.rules.avoidSuperlatives) rules.push('Undvik superlativ');
-      if (data.rules.avoidPraise) rules.push('Undvik lovord');
-      if (data.rules.avoidAcclaim) rules.push('Undvik beröm.');
-      if (data.rules.isInformative) rules.push('Texten skall vara informativ med fokus på att ge läsaren kunskap för ämnet');
-      if (data.rules.useWeForm) rules.push('Skriv i vi-form, som att vi är företaget.');
-      if (data.rules.addressReaderAsYou) rules.push('Läsaren skall benämnas som ni.');
-      if (data.rules.avoidWords.enabled && data.rules.avoidWords.words && data.rules.avoidWords.words.length > 0) {
-          const wordsToAvoid = data.rules.avoidWords.words.map(id => avoidWordsMap[id]).filter(Boolean);
-          if (wordsToAvoid.length > 0) {
-            rules.push(`Texten får aldrig innehålla orden: ${wordsToAvoid.join(', ')}`);
-          }
-      }
-      if (data.rules.avoidXYPhrase) rules.push('skriv aldrig en mening som liknar eller är i närheten av detta “...i en X värld/industri/område är “sökordet” värdefullt för Y anledning”');
-      if (data.rules.avoidVilket) rules.push('Undvik att använda ",vilket..." och använd bara den där det mest passar. ", vilket" får bara finnas i texten 1 gång och ersätts med "och" "som" "detta" och andra ord');
-      if (data.rules.customRules) {
-          rules.push(...data.rules.customRules.split('\n').filter(rule => rule.trim() !== ''));
-      }
-
-      if (rules.length > 0) {
-        promptText += `Regler för texten: ${rules.join(', ')}\n\n`;
-      }
+    const rules: string[] = [];
+    if (data.rules.avoidSuperlatives) rules.push('Undvik superlativ');
+    if (data.rules.avoidPraise) rules.push('Undvik lovord');
+    if (data.rules.avoidAcclaim) rules.push('Undvik beröm.');
+    if (data.rules.isInformative) rules.push('Texten skall vara informativ med fokus på att ge läsaren kunskap för ämnet');
+    if (data.rules.useWeForm) rules.push('Skriv i vi-form, som att vi är företaget.');
+    if (data.rules.addressReaderAsYou) rules.push('Läsaren skall benämnas som ni.');
+    if (data.rules.avoidWords.enabled && data.rules.avoidWords.words && data.rules.avoidWords.words.length > 0) {
+        const wordsToAvoid = data.rules.avoidWords.words.map(id => avoidWordsMap[id]).filter(Boolean);
+        if (wordsToAvoid.length > 0) {
+          rules.push(`Texten får aldrig innehålla orden: ${wordsToAvoid.join(', ')}`);
+        }
+    }
+    if (data.rules.avoidXYPhrase) rules.push('skriv aldrig en mening som liknar eller är i närheten av detta “...i en X värld/industri/område är “sökordet” värdefullt för Y anledning”');
+    if (data.rules.avoidVilket) rules.push('Undvik att använda ",vilket..." och använd bara den där det mest passar. ", vilket" får bara finnas i texten 1 gång och ersätts med "och" "som" "detta" och andra ord');
+    if (data.rules.customRules) {
+        rules.push(...data.rules.customRules.split('\n').filter(rule => rule.trim() !== ''));
     }
 
-    if (!data.links_disabled && data.links && data.links.length > 0) {
+    if (rules.length > 0) {
+      promptText += `Regler för texten: ${rules.join(', ')}\n\n`;
+    }
+
+    if (data.links && data.links.length > 0) {
       data.links.forEach(link => {
         if (link.url && link.anchorText)
           promptText += `Lägg in hyperlänkar i texten, länken är: ${link.url}. På detta sökord: ${link.anchorText}\n\n`;
       });
     }
 
-    if (!data.primaryKeyword_disabled && data.primaryKeyword) {
+    if (data.primaryKeyword) {
       promptText += `Denna text skall innehålla ${data.primaryKeyword} 1% av textens totala antal ord.\n\n`;
     }
 
-    if (!data.author_disabled && data.author) {
+    if (data.author) {
       promptText += `Denna texten är skriven av ${data.author} och kan nämnas i en CTA.\n\n`;
-    } else if (!data.author_disabled) {
+    } else {
       promptText += 'Texten skall skrivas ut ett neutralt perspektiv där vi som skriver inte benämns.\n\n';
     }
     

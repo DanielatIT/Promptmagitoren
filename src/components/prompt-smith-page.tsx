@@ -31,22 +31,51 @@ export default function PromptSmithPage() {
         setIsInitial(false);
         setPromptText('');
 
-        // Clean up data based on disabled flags before sending to the flow.
-        const cleanedData = { ...data };
-        if (cleanedData.copywritingStyle_disabled) cleanedData.copywritingStyle = 'none';
-        if (cleanedData.tonality_disabled) cleanedData.tonality = [];
-        if (cleanedData.textLength_disabled) cleanedData.textLength = '';
+        // Create a deep copy to avoid direct mutation of form state
+        const cleanedData = JSON.parse(JSON.stringify(data));
+        
+        // Explicitly clean data based on the disabled flags.
+        // This ensures no data from a disabled section is ever sent to the flow.
+        if (cleanedData.copywritingStyle_disabled) {
+            cleanedData.copywritingStyle = 'none';
+        }
+        if (cleanedData.tonality_disabled) {
+            cleanedData.tonality = [];
+        }
+        if (cleanedData.textLength_disabled) {
+            cleanedData.textLength = '';
+        }
         if (cleanedData.lists_disabled) {
             cleanedData.numberOfLists = '';
             cleanedData.excludeLists = false;
         }
         if (cleanedData.rules_disabled) {
-            cleanedData.rules = defaultValues.rules!;
-            cleanedData.rules.avoidWords.words = []; // Keep avoidWords object but clear words
+            // Reset rules to their default (empty/neutral) state if the whole section is disabled.
+             cleanedData.rules = {
+                avoidSuperlatives: false,
+                avoidPraise: false,
+                avoidAcclaim: false,
+                isInformative: false,
+                useWeForm: false,
+                addressReaderAsYou: false,
+                avoidWords: {
+                    enabled: false,
+                    words: [],
+                },
+                avoidXYPhrase: false,
+                avoidVilket: false,
+                customRules: '',
+            };
         }
-        if (cleanedData.links_disabled) cleanedData.links = [];
-        if (cleanedData.primaryKeyword_disabled) cleanedData.primaryKeyword = '';
-        if (cleanedData.author_disabled) cleanedData.author = '';
+        if (cleanedData.links_disabled) {
+            cleanedData.links = [];
+        }
+        if (cleanedData.primaryKeyword_disabled) {
+            cleanedData.primaryKeyword = '';
+        }
+        if (cleanedData.author_disabled) {
+            cleanedData.author = '';
+        }
 
         try {
             const result = await adaptivePromptGeneration(cleanedData);
