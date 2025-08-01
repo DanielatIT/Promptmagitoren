@@ -17,10 +17,9 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
-import { X, Plus, Trash2, Info, CheckCircle, XCircle } from "lucide-react"
+import { X, Plus, Trash2, Info } from "lucide-react"
 import { FormSection } from './form-section';
 import { cn } from '@/lib/utils';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 
 const aiRoleOptions = [
     'Copywriter', 'SEO expert', 'Skribent för bloggar', 'Korrekturläsare', 'Programmerare för HTML, CSS och Javascript', 'Researcher'
@@ -45,104 +44,26 @@ const avoidWordsOptions = [
     { id: 'idealiskt', label: 'idealiskt (och dess böjningsformer)' },
 ];
 
-const copywritingStyles = [
+export const copywritingStyles = [
     {
         id: 'AIDA',
-        label: 'AIDA-modellen',
-        tooltipTitle: 'AIDA-modellen',
-        tooltipContent: `
-AIDA står för **Attention**, **Interest**, **Desire** och **Action**. En klassisk och beprövad struktur.
-- **Attention:** Fånga läsarens uppmärksamhet.
-- **Interest:** Skapa intresse för att fortsätta läsa.
-- **Desire:** Bygg ett begär för produkten/tjänsten.
-- **Action:** Avsluta med en tydlig uppmaning.
-`,
-        pros: [
-            'Enkel att komma ihåg och använda.',
-            'Fångar effektivt läsarens intresse.',
-            'Tydlig väg till handling (CTA).',
-        ],
-        cons: [
-            'Kan vara för simpel för nyanserad kommunikation.',
-            'Kan vara ineffektiv vid komplexa budskap.',
-        ],
+        label: 'AIDA-modellen'
     },
     {
         id: 'Fyra P',
-        label: 'Fyra P-modellen',
-        tooltipTitle: 'Fyra P-modellen (Picture, Promise, Prove, Push)',
-        tooltipContent: `
-En modell som bygger förtroende genom att måla en bild och bevisa löftet.
-- **Picture:** Skapa en mental bild av ett önskvärt resultat.
-- **Promise:** Lova att din lösning kan leverera resultatet.
-- **Prove:** Bevisa löftet med fakta, statistik eller sociala bevis.
-- **Push:** Driv läsaren till handling med en CTA.
-`,
-        pros: [
-            'Visar snabbt fördelarna.',
-            'Bygger starkt varumärkesförtroende med sociala bevis.',
-            'Användbar för både text och video.',
-        ],
-        cons: [
-            'Kräver viss kunskap om målgruppen.',
-            'Fungerar bäst med befintliga sociala bevis.',
-        ],
+        label: 'Fyra P-modellen'
     },
     {
         id: 'Före-Efter-Bro',
-        label: 'Före-efter-bro-modellen',
-        tooltipTitle: 'Före-Efter-Bro-modellen',
-        tooltipContent: `
-En enkel och effektiv modell som visar en tydlig transformation.
-- **Före:** Beskriv problemet eller den nuvarande situationen.
-- **Efter:** Måla upp en bild av den ideala situationen när problemet är löst.
-- **Bro:** Presentera din produkt/tjänst som bron mellan "före" och "efter".
-`,
-        pros: [
-            'Mycket enkel att förstå och applicera.',
-            'Relaterbar för läsaren.',
-            'Tydliggör värdet av lösningen.',
-        ],
-        cons: ['Mindre flexibel och inte särskilt anpassningsbar.'],
+        label: 'Före-efter-bro-modellen'
     },
     {
         id: 'PAS',
-        label: 'PAS-modellen',
-        tooltipTitle: 'PAS-modellen (Pain, Agitate, Solution)',
-        tooltipContent: `
-En kraftfull modell som fokuserar på att förstärka ett problem innan lösningen presenteras.
-- **Pain:** Identifiera och beskriv läsarens "smärta" eller problem.
-- **Agitate:** Förstärk problemet. Gör det mer påtagligt och akut.
-- **Solution:** Presentera din produkt/tjänst som den ultimata lösningen.
-`,
-        pros: [
-            'Gör det enkelt att vara konkret.',
-            'Lösningen blir mer tillfredsställande efter agitationen.',
-            'Kan användas i många olika sammanhang.',
-        ],
-        cons: [
-            'Stort fokus på det negativa kan ibland överskugga fördelarna.',
-        ],
+        label: 'PAS-modellen'
     },
     {
         id: 'Star-Story-Solution',
-        label: 'Star Story Solution-modellen',
-        tooltipTitle: 'Star Story Solution-modellen',
-        tooltipContent: `
-Använder storytelling för att engagera och skapa en personlig koppling.
-- **Star:** Introducera en karaktär ("stjärna") som målgruppen kan relatera till.
-- **Story:** Berätta en historia om karaktärens problem och kamp.
-- **Solution:** Visa hur din produkt/tjänst hjälper "stjärnan" att lösa problemet.
-`,
-        pros: [
-            'Skapar en personlig och emotionell koppling.',
-            'Storytelling fångar uppmärksamheten effektivt.',
-            'Möjliggör mer nyanserade och komplexa budskap.',
-        ],
-        cons: [
-            'Passar sämre för korta texter.',
-            'Valet av "stjärna" är avgörande för målgruppen.',
-        ],
+        label: 'Star Story Solution-modellen'
     },
 ];
 
@@ -391,55 +312,6 @@ export function PromptForm() {
                                                 <RadioGroupItem value={style.id} />
                                             </FormControl>
                                             <FormLabel className="font-normal">{style.label}</FormLabel>
-                                            <TooltipProvider delayDuration={100}>
-                                                <Tooltip>
-                                                    <TooltipTrigger asChild>
-                                                        <Button type="button" variant="ghost" size="icon" className="h-5 w-5 text-muted-foreground hover:text-foreground">
-                                                            <Info className="h-4 w-4" />
-                                                        </Button>
-                                                    </TooltipTrigger>
-                                                    <TooltipContent className="max-w-md p-4 bg-background border-border shadow-lg rounded-lg z-50" side="bottom" align="start">
-                                                        <div className="space-y-4 text-popover-foreground">
-                                                            <h4 className="font-bold text-base">{style.tooltipTitle}</h4>
-                                                            
-                                                            <p className="text-sm">
-                                                                {style.tooltipContent.split('\n').filter(l => l.trim()).map((line, i) => (
-                                                                    <React.Fragment key={i}>
-                                                                        {line.startsWith('- ') ? <span className="flex items-start gap-2 ml-2"><span className="mt-1.5">*</span>{line.substring(2)}</span> : line}
-                                                                        <br />
-                                                                    </React.Fragment>
-                                                                ))}
-                                                            </p>
-
-                                                            <div>
-                                                                <h5 className="font-semibold text-sm mb-2">Fördelar</h5>
-                                                                <ul className="space-y-1.5">
-                                                                    {style.pros.map((pro, i) => (
-                                                                        <li key={i} className="flex items-start gap-2 text-sm">
-                                                                            <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
-                                                                            <span>{pro}</span>
-                                                                        </li>
-                                                                    ))}
-                                                                </ul>
-                                                            </div>
-                                                            
-                                                            {style.cons.length > 0 && (
-                                                                <div>
-                                                                    <h5 className="font-semibold text-sm mb-2">Nackdelar</h5>
-                                                                    <ul className="space-y-1.5">
-                                                                        {style.cons.map((con, i) => (
-                                                                            <li key={i} className="flex items-start gap-2 text-sm">
-                                                                                <XCircle className="h-4 w-4 text-red-500 mt-0.5 shrink-0" />
-                                                                                <span>{con}</span>
-                                                                            </li>
-                                                                        ))}
-                                                                    </ul>
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    </TooltipContent>
-                                                </Tooltip>
-                                            </TooltipProvider>
                                         </FormItem>
                                     ))}
                                 </RadioGroup>
@@ -656,5 +528,3 @@ export function PromptForm() {
         </div>
     );
 }
-
-    
