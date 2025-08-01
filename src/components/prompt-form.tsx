@@ -568,7 +568,7 @@ export function PromptForm() {
                                                         const newValue = checked
                                                             ? [...(field.value || []), word.id]
                                                             : (field.value || []).filter(v => v !== word.id);
-                                                        field.onChange(newValue.length > 0 ? newValue : undefined);
+                                                        field.onChange(newValue);
                                                     }}
                                                 />
                                                 </FormControl>

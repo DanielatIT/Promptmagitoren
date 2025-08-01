@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { useForm, FormProvider, useWatch } from 'react-hook-form';
+import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,8 +15,9 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/t
 
 
 export default function PromptSmithPage() {
-    const [generatedContent, setGeneratedContent] = useState<React.ReactNode>('');
+    const [promptText, setPromptText] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [isInitial, setIsInitial] = useState(true);
     const { toast } = useToast();
     
     const methods = useForm<FormValues>({
@@ -25,23 +26,13 @@ export default function PromptSmithPage() {
         mode: 'onSubmit'
     });
 
-    const copywritingStyle = useWatch({ control: methods.control, name: 'copywritingStyle' });
-
-    useEffect(() => {
-        setGeneratedContent(
-            <div className="flex items-center justify-center h-full text-muted-foreground">
-                <p>Din genererade prompt kommer att visas här.</p>
-            </div>
-        );
-    }, [copywritingStyle]);
-
-
     const onGenerate = async (data: FormValues) => {
         setIsLoading(true);
-        setGeneratedContent('');
+        setIsInitial(false);
+        setPromptText('');
         try {
             const result = await adaptivePromptGeneration(data);
-            setGeneratedContent(<pre className="text-sm whitespace-pre-wrap font-body leading-relaxed">{result.prompt}</pre>);
+            setPromptText(result.prompt);
         } catch (error) {
             console.error(error);
             toast({
@@ -55,22 +46,7 @@ export default function PromptSmithPage() {
     };
 
     const handleCopy = () => {
-        let textToCopy = '';
-        const content = generatedContent;
-    
-        if (typeof content === 'string') {
-            textToCopy = content;
-        } else if (React.isValidElement(content) && content.type === 'pre') {
-            textToCopy = content.props.children;
-        } else if (React.isValidElement(content) && content.props.children) {
-            // Fallback for the initial placeholder text
-            const pElement = (content.props.children as React.ReactElement).props.children;
-            if (typeof pElement === 'string') {
-                textToCopy = pElement;
-            }
-        }
-    
-        if (!textToCopy || textToCopy === 'Din genererade prompt kommer att visas här.') {
+        if (!promptText || isInitial) {
             toast({
                 title: "Inget att kopiera",
                 description: "Vänligen generera en prompt först.",
@@ -79,11 +55,33 @@ export default function PromptSmithPage() {
             return;
         }
     
-        navigator.clipboard.writeText(textToCopy);
+        navigator.clipboard.writeText(promptText);
         toast({
             title: "Kopierad till urklipp!",
             description: "Prompten är redo att användas.",
         });
+    };
+
+    const renderContent = () => {
+        if (isLoading) {
+            return (
+                <div className="flex items-center justify-center h-full text-muted-foreground">
+                    <Loader2 className="h-8 w-8 animate-spin" />
+                </div>
+            );
+        }
+        if (isInitial) {
+            return (
+                <div className="flex items-center justify-center h-full text-muted-foreground">
+                    <p>Din genererade prompt kommer att visas här.</p>
+                </div>
+            );
+        }
+        return (
+            <pre className="text-sm whitespace-pre-wrap font-body leading-relaxed">
+                {promptText}
+            </pre>
+        );
     };
 
     return (
@@ -141,13 +139,7 @@ export default function PromptSmithPage() {
                                     <Clipboard className="mr-2 h-4 w-4" /> Copy Text
                                 </Button>
                                 <ScrollArea className="h-[calc(100vh-25rem)] lg:h-[calc(100vh-18rem)] rounded-md border p-4 bg-muted/20">
-                                    {isLoading ? (
-                                        <div className="flex items-center justify-center h-full text-muted-foreground">
-                                            <Loader2 className="h-8 w-8 animate-spin" />
-                                        </div>
-                                    ) : (
-                                        generatedContent
-                                    )}
+                                    {renderContent()}
                                 </ScrollArea>
                                  <Button onClick={handleCopy} type="button" className="w-full" variant="outline">
                                     <Clipboard className="mr-2 h-4 w-4" /> Copy Text
