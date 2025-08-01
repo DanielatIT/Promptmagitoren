@@ -143,6 +143,14 @@ const tonalityMap: Record<string, string> = {
     'Övertygande/Säljande': 'Använd en tonalitet som engagera läsaren känslomässigt och intellektuellt för att motivera dem till en specifik handling (köp, anmälan etc.). Använder ofta starka verb, fördelar snarare än funktioner och call-to-actions.',
 };
 
+const avoidWordsMap: Record<string, string> = {
+    upptäck: 'Upptäck',
+    utforska: 'Utforska',
+    oumbärligt: 'Oumbärligt',
+    särskiljt: 'Särskiljt',
+    idealiskt: 'idealiskt',
+};
+
 
 const adaptivePromptGenerationFlow = ai.defineFlow(
   {
@@ -210,7 +218,10 @@ const adaptivePromptGenerationFlow = ai.defineFlow(
       if (data.rules.useWeForm) rules.push('Skriv i vi-form, som att vi är företaget.');
       if (data.rules.addressReaderAsYou) rules.push('Läsaren skall benämnas som ni.');
       if (data.rules.avoidWords.enabled && data.rules.avoidWords.words && data.rules.avoidWords.words.length > 0) {
-          rules.push(`Texten får aldrig innehålla orden: ${data.rules.avoidWords.words.join(', ')}`);
+          const wordsToAvoid = data.rules.avoidWords.words.map(id => avoidWordsMap[id]).filter(Boolean);
+          if (wordsToAvoid.length > 0) {
+            rules.push(`Texten får aldrig innehålla orden: ${wordsToAvoid.join(', ')}`);
+          }
       }
       if (data.rules.avoidXYPhrase) rules.push('skriv aldrig en mening som liknar eller är i närheten av detta “...i en X värld/industri/område är “sökordet” värdefullt för Y anledning”');
       if (data.rules.avoidVilket) rules.push('Undvik att använda ",vilket..." och använd bara den där det mest passar. ", vilket" får bara finnas i texten 1 gång och ersätts med "och" "som" "detta" och andra ord');
@@ -244,5 +255,3 @@ const adaptivePromptGenerationFlow = ai.defineFlow(
     return promptText;
   }
 );
-
-    

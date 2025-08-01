@@ -36,10 +36,10 @@ const tonalityOptions = [
 ] as const;
 
 const avoidWordsOptions = [
-    { id: 'Upptäck', label: 'Upptäck' },
-    { id: 'Utforska', label: 'Utforska' },
-    { id: 'Oumbärligt', label: 'Oumbärligt' },
-    { id: 'Särskiljt', label: 'Särskiljt' },
+    { id: 'upptäck', label: 'Upptäck' },
+    { id: 'utforska', label: 'Utforska' },
+    { id: 'oumbärligt', label: 'Oumbärligt' },
+    { id: 'särskiljt', label: 'Särskiljt' },
     { id: 'idealiskt', label: 'idealiskt (och dess böjningsformer)' },
 ];
 
@@ -258,7 +258,7 @@ export const defaultValues: Partial<FormValues> = {
     addressReaderAsYou: true,
     avoidWords: {
         enabled: true,
-        words: ['Upptäck', 'Utforska', 'Oumbärligt', 'Särskiljt', 'idealiskt'],
+        words: ['upptäck', 'utforska', 'oumbärligt', 'särskiljt', 'idealiskt'],
     },
     avoidXYPhrase: true,
     avoidVilket: true,
