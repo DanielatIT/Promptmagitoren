@@ -11,14 +11,16 @@
 
 import { z } from 'zod';
 
+const aiRoleOptions = [
+    'Copywriter', 'SEO expert', 'Skribent för bloggar', 'Korrekturläsare', 'Programmerare för HTML, CSS och Javascript', 'Researcher'
+] as const;
+
+
 // Define a strict schema for the form input.
 const AdaptivePromptGenerationInputSchema = z.object({
   topicGuideline: z.string().min(1),
-  aiRole: z.enum([
-    'Copywriter', 'SEO expert', 'Skribent för bloggar', 'Korrekturläsare', 'Programmerare för HTML, CSS och Javascript', 'Researcher'
-  ]),
-  taskTypeRadio: z.enum(['Artikel', 'Seo onpage text', 'Korrekturläsning', 'custom']),
-  taskTypeCustom: z.string().optional(),
+  aiRole: z.enum(aiRoleOptions),
+  taskType: z.string().min(1),
   
   copywritingStyle: z.string().optional(),
   
@@ -149,12 +151,10 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
 
   promptText += roleOutputs[validatedData.aiRole] + '\n\n';
 
-  const taskType = validatedData.taskTypeRadio === 'custom' && validatedData.taskTypeCustom
-    ? validatedData.taskTypeCustom
-    : taskTypeMap[validatedData.taskTypeRadio];
-  if (taskType) {
-    promptText += `Din uppgift är att: ${taskType}\n\n`;
-  }
+  const taskTypeInstruction = taskTypeMap[validatedData.taskType] || validatedData.taskType;
+    if (taskTypeInstruction) {
+        promptText += `Din uppgift är att: ${taskTypeInstruction}\n\n`;
+    }
 
   if (validatedData.copywritingStyle && validatedData.copywritingStyle !== 'none') {
       promptText += `Använd följande copywriting-stil: \n${copywritingStyleMap[validatedData.copywritingStyle]}\n\n`;
@@ -234,3 +234,5 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
   
   return { prompt: promptText };
 }
+
+    

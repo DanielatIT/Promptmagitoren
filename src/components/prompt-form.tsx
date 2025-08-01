@@ -172,13 +172,11 @@ const FormattedCopywritingInfo = ({ styleId }: { styleId: string }) => {
     );
 };
 
-
 export const formSchema = z.object({
   topicGuideline: z.string().min(1, 'Detta fält är obligatoriskt.'),
-  aiRole: z.enum([
-    'Copywriter', 'SEO expert', 'Skribent för bloggar', 'Korrekturläsare', 'Programmerare för HTML, CSS och Javascript', 'Researcher'
-  ]),
-  taskTypeRadio: z.enum(['Artikel', 'Seo onpage text', 'Korrekturläsning', 'custom']),
+  aiRole: z.enum(aiRoleOptions),
+  taskType: z.string().min(1, 'Texttyp är obligatoriskt.'),
+  taskTypeRadio: z.enum([...taskTypeRadioOptions, 'custom']),
   taskTypeCustom: z.string().optional(),
   
   copywritingStyle: z.string().optional(),
@@ -210,7 +208,7 @@ export const formSchema = z.object({
     avoidXYPhrase: z.boolean().default(true),
     avoidVilket: z.boolean().default(true),
     customRules: z.string().optional(),
-  }),
+  }).optional(),
   rules_disabled: z.boolean().default(false),
   
   links: z.array(z.object({ url: z.string().url("Invalid URL format"), anchorText: z.string().min(1, "Anchor text is required") })).optional(),
@@ -230,11 +228,20 @@ export const formSchema = z.object({
         path: ['taskTypeCustom'],
       });
     }
-  });
+}).transform(data => {
+    if (data.taskTypeRadio === 'custom') {
+        data.taskType = data.taskTypeCustom || '';
+    } else {
+        data.taskType = data.taskTypeRadio;
+    }
+    const { taskTypeRadio, taskTypeCustom, ...rest } = data;
+    return rest;
+});
+
 
 export type FormValues = z.infer<typeof formSchema>;
 
-export const defaultValues: Partial<FormValues> = {
+export const defaultValues: Partial<FormValues> & { taskTypeRadio: 'Artikel' | 'Seo onpage text' | 'Korrekturläsning' | 'custom' } = {
   topicGuideline: '',
   aiRole: 'Copywriter',
   taskTypeRadio: 'Artikel',
@@ -274,7 +281,7 @@ export const defaultValues: Partial<FormValues> = {
 };
 
 export function PromptForm() {
-    const { control, setValue, getValues } = useFormContext<FormValues>();
+    const { control, setValue, getValues } = useFormContext<FormValues & { taskTypeRadio: string }>();
     const { fields, append, remove } = useFieldArray({
         control,
         name: "links",
@@ -282,9 +289,9 @@ export function PromptForm() {
     
     const values = useWatch({ control });
 
-    const toggleDisabled = (fieldName: keyof FormValues) => {
-        const currentVal = getValues(fieldName);
-        setValue(fieldName, !currentVal, { shouldValidate: true, shouldDirty: true });
+    const toggleDisabled = (fieldName: keyof FormValues | `${string}_disabled`) => {
+        const currentVal = getValues(fieldName as any);
+        setValue(fieldName as any, !currentVal, { shouldValidate: true, shouldDirty: true });
     }
     
     const avoidWordsEnabled = useWatch({ control, name: "rules.avoidWords.enabled" });
@@ -610,3 +617,5 @@ export function PromptForm() {
         </div>
     );
 }
+
+    
