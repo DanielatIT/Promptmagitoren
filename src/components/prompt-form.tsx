@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
-import { X, Plus, Trash2, Info, CheckCircle, XCircle } from "lucide-react"
+import { X, Plus, Trash2, Info, CheckCircle, XCircle, CheckSquare, Square } from "lucide-react"
 import { FormSection } from './form-section';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
@@ -533,7 +533,12 @@ export function PromptForm() {
                 />
             </FormSection>
 
-            <FormSection title="Regler på texten" onToggle={() => toggleDisabled('rules_disabled')} isDisabled={values.rules_disabled}>
+            <FormSection
+                title="Regler på texten"
+                description="Alla ibockade regler gäller, bocka av om du inte vill ha med en regel."
+                onToggle={() => toggleDisabled('rules_disabled')}
+                isDisabled={values.rules_disabled}
+            >
                 <div className="space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <FormField control={control} name="rules.avoidSuperlatives" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Undvik superlativ</FormLabel></FormItem>)} />
@@ -605,5 +610,3 @@ export function PromptForm() {
         </div>
     );
 }
-
-    
