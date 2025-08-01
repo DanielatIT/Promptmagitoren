@@ -35,12 +35,12 @@ export default function PromptSmithPage() {
         const cleanedData = JSON.parse(JSON.stringify(data));
         
         // Explicitly clean data based on the disabled flags.
-        // This ensures no data from a disabled section is ever sent to the flow.
+        // This ensures no data from a disabled section is ever sent.
         if (cleanedData.copywritingStyle_disabled) {
             delete cleanedData.copywritingStyle;
         }
         if (cleanedData.tonality_disabled) {
-            cleanedData.tonality = [];
+            delete cleanedData.tonality;
         }
         if (cleanedData.textLength_disabled) {
             delete cleanedData.textLength;
@@ -53,7 +53,7 @@ export default function PromptSmithPage() {
             delete cleanedData.rules;
         }
         if (cleanedData.links_disabled) {
-            cleanedData.links = [];
+            delete cleanedData.links;
         }
         if (cleanedData.primaryKeyword_disabled) {
             delete cleanedData.primaryKeyword;
@@ -130,7 +130,7 @@ export default function PromptSmithPage() {
                             </TooltipTrigger>
                             <TooltipContent side="bottom" align="end" className="w-80">
                                 <div className="text-sm p-2 text-left">
-                                    <h3 className="font-bold font-headline mb-2">Version 0.2</h3>
+                                    <h3 className="font-bold font-headline mb-2">Version 0.3</h3>
                                     <h4 className="font-semibold text-foreground mb-1 mt-3">Rättighetsförklaring</h4>
                                     <p className="text-muted-foreground text-xs leading-relaxed">
                                         PromptSmithy är utvecklad av Daniel Wölfing för Industritorget. Alla immateriella rättigheter, inklusive men inte begränsat till upphovsrätt och varumärkesrätt, tillhör Industritorget. Ingen del av denna applikation får reproduceras, distribueras eller användas i kommersiellt eller icke-kommersiellt syfte utan skriftligt medgivande från Industritorget.
