@@ -52,7 +52,7 @@ const AdaptivePromptGenerationInputSchema = z.object({
   }),
   rules_disabled: z.boolean().default(false),
   
-  links: z.array(z.object({ url: z.string(), anchorText: z.string() })).optional(),
+  links: z.array(z.object({ url: z.string().url(), anchorText: z.string() })).optional(),
   links_disabled: z.boolean().default(false),
 
   primaryKeyword: z.string().optional(),
