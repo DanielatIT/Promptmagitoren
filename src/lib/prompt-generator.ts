@@ -21,17 +21,13 @@ const AdaptivePromptGenerationInputSchema = z.object({
   taskTypeCustom: z.string().optional(),
   
   copywritingStyle: z.string().optional(),
-  copywritingStyle_disabled: z.boolean().default(false),
   
   tonality: z.array(z.string()).optional(),
-  tonality_disabled: z.boolean().default(false),
   
   textLength: z.string().optional(),
-  textLength_disabled: z.boolean().default(false),
   
   numberOfLists: z.string().optional(),
-  excludeLists: z.boolean().default(false),
-  lists_disabled: z.boolean().default(false),
+  excludeLists: z.boolean().optional(),
   
   language: z.enum(['Engelska', 'Svenska']),
   
@@ -49,18 +45,14 @@ const AdaptivePromptGenerationInputSchema = z.object({
     avoidXYPhrase: z.boolean().default(true),
     avoidVilket: z.boolean().default(true),
     customRules: z.string().optional(),
-  }),
-  rules_disabled: z.boolean().default(false),
+  }).optional(),
   
   links: z.array(z.object({ url: z.string().url(), anchorText: z.string() })).optional(),
-  links_disabled: z.boolean().default(false),
 
   primaryKeyword: z.string().optional(),
-  primaryKeyword_disabled: z.boolean().default(false),
   
   author: z.string().optional(),
-  author_disabled: z.boolean().default(false),
-});
+}).passthrough(); // Use passthrough to ignore _disabled fields
 
 export type FormValues = z.infer<typeof AdaptivePromptGenerationInputSchema>;
 
@@ -147,29 +139,29 @@ const avoidWordsMap: Record<string, string> = {
 
 export async function adaptivePromptGeneration(data: FormValues): Promise<AdaptivePromptGenerationOutput> {
   // Validate input data
-  AdaptivePromptGenerationInputSchema.parse(data);
+  const validatedData = AdaptivePromptGenerationInputSchema.parse(data);
 
   let promptText = "Dessa regler nedan skall följas väldigt strikt, kolla konstant att du alltid följer det instruktioner jag ger dig här och återkom med en fråga om vad du skall göra istället för att göra något annat än vad instruktioner hänvisar. \n\n";
 
-  if (data.topicGuideline) {
-    promptText += `Förhåll dig till denna information när du skriver texten: ${data.topicGuideline}\n\n`;
+  if (validatedData.topicGuideline) {
+    promptText += `Förhåll dig till denna information när du skriver texten: ${validatedData.topicGuideline}\n\n`;
   }
 
-  promptText += roleOutputs[data.aiRole] + '\n\n';
+  promptText += roleOutputs[validatedData.aiRole] + '\n\n';
 
-  const taskType = data.taskTypeRadio === 'custom' && data.taskTypeCustom
-    ? data.taskTypeCustom
-    : taskTypeMap[data.taskTypeRadio];
+  const taskType = validatedData.taskTypeRadio === 'custom' && validatedData.taskTypeCustom
+    ? validatedData.taskTypeCustom
+    : taskTypeMap[validatedData.taskTypeRadio];
   if (taskType) {
     promptText += `Din uppgift är att: ${taskType}\n\n`;
   }
 
-  if (data.copywritingStyle && data.copywritingStyle !== 'none') {
-      promptText += `Använd följande copywriting-stil: \n${copywritingStyleMap[data.copywritingStyle]}\n\n`;
+  if (validatedData.copywritingStyle && validatedData.copywritingStyle !== 'none') {
+      promptText += `Använd följande copywriting-stil: \n${copywritingStyleMap[validatedData.copywritingStyle]}\n\n`;
   }
 
-  if (data.tonality && data.tonality.length > 0) {
-    const tonalityDescriptions = data.tonality
+  if (validatedData.tonality && validatedData.tonality.length > 0) {
+    const tonalityDescriptions = validatedData.tonality
       .map(t => tonalityMap[t])
       .filter(Boolean)
       .join('\n');
@@ -178,61 +170,64 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
     }
   }
 
-  if (data.textLength) {
-    const textLengthNum = parseInt(data.textLength, 10);
+  if (validatedData.textLength) {
+    const textLengthNum = parseInt(validatedData.textLength, 10);
     if (!isNaN(textLengthNum)) {
       const lowerBound = textLengthNum - 50;
       promptText += `Längd på denna text skall vara ${textLengthNum}, och skall hållas till detta så gott det går. Texten får ej överskridas mer än med 20 ord och får ej vara mindre än ${lowerBound} ord.\n\n`;
     }
   }
   
-  if (data.excludeLists) {
+  if (validatedData.excludeLists) {
     promptText += 'Texten får inte innehålla några listor alls.\n\n';
-  } else if (data.numberOfLists) {
-    const numberOfListsNum = parseInt(data.numberOfLists, 10);
+  } else if (validatedData.numberOfLists) {
+    const numberOfListsNum = parseInt(validatedData.numberOfLists, 10);
     if (!isNaN(numberOfListsNum)) {
       promptText += `Texten får bara ha ${numberOfListsNum} antal listor i alla dess former\n\n`;
     }
   }
 
-  promptText += languageOutputs[data.language] + '\n\n';
+  promptText += languageOutputs[validatedData.language] + '\n\n';
 
   const rules: string[] = [];
-  if (data.rules.avoidSuperlatives) rules.push('Undvik superlativ');
-  if (data.rules.avoidPraise) rules.push('Undvik lovord');
-  if (data.rules.avoidAcclaim) rules.push('Undvik beröm.');
-  if (data.rules.isInformative) rules.push('Texten skall vara informativ med fokus på att ge läsaren kunskap för ämnet');
-  if (data.rules.useWeForm) rules.push('Skriv i vi-form, som att vi är företaget.');
-  if (data.rules.addressReaderAsYou) rules.push('Läsaren skall benämnas som ni.');
-  if (data.rules.avoidWords.enabled && data.rules.avoidWords.words && data.rules.avoidWords.words.length > 0) {
-      const wordsToAvoid = data.rules.avoidWords.words.map(id => avoidWordsMap[id]).filter(Boolean);
-      if (wordsToAvoid.length > 0) {
-        rules.push(`Texten får aldrig innehålla orden: ${wordsToAvoid.join(', ')}`);
+  if (validatedData.rules) {
+      if (validatedData.rules.avoidSuperlatives) rules.push('Undvik superlativ');
+      if (validatedData.rules.avoidPraise) rules.push('Undvik lovord');
+      if (validatedData.rules.avoidAcclaim) rules.push('Undvik beröm.');
+      if (validatedData.rules.isInformative) rules.push('Texten skall vara informativ med fokus på att ge läsaren kunskap för ämnet');
+      if (validatedData.rules.useWeForm) rules.push('Skriv i vi-form, som att vi är företaget.');
+      if (validatedData.rules.addressReaderAsYou) rules.push('Läsaren skall benämnas som ni.');
+      if (validatedData.rules.avoidWords.enabled && validatedData.rules.avoidWords.words && validatedData.rules.avoidWords.words.length > 0) {
+          const wordsToAvoid = validatedData.rules.avoidWords.words.map(id => avoidWordsMap[id]).filter(Boolean);
+          if (wordsToAvoid.length > 0) {
+            rules.push(`Texten får aldrig innehålla orden: ${wordsToAvoid.join(', ')}`);
+          }
+      }
+      if (validatedData.rules.avoidXYPhrase) rules.push('skriv aldrig en mening som liknar eller är i närheten av detta “...i en X värld/industri/område är “sökordet” värdefullt för Y anledning”');
+      if (validatedData.rules.avoidVilket) rules.push('Undvik att använda ",vilket..." och använd bara den där det mest passar. ", vilket" får bara finnas i texten 1 gång och ersätts med "och" "som" "detta" och andra ord');
+      if (validatedData.rules.customRules) {
+          rules.push(...validatedData.rules.customRules.split('\n').filter(rule => rule.trim() !== ''));
       }
   }
-  if (data.rules.avoidXYPhrase) rules.push('skriv aldrig en mening som liknar eller är i närheten av detta “...i en X värld/industri/område är “sökordet” värdefullt för Y anledning”');
-  if (data.rules.avoidVilket) rules.push('Undvik att använda ",vilket..." och använd bara den där det mest passar. ", vilket" får bara finnas i texten 1 gång och ersätts med "och" "som" "detta" och andra ord');
-  if (data.rules.customRules) {
-      rules.push(...data.rules.customRules.split('\n').filter(rule => rule.trim() !== ''));
-  }
+
 
   if (rules.length > 0) {
     promptText += `Regler för texten: ${rules.join(', ')}\n\n`;
   }
 
-  if (data.links && data.links.length > 0) {
-    data.links.forEach(link => {
+  if (validatedData.links && validatedData.links.length > 0) {
+    validatedData.links.forEach(link => {
       if (link.url && link.anchorText)
         promptText += `Lägg in hyperlänkar i texten, länken är: ${link.url}. På detta sökord: ${link.anchorText}\n\n`;
     });
   }
 
-  if (data.primaryKeyword) {
-    promptText += `Denna text skall innehålla ${data.primaryKeyword} 1% av textens totala antal ord.\n\n`;
+  if (validatedData.primaryKeyword) {
+    promptText += `Denna text skall innehålla ${validatedData.primaryKeyword} 1% av textens totala antal ord.\n\n`;
   }
 
-  if (data.author) {
-    promptText += `Denna texten är skriven av ${data.author} och kan nämnas i en CTA.\n\n`;
+  if (validatedData.author) {
+    promptText += `Denna texten är skriven av ${validatedData.author} och kan nämnas i en CTA.\n\n`;
   } else {
     promptText += 'Texten skall skrivas ut ett neutralt perspektiv där vi som skriver inte benämns.\n\n';
   }

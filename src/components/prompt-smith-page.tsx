@@ -10,7 +10,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Clipboard, Loader2, Info } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast"
 import { PromptForm, formSchema, defaultValues, type FormValues } from './prompt-form';
-import { adaptivePromptGeneration } from '@/ai/flows/adaptive-prompt-generation';
+import { adaptivePromptGeneration } from '@/lib/prompt-generator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 
 
@@ -37,44 +37,29 @@ export default function PromptSmithPage() {
         // Explicitly clean data based on the disabled flags.
         // This ensures no data from a disabled section is ever sent to the flow.
         if (cleanedData.copywritingStyle_disabled) {
-            cleanedData.copywritingStyle = 'none';
+            delete cleanedData.copywritingStyle;
         }
         if (cleanedData.tonality_disabled) {
             cleanedData.tonality = [];
         }
         if (cleanedData.textLength_disabled) {
-            cleanedData.textLength = '';
+            delete cleanedData.textLength;
         }
         if (cleanedData.lists_disabled) {
-            cleanedData.numberOfLists = '';
-            cleanedData.excludeLists = false;
+            delete cleanedData.numberOfLists;
+            delete cleanedData.excludeLists;
         }
         if (cleanedData.rules_disabled) {
-            // Reset rules to their default (empty/neutral) state if the whole section is disabled.
-             cleanedData.rules = {
-                avoidSuperlatives: false,
-                avoidPraise: false,
-                avoidAcclaim: false,
-                isInformative: false,
-                useWeForm: false,
-                addressReaderAsYou: false,
-                avoidWords: {
-                    enabled: false,
-                    words: [],
-                },
-                avoidXYPhrase: false,
-                avoidVilket: false,
-                customRules: '',
-            };
+            delete cleanedData.rules;
         }
         if (cleanedData.links_disabled) {
             cleanedData.links = [];
         }
         if (cleanedData.primaryKeyword_disabled) {
-            cleanedData.primaryKeyword = '';
+            delete cleanedData.primaryKeyword;
         }
         if (cleanedData.author_disabled) {
-            cleanedData.author = '';
+            delete cleanedData.author;
         }
 
         try {
