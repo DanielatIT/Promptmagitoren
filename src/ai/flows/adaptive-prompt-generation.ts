@@ -10,7 +10,60 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'zod';
-import type { FormValues } from '@/components/prompt-form';
+
+// Define a strict schema for the flow input, mirroring the frontend form schema.
+const AdaptivePromptGenerationInputSchema = z.object({
+  topicGuideline: z.string().min(1),
+  aiRole: z.enum([
+    'Copywriter', 'SEO expert', 'Skribent för bloggar', 'Korrekturläsare', 'Programmerare för HTML, CSS och Javascript', 'Researcher'
+  ]),
+  taskTypeRadio: z.enum(['Artikel', 'Seo onpage text', 'Korrekturläsning', 'custom']),
+  taskTypeCustom: z.string().optional(),
+  
+  copywritingStyle: z.string().optional(),
+  copywritingStyle_disabled: z.boolean().default(false),
+  
+  tonality: z.array(z.string()).optional(),
+  tonality_disabled: z.boolean().default(false),
+  
+  textLength: z.string().optional(),
+  textLength_disabled: z.boolean().default(false),
+  
+  numberOfLists: z.string().optional(),
+  excludeLists: z.boolean().default(false),
+  lists_disabled: z.boolean().default(false),
+  
+  language: z.enum(['Engelska', 'Svenska']),
+  
+  rules: z.object({
+    avoidSuperlatives: z.boolean().default(true),
+    avoidPraise: z.boolean().default(true),
+    avoidAcclaim: z.boolean().default(true),
+    isInformative: z.boolean().default(true),
+    useWeForm: z.boolean().default(true),
+    addressReaderAsYou: z.boolean().default(true),
+    avoidWords: z.object({
+        enabled: z.boolean().default(true),
+        words: z.array(z.string()).optional(),
+    }),
+    avoidXYPhrase: z.boolean().default(true),
+    avoidVilket: z.boolean().default(true),
+    customRules: z.string().optional(),
+  }),
+  rules_disabled: z.boolean().default(false),
+  
+  links: z.array(z.object({ url: z.string(), anchorText: z.string() })).optional(),
+  links_disabled: z.boolean().default(false),
+
+  primaryKeyword: z.string().optional(),
+  primaryKeyword_disabled: z.boolean().default(false),
+  
+  author: z.string().optional(),
+  author_disabled: z.boolean().default(false),
+});
+
+export type FormValues = z.infer<typeof AdaptivePromptGenerationInputSchema>;
+
 
 const AdaptivePromptGenerationOutputSchema = z.object({
   prompt: z.string().describe('The generated AI prompt.'),
@@ -44,48 +97,43 @@ const taskTypeMap: Record<string, string> = {
 };
 
 const copywritingStyleMap: Record<string, string> = {
-    'AIDA': `AIDA-modellen
+    AIDA: `AIDA-modellen
 Jag vill att denna text ska använda sig av AIDA-modellen.
-
 Så här ska du följa stilen:
 AIDA står för Attention, Interest, Desire och Action. Du ska strukturera texten i fyra delar:
-1.  Attention: Börja med att fånga läsarens uppmärksamhet med en intressant inledning eller en fråga.
-2.  Interest: Fortsätt med att förklara varför ämnet är relevant för läsaren och varför de bör fortsätta läsa.
-3.  Desire: Skapa ett begär genom att beskriva de positiva fördelarna och känslorna som läsaren kommer att uppleva.
-4.  Action: Avsluta med en tydlig uppmaning till handling, till exempel att köpa, prenumerera eller lära sig mer.`,
+1. Attention: Börja med att fånga läsarens uppmärksamhet med en intressant inledning eller en fråga.
+2. Interest: Fortsätt med att förklara varför ämnet är relevant för läsaren och varför de bör fortsätta läsa.
+3. Desire: Skapa ett begär genom att beskriva de positiva fördelarna och känslorna som läsaren kommer att uppleva.
+4. Action: Avsluta med en tydlig uppmaning till handling, till exempel att köpa, prenumerera eller lära sig mer.`,
     'Fyra P': `Fyra P-modellen
 Jag vill att denna text ska använda sig av Fyra P-modellen.
-
 Så här ska du följa stilen:
 Modellen är baserad på Picture, Promise, Prove och Push. Använd denna struktur för att bygga upp texten:
-1.  Picture: Skapa en mental bild av ett önskvärt resultat eller en bättre framtid för läsaren.
-2.  Promise: Lova att din produkt eller tjänst kan leverera det positiva resultatet du just har beskrivit.
-3.  Prove: Stöd ditt löfte med konkreta bevis, som exempelvis kundomdömen, betyg eller statistik.
-4.  Push: Avsluta med en uppmaning till handling (CTA) för att driva läsaren att agera.`,
+1. Picture: Skapa en mental bild av ett önskvärt resultat eller en bättre framtid för läsaren.
+2. Promise: Lova att din produkt eller tjänst kan leverera det positiva resultatet du just har beskrivit.
+3. Prove: Stöd ditt löfte med konkreta bevis, som exempelvis kundomdömen, betyg eller statistik.
+4. Push: Avsluta med en uppmaning till handling (CTA) för att driva läsaren att agera.`,
     'Före-Efter-Bro': `Före-efter-bro-modellen
 Jag vill att denna text ska använda sig av Före-efter-bro-modellen.
-
 Så här ska du följa stilen:
 Strukturen bygger på tre tydliga delar: Före, Efter och Bro. Texten ska följa denna logik:
-1.  Före: Beskriv läsarens nuvarande, problemfyllda situation.
-2.  Efter: Måla upp en bild av hur bra livet kan bli när problemet är löst.
-3.  Bro: Förklara hur din produkt eller tjänst fungerar som bron som tar läsaren från den problematiska "Före"-situationen till den idealiska "Efter"-situationen.`,
-    'PAS': `PAS-modellen
+1. Före: Beskriv läsarens nuvarande, problemfyllda situation.
+2. Efter: Måla upp en bild av hur bra livet kan bli när problemet är löst.
+3. Bro: Förklara hur din produkt eller tjänst fungerar som bron som tar läsaren från den problematiska "Före"-situationen till den idealiska "Efter"-situationen.`,
+    PAS: `PAS-modellen
 Jag vill att denna text ska använda sig av PAS-modellen.
-
 Så här ska du följa stilen:
 Denna modell, Pain, Agitation och Solution, fokuserar på att eskalera ett problem innan lösningen presenteras. Följ denna process:
-1.  Pain: Börja med att beskriva läsarens huvudproblem eller "smärta".
-2.  Agitation: Förstärk problemet genom att beskriva konsekvenserna och göra smärtan mer påtaglig.
-3.  Solution: Presentera din produkt eller tjänst som den ultimata lösningen som tar bort problemet helt och hållet.`,
+1. Pain: Börja med att beskriva läsarens huvudproblem eller "smärta".
+2. Agitation: Förstärk problemet genom att beskriva konsekvenserna och göra smärtan mer påtaglig.
+3. Solution: Presentera din produkt eller tjänst som den ultimata lösningen som tar bort problemet helt och hållet.`,
     'Star-Story-Solution': `Star Story Solution-modellen
 Jag vill att denna text ska använda sig av Star Story Solution-modellen.
-
 Så här ska du följa stilen:
 Använd storytelling för att engagera läsaren. Modellen består av tre delar: Star, Story och Solution.
-1.  Star: Introducera en karaktär, en "stjärna", som har ett problem som målgruppen kan känna igen sig i.
-2.  Story: Berätta en historia som beskriver stjärnans kamp med problemet.
-3.  Solution: Avsluta med att visa hur din produkt eller tjänst hjälper stjärnan att lösa problemet och uppnå sina mål.`
+1. Star: Introducera en karaktär, en "stjärna", som har ett problem som målgruppen kan känna igen sig i.
+2. Story: Berätta en historia som beskriver stjärnans kamp med problemet.
+3. Solution: Avsluta med att visa hur din produkt eller tjänst hjälper stjärnan att lösa problemet och uppnå sina mål.`
 };
 
 const tonalityMap: Record<string, string> = {
@@ -99,10 +147,10 @@ const tonalityMap: Record<string, string> = {
 const adaptivePromptGenerationFlow = ai.defineFlow(
   {
     name: 'adaptivePromptGenerationFlow',
-    inputSchema: z.any(), // Using "any" because the schema is defined and validated in the form component.
+    inputSchema: AdaptivePromptGenerationInputSchema,
     outputSchema: z.string(),
   },
-  async (data: FormValues) => {
+  async (data) => {
     let promptText = "Dessa regler nedan skall följas väldigt strikt, kolla konstant att du alltid följer det instruktioner jag ger dig här och återkom med en fråga om vad du skall göra istället för att göra något annat än vad instruktioner hänvisar. \n\n";
 
     if (data.topicGuideline) {
@@ -196,3 +244,5 @@ const adaptivePromptGenerationFlow = ai.defineFlow(
     return promptText;
   }
 );
+
+    
