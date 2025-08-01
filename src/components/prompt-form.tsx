@@ -205,7 +205,7 @@ export const formSchema = z.object({
     addressReaderAsYou: z.boolean().default(true),
     avoidWords: z.object({
         enabled: z.boolean().default(true),
-        words: z.array(z.string()).default(['Upptäck', 'Utforska', 'Oumbärligt', 'Särskiljt', 'idealiskt']),
+        words: z.array(z.string()).optional(),
     }),
     avoidXYPhrase: z.boolean().default(true),
     avoidVilket: z.boolean().default(true),
@@ -568,7 +568,7 @@ export function PromptForm() {
                                                         const newValue = checked
                                                             ? [...(field.value || []), word.id]
                                                             : (field.value || []).filter(v => v !== word.id);
-                                                        field.onChange(newValue);
+                                                        field.onChange(newValue.length > 0 ? newValue : undefined);
                                                     }}
                                                 />
                                                 </FormControl>

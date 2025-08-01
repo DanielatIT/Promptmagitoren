@@ -111,7 +111,7 @@ const adaptivePromptGenerationFlow = ai.defineFlow(
 
     promptText += roleOutputs[data.aiRole] + '\n\n';
 
-    const taskType = data.taskTypeRadio === 'custom'
+    const taskType = data.taskTypeRadio === 'custom' && data.taskTypeCustom
       ? data.taskTypeCustom
       : taskTypeMap[data.taskTypeRadio];
     if (taskType) {
@@ -161,7 +161,7 @@ const adaptivePromptGenerationFlow = ai.defineFlow(
       if (data.rules.isInformative) rules.push('Texten skall vara informativ med fokus på att ge läsaren kunskap för ämnet');
       if (data.rules.useWeForm) rules.push('Skriv i vi-form, som att vi är företaget.');
       if (data.rules.addressReaderAsYou) rules.push('Läsaren skall benämnas som ni.');
-      if (data.rules.avoidWords.enabled && data.rules.avoidWords.words.length > 0) {
+      if (data.rules.avoidWords.enabled && data.rules.avoidWords.words && data.rules.avoidWords.words.length > 0) {
           rules.push(`Texten får aldrig innehålla orden: ${data.rules.avoidWords.words.join(', ')}`);
       }
       if (data.rules.avoidXYPhrase) rules.push('skriv aldrig en mening som liknar eller är i närheten av detta “...i en X värld/industri/område är “sökordet” värdefullt för Y anledning”');
@@ -196,5 +196,3 @@ const adaptivePromptGenerationFlow = ai.defineFlow(
     return promptText;
   }
 );
-
-    
