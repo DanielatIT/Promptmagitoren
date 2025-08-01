@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
-import { X, Plus, Trash2, Info, CheckCircle, XCircle, CheckSquare, Square } from "lucide-react"
+import { X, Plus, Trash2, Info, CheckCircle, XCircle } from "lucide-react"
 import { FormSection } from './form-section';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
@@ -535,7 +535,7 @@ export function PromptForm() {
 
             <FormSection
                 title="Regler på texten"
-                description="Alla ibockade regler gäller, bocka av om du inte vill ha med en regel."
+                description="Alla ibockade regler gäller, bocka av om du inte vill använda regel."
                 onToggle={() => toggleDisabled('rules_disabled')}
                 isDisabled={values.rules_disabled}
             >

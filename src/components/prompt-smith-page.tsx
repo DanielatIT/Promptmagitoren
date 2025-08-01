@@ -30,7 +30,7 @@ export default function PromptSmithPage() {
     useEffect(() => {
         setGeneratedContent(
             <div className="flex items-center justify-center h-full text-muted-foreground">
-                <p>Your generated prompt will appear here.</p>
+                <p>Din genererade prompt kommer att visas här.</p>
             </div>
         );
     }, [copywritingStyle]);
@@ -70,10 +70,10 @@ export default function PromptSmithPage() {
             }
         }
     
-        if (!textToCopy || textToCopy === 'Your generated prompt will appear here.') {
+        if (!textToCopy || textToCopy === 'Din genererade prompt kommer att visas här.') {
             toast({
-                title: "Nothing to copy",
-                description: "Please generate a prompt first.",
+                title: "Inget att kopiera",
+                description: "Vänligen generera en prompt först.",
                 variant: "destructive"
             });
             return;
@@ -81,8 +81,8 @@ export default function PromptSmithPage() {
     
         navigator.clipboard.writeText(textToCopy);
         toast({
-            title: "Copied to clipboard!",
-            description: "The prompt is ready to be used.",
+            title: "Kopierad till urklipp!",
+            description: "Prompten är redo att användas.",
         });
     };
 
