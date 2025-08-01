@@ -7,10 +7,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Clipboard, Loader2 } from 'lucide-react';
+import { Clipboard, Loader2, Info } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast"
 import { PromptForm, formSchema, defaultValues, type FormValues } from './prompt-form';
 import { adaptivePromptGeneration } from '@/ai/flows/adaptive-prompt-generation';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 
 
 export default function PromptSmithPage() {
@@ -87,11 +88,31 @@ export default function PromptSmithPage() {
 
     return (
         <div className="container mx-auto p-4 md:py-8">
-            <header className="text-center mb-8">
+            <header className="relative text-center mb-8">
                 <h1 className="text-4xl lg:text-5xl font-headline font-bold text-primary">PromptSmithy</h1>
-                <p className="text-muted-foreground mt-2 text-lg">
-                    Ett verktyg skapat av: <a href="http://www.industritorget.se" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">Industritorget.se</a>
-                </p>
+                 <div className="absolute top-0 right-0">
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                    <Info className="h-5 w-5 text-muted-foreground" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom" align="end" className="w-80">
+                                <div className="text-sm p-2">
+                                    <h3 className="font-bold font-headline mb-2">Version 0.1</h3>
+                                    <h4 className="font-semibold text-foreground mb-1 mt-3">Rättighetsförklaring</h4>
+                                    <p className="text-muted-foreground text-xs leading-relaxed">
+                                        Denna applikation är utvecklad av Daniel Wölfing för Industritorget. Alla immateriella rättigheter, inklusive men inte begränsat till upphovsrätt och varumärkesrätt, tillhör Industritorget. Ingen del av denna applikation får reproduceras, distribueras eller användas i kommersiellt eller icke-kommersiellt syfte utan skriftligt medgivande från Industritorget.
+                                    </p>
+                                    <p className="text-muted-foreground text-xs mt-2">
+                                        Vid frågor eller behov av kontakt hänvisar vi till vår support: support@industritorget.se.
+                                    </p>
+                                </div>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                </div>
             </header>
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">

@@ -5,6 +5,10 @@ import { Toaster } from "@/components/ui/toaster"
 export const metadata: Metadata = {
   title: 'PromptSmith',
   description: 'Craft the perfect AI prompt for your needs.',
+  robots: {
+    index: false,
+    follow: false,
+  }
 };
 
 export default function RootLayout({
