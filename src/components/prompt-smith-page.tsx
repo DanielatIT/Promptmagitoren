@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Clipboard, Loader2, CheckCircle, XCircle } from 'lucide-react';
+import { Clipboard, Loader2 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast"
 import { PromptForm, formSchema, defaultValues, type FormValues } from './prompt-form';
 import { adaptivePromptGeneration } from '@/ai/flows/adaptive-prompt-generation';
@@ -24,13 +24,15 @@ export default function PromptSmithPage() {
         mode: 'onSubmit'
     });
 
+    const copywritingStyle = useWatch({ control: methods.control, name: 'copywritingStyle' });
+
     useEffect(() => {
         setGeneratedContent(
             <div className="flex items-center justify-center h-full text-muted-foreground">
-                <p>Your generated content will appear here.</p>
+                <p>Your generated prompt will appear here.</p>
             </div>
         );
-    }, []);
+    }, [copywritingStyle]);
 
 
     const onGenerate = async (data: FormValues) => {
@@ -53,29 +55,34 @@ export default function PromptSmithPage() {
 
     const handleCopy = () => {
         let textToCopy = '';
-        if (typeof generatedContent === 'string') {
-            textToCopy = generatedContent;
-        } else if (generatedContent && typeof generatedContent === 'object' && 'props' in generatedContent) {
-             const preElement = (generatedContent as React.ReactElement)?.props?.children;
-             if(preElement && typeof preElement === 'object' && 'type' in preElement && preElement.type === 'pre') {
-                textToCopy = preElement.props.children;
-             }
+        const content = generatedContent;
+    
+        if (typeof content === 'string') {
+            textToCopy = content;
+        } else if (React.isValidElement(content) && content.type === 'pre') {
+            textToCopy = content.props.children;
+        } else if (React.isValidElement(content) && content.props.children) {
+            // Fallback for the initial placeholder text
+            const pElement = (content.props.children as React.ReactElement).props.children;
+            if (typeof pElement === 'string') {
+                textToCopy = pElement;
+            }
         }
-        
-        if (!textToCopy) {
+    
+        if (!textToCopy || textToCopy === 'Your generated prompt will appear here.') {
             toast({
                 title: "Nothing to copy",
-                description: "Please generate content first or select a different view.",
+                description: "Please generate a prompt first.",
                 variant: "destructive"
-            })
+            });
             return;
         }
-
+    
         navigator.clipboard.writeText(textToCopy);
         toast({
             title: "Copied to clipboard!",
-            description: "The content is ready to be used.",
-        })
+            description: "The prompt is ready to be used.",
+        });
     };
 
     return (
@@ -132,5 +139,3 @@ export default function PromptSmithPage() {
         </div>
     );
 }
-
-    

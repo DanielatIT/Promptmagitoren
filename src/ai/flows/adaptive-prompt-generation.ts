@@ -191,14 +191,8 @@ const adaptivePromptGenerationFlow = ai.defineFlow(
     } else if (!data.author_disabled) {
       promptText += 'Texten skall skrivas ut ett neutralt perspektiv där vi som skriver inte benämns.\n\n';
     }
-
-    const result = await ai.generate({
-      model: 'googleai/gemini-1.5-flash',
-      prompt: promptText,
-    });
     
-    return result.text;
+    // Just return the constructed prompt text
+    return promptText;
   }
 );
-
-    
