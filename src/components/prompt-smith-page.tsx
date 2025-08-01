@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast"
 import { PromptForm, formSchema, defaultValues, type FormValues } from './prompt-form';
 import { adaptivePromptGeneration } from '@/ai/flows/adaptive-prompt-generation';
 
-function PageContent() {
+export default function PromptSmithPage() {
     const [generatedContent, setGeneratedContent] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const { toast } = useToast();
@@ -117,8 +117,4 @@ function PageContent() {
             </div>
         </div>
     );
-}
-
-export default function PromptSmithPageWrapper() {
-    return <PageContent />
 }
