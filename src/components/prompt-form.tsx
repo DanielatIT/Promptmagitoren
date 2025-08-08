@@ -206,6 +206,7 @@ export const formSchema = z.object({
     }),
     avoidXYPhrase: z.boolean().default(true),
     avoidVilket: z.boolean().default(true),
+    avoidEmDash: z.boolean().default(true),
     customRules: z.string().optional(),
   }).optional(),
   rules_disabled: z.boolean().default(false),
@@ -260,6 +261,7 @@ export const defaultValues: Partial<FormValues> = {
     },
     avoidXYPhrase: true,
     avoidVilket: true,
+    avoidEmDash: true,
     customRules: '',
   },
   rules_disabled: false,
@@ -547,6 +549,7 @@ export function PromptForm() {
                         <FormField control={control} name="rules.addressReaderAsYou" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Benämn läsaren som "ni"</FormLabel></FormItem>)} />
                         <FormField control={control} name="rules.avoidXYPhrase" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Undvik "i en X är Y värdefullt..."</FormLabel></FormItem>)} />
                         <FormField control={control} name="rules.avoidVilket" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Undvik ", vilket..."</FormLabel></FormItem>)} />
+                        <FormField control={control} name="rules.avoidEmDash" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Undvik em-tecken (—)</FormLabel></FormItem>)} />
                     </div>
                     <div>
                         <FormField control={control} name="rules.avoidWords.enabled" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Undvik specifika ord</FormLabel></FormItem>)} />
