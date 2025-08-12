@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { X, Plus, Trash2, Info, CheckCircle, XCircle } from "lucide-react"
 import { FormSection } from './form-section';
-import { cn } from '@/lib/utils';
+import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
@@ -244,7 +244,7 @@ export type FormValues = z.infer<typeof formSchema>;
 
 export const defaultValues: Partial<FormValues> = {
   topicGuideline: '',
-  aiRole: 'Copywriter',
+  aiRole: 'SEO expert',
   taskTypeRadio: 'Artikel',
   taskTypeCustom: '',
   copywritingStyle: 'none',
@@ -600,68 +600,70 @@ export function PromptForm() {
                 </div>
             </FormSection>
 
-             <FormSection title="Struktur" description="Ange struktur på texten." onToggle={() => toggleDisabled('structure_disabled')} isDisabled={values.structure_disabled}>
-                <div className="space-y-4">
-                    {structureFields.fields.map((field, index) => (
-                        <div key={field.id} className="flex items-end gap-2 p-3 border rounded-md bg-background/50">
-                             <FormField
-                                control={control}
-                                name={`structure.${index}.type`}
-                                render={({ field }) => (
-                                <FormItem className="flex-1">
-                                    <FormLabel>Styckestyp</FormLabel>
-                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <FormControl>
-                                        <SelectTrigger>
-                                        <SelectValue placeholder="Välj en typ" />
-                                        </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                        {paragraphTypes.map(type => (
-                                            <SelectItem key={type} value={type}>{type}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                    </Select>
-                                    <FormMessage />
-                                </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={control}
-                                name={`structure.${index}.topic`}
-                                render={({ field }) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                 <FormSection title="Struktur" description="Ange struktur på texten." onToggle={() => toggleDisabled('structure_disabled')} isDisabled={values.structure_disabled}>
+                    <div className="space-y-4">
+                        {structureFields.fields.map((field, index) => (
+                            <div key={field.id} className="flex items-end gap-2 p-3 border rounded-md bg-background/50">
+                                 <FormField
+                                    control={control}
+                                    name={`structure.${index}.type`}
+                                    render={({ field }) => (
                                     <FormItem className="flex-1">
-                                        <FormLabel>Ämne för stycket</FormLabel>
+                                        <FormLabel>Styckestyp</FormLabel>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
                                         <FormControl>
-                                            <Input {...field} placeholder="Beskriv ämnet..." />
+                                            <SelectTrigger>
+                                            <SelectValue placeholder="Välj en typ" />
+                                            </SelectTrigger>
                                         </FormControl>
+                                        <SelectContent>
+                                            {paragraphTypes.map(type => (
+                                                <SelectItem key={type} value={type}>{type}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                        </Select>
                                         <FormMessage />
                                     </FormItem>
-                                )}
-                            />
-                            <Button type="button" variant="destructive" size="icon" onClick={() => structureFields.remove(index)}>
-                                <Trash2 className="h-4 w-4" />
-                            </Button>
-                        </div>
-                    ))}
-                    <Button type="button" variant="outline" onClick={() => structureFields.append({ type: '', topic: '' })}>
-                        <Plus className="mr-2 h-4 w-4" /> Lägg till stycke
-                    </Button>
-                </div>
-            </FormSection>
+                                    )}
+                                />
+                                <FormField
+                                    control={control}
+                                    name={`structure.${index}.topic`}
+                                    render={({ field }) => (
+                                        <FormItem className="flex-1">
+                                            <FormLabel>Ämne för stycket</FormLabel>
+                                            <FormControl>
+                                                <Input {...field} placeholder="Beskriv ämnet..." />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <Button type="button" variant="destructive" size="icon" onClick={() => structureFields.remove(index)}>
+                                    <Trash2 className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        ))}
+                        <Button type="button" variant="outline" onClick={() => structureFields.append({ type: '', topic: '' })}>
+                            <Plus className="mr-2 h-4 w-4" /> Lägg till stycke
+                        </Button>
+                    </div>
+                </FormSection>
 
-            <FormSection title="Länkar att inkludera" onToggle={() => toggleDisabled('links_disabled')} isDisabled={values.links_disabled}>
-                <div className="space-y-4">
-                    {linkFields.fields.map((field, index) => (
-                        <div key={field.id} className="flex items-end gap-2 p-3 border rounded-md">
-                            <FormField control={control} name={`links.${index}.url`} render={({ field }) => (<FormItem className="flex-1"><FormLabel>URL</FormLabel><FormControl><Input {...field} placeholder="https://example.com" /></FormControl><FormMessage /></FormItem>)} />
-                            <FormField control={control} name={`links.${index}.anchorText`} render={({ field }) => (<FormItem className="flex-1"><FormLabel>Sökord</FormLabel><FormControl><Input {...field} placeholder="Sökord att länka" /></FormControl><FormMessage /></FormItem>)} />
-                            <Button type="button" variant="destructive" size="icon" onClick={() => linkFields.remove(index)}><Trash2 className="h-4 w-4" /></Button>
-                        </div>
-                    ))}
-                    <Button type="button" variant="outline" onClick={() => linkFields.append({ url: '', anchorText: '' })}><Plus className="mr-2 h-4 w-4" /> Lägg till länk</Button>
-                </div>
-            </FormSection>
+                <FormSection title="Länkar att inkludera" onToggle={() => toggleDisabled('links_disabled')} isDisabled={values.links_disabled}>
+                    <div className="space-y-4">
+                        {linkFields.fields.map((field, index) => (
+                            <div key={field.id} className="flex items-end gap-2 p-3 border rounded-md">
+                                <FormField control={control} name={`links.${index}.url`} render={({ field }) => (<FormItem className="flex-1"><FormLabel>URL</FormLabel><FormControl><Input {...field} placeholder="https://example.com" /></FormControl><FormMessage /></FormItem>)} />
+                                <FormField control={control} name={`links.${index}.anchorText`} render={({ field }) => (<FormItem className="flex-1"><FormLabel>Sökord</FormLabel><FormControl><Input {...field} placeholder="Sökord att länka" /></FormControl><FormMessage /></FormItem>)} />
+                                <Button type="button" variant="destructive" size="icon" onClick={() => linkFields.remove(index)}><Trash2 className="h-4 w-4" /></Button>
+                            </div>
+                        ))}
+                        <Button type="button" variant="outline" onClick={() => linkFields.append({ url: '', anchorText: '' })}><Plus className="mr-2 h-4 w-4" /> Lägg till länk</Button>
+                    </div>
+                </FormSection>
+            </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormSection title="Primärt sökord/sökfras" onToggle={() => toggleDisabled('primaryKeywords_disabled')} isDisabled={values.primaryKeywords_disabled}>

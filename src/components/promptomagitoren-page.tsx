@@ -15,7 +15,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/t
 import Image from 'next/image';
 
 
-export default function PromptmagitorenPage() {
+export default function PromptomagitorenPage() {
     const [promptText, setPromptText] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isInitial, setIsInitial] = useState(true);
@@ -124,8 +124,8 @@ export default function PromptmagitorenPage() {
         <div className="container mx-auto p-4 md:p-8 lg:p-12">
             <header className="relative text-center mb-8">
                 <div className="flex justify-center items-center gap-4">
-                    <Image src="https://placehold.co/64x64.png" alt="Promptmagitören logotyp" width={64} height={64} data-ai-hint="wizard code" />
-                    <h1 className="text-4xl lg:text-5xl font-headline font-bold text-primary">Promptmagitören</h1>
+                    <Image src="https://placehold.co/64x64.png" alt="Promptomagitören logotyp" width={64} height={64} data-ai-hint="wizard code" />
+                    <h1 className="text-4xl lg:text-5xl font-headline font-bold text-primary">Promptomagitören</h1>
                 </div>
                  <div className="absolute top-0 right-0">
                     <TooltipProvider>
@@ -140,7 +140,7 @@ export default function PromptmagitorenPage() {
                                     <h3 className="font-bold font-headline mb-2">Version 0.3</h3>
                                     <h4 className="font-semibold text-foreground mb-1 mt-3">Rättighetsförklaring</h4>
                                     <p className="text-muted-foreground text-xs leading-relaxed">
-                                        Promptmagitören är utvecklad av Daniel Wölfing för Industritorget. Alla immateriella rättigheter, inklusive men inte begränsat till upphovsrätt och varumärkesrätt, tillhör Industritorget. Ingen del av denna applikation får reproduceras, distribueras eller användas i kommersiellt eller icke-kommersiellt syfte utan skriftligt medgivande från Industritorget.
+                                        Promptomagitören är utvecklad av Daniel Wölfing för Industritorget. Alla immateriella rättigheter, inklusive men inte begränsat till upphovsrätt och varumärkesrätt, tillhör Industritorget. Ingen del av denna applikation får reproduceras, distribueras eller användas i kommersiellt eller icke-kommersiellt syfte utan skriftligt medgivande från Industritorget.
                                     </p>
                                     <p className="text-muted-foreground text-xs mt-2">
                                         Vid frågor eller behov av kontakt hänvisar vi till vår support: support@industritorget.se.
