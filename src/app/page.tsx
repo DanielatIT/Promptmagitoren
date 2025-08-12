@@ -1,9 +1,9 @@
-import PromptomagitorenPage from '@/components/promptomagitoren-page';
+import PromptmagitorenPage from '@/components/promptmagitoren-page';
 
 export default function Home() {
   return (
     <main>
-      <PromptomagitorenPage />
+      <PromptmagitorenPage />
     </main>
   );
 }

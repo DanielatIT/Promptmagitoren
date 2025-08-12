@@ -3,7 +3,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
 
 export const metadata: Metadata = {
-  title: 'Promptomagitören',
+  title: 'Promptmagitören',
   description: 'Skapa den perfekta AI-prompten för dina behov.',
   robots: {
     index: false,
