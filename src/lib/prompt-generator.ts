@@ -47,15 +47,20 @@ const AdaptivePromptGenerationInputSchema = z.object({
     }),
     avoidXYPhrase: z.boolean().default(true),
     avoidVilket: z.boolean().default(true),
-    avoidEmDash: z.boolean().optional(),
+    avoidEmDash: z.boolean().default(true),
     customRules: z.string().optional(),
   }).optional(),
   
   links: z.array(z.object({ url: z.string().url(), anchorText: z.string() })).optional(),
 
-  primaryKeyword: z.string().optional(),
+  primaryKeywords: z.array(z.object({ value: z.string() })).optional(),
   
   author: z.string().optional(),
+
+  structure: z.array(z.object({
+    type: z.string(),
+    topic: z.string(),
+  })).optional(),
 }).passthrough(); // Use passthrough to ignore _disabled fields
 
 export type FormValues = z.infer<typeof AdaptivePromptGenerationInputSchema>;
@@ -222,6 +227,11 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
     }
   }
 
+  if (validatedData.structure && validatedData.structure.length > 0) {
+    const structureIntro = "Detta skall vara strukturen på denna text du har valfrihet att lägga in dessa delar där du vill och där det passar bäst men styckarna skall, Detta är delarna jag vill ha in samt det ämne vardera text ska handla om: ";
+    const structureParts = validatedData.structure.map(item => `Ha med ett stycke som är en ${item.type} som handlar om ${item.topic}`).join('. ');
+    promptText += `${structureIntro}${structureParts}.\n\n`;
+  }
 
   if (validatedData.links && validatedData.links.length > 0) {
     validatedData.links.forEach(link => {
@@ -230,8 +240,11 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
     });
   }
 
-  if (validatedData.primaryKeyword) {
-    promptText += `Denna text skall innehålla ${validatedData.primaryKeyword} 1% av textens totala antal ord.\n\n`;
+  if (validatedData.primaryKeywords && validatedData.primaryKeywords.length > 0) {
+    const keywords = validatedData.primaryKeywords.map(kw => kw.value).filter(Boolean);
+    if (keywords.length > 0) {
+      promptText += `Denna text skall innehålla följande sökord/sökfraser: ${keywords.join(', ')}. Fördela dessa naturligt i texten med en densitet på cirka 1% av textens totala antal ord för varje sökord.\n\n`;
+    }
   }
 
   if (validatedData.author) {

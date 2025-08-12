@@ -21,6 +21,7 @@ import { X, Plus, Trash2, Info, CheckCircle, XCircle } from "lucide-react"
 import { FormSection } from './form-section';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 const aiRoleOptions = [
     'Copywriter', 'SEO expert', 'Skribent för bloggar', 'Korrekturläsare', 'Programmerare för HTML, CSS och Javascript', 'Researcher'
@@ -126,6 +127,8 @@ const copywritingStyleInfo: Record<string, any> = {
     }
 };
 
+const paragraphTypes = ['Ingress', 'Brödtext & underrubrik', 'Fristående text', 'CTA', 'Titel'];
+
 const FormattedCopywritingInfo = ({ styleId }: { styleId: string }) => {
     const info = copywritingStyleInfo[styleId];
     if (!info) return null;
@@ -214,11 +217,17 @@ export const formSchema = z.object({
   links: z.array(z.object({ url: z.string().url("Invalid URL format"), anchorText: z.string().min(1, "Anchor text is required") })).optional(),
   links_disabled: z.boolean().default(false),
 
-  primaryKeyword: z.string().optional(),
-  primaryKeyword_disabled: z.boolean().default(false),
+  primaryKeywords: z.array(z.object({ value: z.string() })).max(3).optional(),
+  primaryKeywords_disabled: z.boolean().default(false),
   
   author: z.string().optional(),
   author_disabled: z.boolean().default(false),
+
+  structure: z.array(z.object({
+    type: z.string().min(1, "Styckestyp är obligatoriskt"),
+    topic: z.string().min(1, "Ämne är obligatoriskt"),
+  })).optional(),
+  structure_disabled: z.boolean().default(false),
 
 }).superRefine((data, ctx) => {
     if (data.taskTypeRadio === 'custom' && (!data.taskTypeCustom || data.taskTypeCustom.trim() === '')) {
@@ -267,20 +276,23 @@ export const defaultValues: Partial<FormValues> = {
   rules_disabled: false,
   links: [],
   links_disabled: false,
-  primaryKeyword: '',
-  primaryKeyword_disabled: false,
+  primaryKeywords: [{ value: '' }],
+  primaryKeywords_disabled: false,
   author: '',
   author_disabled: false,
+  structure: [],
+  structure_disabled: false,
 };
 
 export function PromptForm() {
     const { control, setValue, getValues } = useFormContext<FormValues>();
-    const { fields, append, remove } = useFieldArray({
-        control,
-        name: "links",
-    });
+
+    const linkFields = useFieldArray({ control, name: "links" });
+    const keywordFields = useFieldArray({ control, name: "primaryKeywords" });
+    const structureFields = useFieldArray({ control, name: "structure" });
     
     const values = useWatch({ control });
+    const aiRole = useWatch({ control, name: "aiRole" });
 
     const toggleDisabled = (fieldName: keyof FormValues | `${string}_disabled`) => {
         const currentVal = getValues(fieldName as any);
@@ -384,53 +396,55 @@ export function PromptForm() {
                   )}
                 </FormSection>
             </div>
-
-            <FormSection title="Copywriting-stil?" description="Om någon, vilken copywriting-stil skall texten ha" onToggle={() => toggleDisabled('copywritingStyle_disabled')} isDisabled={values.copywritingStyle_disabled}>
-                <FormField
-                    control={control}
-                    name="copywritingStyle"
-                    render={({ field }) => (
-                        <FormItem className="space-y-3">
-                            <FormControl>
-                                <TooltipProvider>
-                                    <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2">
-                                        <FormItem className="flex items-center space-x-3 space-y-0">
-                                            <FormControl>
-                                                <RadioGroupItem value="none" />
-                                            </FormControl>
-                                            <FormLabel className="font-normal">Ingen specifik stil</FormLabel>
-                                        </FormItem>
-                                        {copywritingStyles.map((style) => (
-                                            <FormItem key={style.id} className="flex items-center space-x-3 space-y-0">
+            
+            {aiRole === 'Copywriter' && (
+                <FormSection title="Copywriting-stil?" description="Om någon, vilken copywriting-stil skall texten ha" onToggle={() => toggleDisabled('copywritingStyle_disabled')} isDisabled={values.copywritingStyle_disabled}>
+                    <FormField
+                        control={control}
+                        name="copywritingStyle"
+                        render={({ field }) => (
+                            <FormItem className="space-y-3">
+                                <FormControl>
+                                    <TooltipProvider>
+                                        <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2">
+                                            <FormItem className="flex items-center space-x-3 space-y-0">
                                                 <FormControl>
-                                                    <RadioGroupItem value={style.id} />
+                                                    <RadioGroupItem value="none" />
                                                 </FormControl>
-                                                <FormLabel className="font-normal flex items-center gap-2">{style.label}
-                                                    <Tooltip>
-                                                        <TooltipTrigger asChild>
-                                                            <button type="button">
-                                                                <Info className="h-4 w-4 text-muted-foreground" />
-                                                            </button>
-                                                        </TooltipTrigger>
-                                                        <TooltipContent 
-                                                            side="right" 
-                                                            align="center" 
-                                                            sideOffset={20}
-                                                            className="w-96 max-h-[calc(100vh-2rem)] overflow-y-auto bg-card">
-                                                            <FormattedCopywritingInfo styleId={style.id} />
-                                                        </TooltipContent>
-                                                    </Tooltip>
-                                                </FormLabel>
+                                                <FormLabel className="font-normal">Ingen specifik stil</FormLabel>
                                             </FormItem>
-                                        ))}
-                                    </RadioGroup>
-                                </TooltipProvider>
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-            </FormSection>
+                                            {copywritingStyles.map((style) => (
+                                                <FormItem key={style.id} className="flex items-center space-x-3 space-y-0">
+                                                    <FormControl>
+                                                        <RadioGroupItem value={style.id} />
+                                                    </FormControl>
+                                                    <FormLabel className="font-normal flex items-center gap-2">{style.label}
+                                                        <Tooltip>
+                                                            <TooltipTrigger asChild>
+                                                                <button type="button">
+                                                                    <Info className="h-4 w-4 text-muted-foreground" />
+                                                                </button>
+                                                            </TooltipTrigger>
+                                                            <TooltipContent 
+                                                                side="right" 
+                                                                align="center" 
+                                                                sideOffset={20}
+                                                                className="w-96 max-h-[calc(100vh-2rem)] overflow-y-auto bg-card">
+                                                                <FormattedCopywritingInfo styleId={style.id} />
+                                                            </TooltipContent>
+                                                        </Tooltip>
+                                                    </FormLabel>
+                                                </FormItem>
+                                            ))}
+                                        </RadioGroup>
+                                    </TooltipProvider>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </FormSection>
+            )}
 
 
             <FormSection title="Vilken tonalitet ska texten ha?" onToggle={() => toggleDisabled('tonality_disabled')} isDisabled={values.tonality_disabled}>
@@ -586,22 +600,99 @@ export function PromptForm() {
                 </div>
             </FormSection>
 
+             <FormSection title="Struktur" description="Ange struktur på texten." onToggle={() => toggleDisabled('structure_disabled')} isDisabled={values.structure_disabled}>
+                <div className="space-y-4">
+                    {structureFields.fields.map((field, index) => (
+                        <div key={field.id} className="flex items-end gap-2 p-3 border rounded-md bg-background/50">
+                             <FormField
+                                control={control}
+                                name={`structure.${index}.type`}
+                                render={({ field }) => (
+                                <FormItem className="flex-1">
+                                    <FormLabel>Styckestyp</FormLabel>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <FormControl>
+                                        <SelectTrigger>
+                                        <SelectValue placeholder="Välj en typ" />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        {paragraphTypes.map(type => (
+                                            <SelectItem key={type} value={type}>{type}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={control}
+                                name={`structure.${index}.topic`}
+                                render={({ field }) => (
+                                    <FormItem className="flex-1">
+                                        <FormLabel>Ämne för stycket</FormLabel>
+                                        <FormControl>
+                                            <Input {...field} placeholder="Beskriv ämnet..." />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <Button type="button" variant="destructive" size="icon" onClick={() => structureFields.remove(index)}>
+                                <Trash2 className="h-4 w-4" />
+                            </Button>
+                        </div>
+                    ))}
+                    <Button type="button" variant="outline" onClick={() => structureFields.append({ type: '', topic: '' })}>
+                        <Plus className="mr-2 h-4 w-4" /> Lägg till stycke
+                    </Button>
+                </div>
+            </FormSection>
+
             <FormSection title="Länkar att inkludera" onToggle={() => toggleDisabled('links_disabled')} isDisabled={values.links_disabled}>
                 <div className="space-y-4">
-                    {fields.map((field, index) => (
+                    {linkFields.fields.map((field, index) => (
                         <div key={field.id} className="flex items-end gap-2 p-3 border rounded-md">
                             <FormField control={control} name={`links.${index}.url`} render={({ field }) => (<FormItem className="flex-1"><FormLabel>URL</FormLabel><FormControl><Input {...field} placeholder="https://example.com" /></FormControl><FormMessage /></FormItem>)} />
                             <FormField control={control} name={`links.${index}.anchorText`} render={({ field }) => (<FormItem className="flex-1"><FormLabel>Sökord</FormLabel><FormControl><Input {...field} placeholder="Sökord att länka" /></FormControl><FormMessage /></FormItem>)} />
-                            <Button type="button" variant="destructive" size="icon" onClick={() => remove(index)}><Trash2 className="h-4 w-4" /></Button>
+                            <Button type="button" variant="destructive" size="icon" onClick={() => linkFields.remove(index)}><Trash2 className="h-4 w-4" /></Button>
                         </div>
                     ))}
-                    <Button type="button" variant="outline" onClick={() => append({ url: '', anchorText: '' })}><Plus className="mr-2 h-4 w-4" /> Lägg till länk</Button>
+                    <Button type="button" variant="outline" onClick={() => linkFields.append({ url: '', anchorText: '' })}><Plus className="mr-2 h-4 w-4" /> Lägg till länk</Button>
                 </div>
             </FormSection>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormSection title="Primärt sökord/sökfras" onToggle={() => toggleDisabled('primaryKeyword_disabled')} isDisabled={values.primaryKeyword_disabled}>
-                    <FormField control={control} name="primaryKeyword" render={({ field }) => (<FormItem><FormControl><Input placeholder="t.ex. bästa SEO-tipsen" {...field} /></FormControl></FormItem>)} />
+                <FormSection title="Primärt sökord/sökfras" onToggle={() => toggleDisabled('primaryKeywords_disabled')} isDisabled={values.primaryKeywords_disabled}>
+                     <div className="space-y-4">
+                        {keywordFields.fields.map((field, index) => (
+                            <div key={field.id} className="flex items-center gap-2">
+                                <FormField
+                                    control={control}
+                                    name={`primaryKeywords.${index}.value`}
+                                    render={({ field }) => (
+                                        <FormItem className="flex-1">
+                                            <FormControl>
+                                                <Input placeholder={`Sökord ${index + 1}`} {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                {keywordFields.fields.length > 1 && (
+                                    <Button type="button" variant="destructive" size="icon" onClick={() => keywordFields.remove(index)}>
+                                        <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                )}
+                            </div>
+                        ))}
+                        {keywordFields.fields.length < 3 && (
+                            <Button type="button" variant="outline" size="sm" onClick={() => keywordFields.append({ value: '' })}>
+                                <Plus className="mr-2 h-4 w-4" /> Lägg till sökord
+                            </Button>
+                        )}
+                    </div>
                 </FormSection>
 
                 <FormSection title="Vem skriver texten?" onToggle={() => toggleDisabled('author_disabled')} isDisabled={values.author_disabled}>

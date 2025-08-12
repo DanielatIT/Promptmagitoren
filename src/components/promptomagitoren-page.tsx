@@ -36,7 +36,7 @@ export default function PromptomagitorenPage() {
         
         // Explicitly clean data based on the disabled flags.
         // This ensures no data from a disabled section is ever sent.
-        if (cleanedData.copywritingStyle_disabled) {
+        if (cleanedData.copywritingStyle_disabled || cleanedData.aiRole !== 'Copywriter') {
             delete cleanedData.copywritingStyle;
         }
         if (cleanedData.tonality_disabled) {
@@ -55,11 +55,14 @@ export default function PromptomagitorenPage() {
         if (cleanedData.links_disabled) {
             delete cleanedData.links;
         }
-        if (cleanedData.primaryKeyword_disabled) {
-             delete cleanedData.primaryKeyword;
+        if (cleanedData.primaryKeywords_disabled) {
+             delete cleanedData.primaryKeywords;
         }
         if (cleanedData.author_disabled) {
             delete cleanedData.author;
+        }
+        if (cleanedData.structure_disabled) {
+            delete cleanedData.structure;
         }
 
         try {
@@ -117,7 +120,7 @@ export default function PromptomagitorenPage() {
     };
 
     return (
-        <div className="container mx-auto p-4 md:py-8">
+        <div className="container mx-auto p-4 md:p-8 lg:p-12">
             <header className="relative text-center mb-8">
                 <h1 className="text-4xl lg:text-5xl font-headline font-bold text-primary">Promptomagitören</h1>
                  <div className="absolute top-0 right-0">
@@ -145,13 +148,11 @@ export default function PromptomagitorenPage() {
                 </div>
             </header>
             
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-                <div>
+            <div className="flex flex-col gap-8 items-start">
+                <div className="w-full">
                     <FormProvider {...methods}>
                         <form onSubmit={methods.handleSubmit(onGenerate)} className="w-full">
-                            <ScrollArea className="h-[calc(100vh-14rem)] pr-4 -mr-4">
-                                <PromptForm />
-                            </ScrollArea>
+                            <PromptForm />
                             <Button type="submit" className="w-full mt-6" disabled={isLoading}>
                                 {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                                 Magitera prompt
@@ -160,7 +161,7 @@ export default function PromptomagitorenPage() {
                     </FormProvider>
                 </div>
                 
-                <div className="lg:sticky lg:top-8">
+                <div className="w-full">
                     <Card>
                         <CardHeader>
                             <CardTitle className="font-headline text-lg">Preview</CardTitle>
@@ -171,7 +172,7 @@ export default function PromptomagitorenPage() {
                                     <Clipboard className="mr-2 h-4 w-4" /> Copy Text
                                 </Button>
 
-                                <ScrollArea className="h-[calc(100vh-25rem)] lg:h-[calc(100vh-18rem)] rounded-md border p-4 bg-muted/20">
+                                <ScrollArea className="h-96 rounded-md border p-4 bg-muted/20">
                                     {renderContent()}
                                 </ScrollArea>
                                  <Button onClick={handleCopy} type="button" className="w-full" variant="outline">
