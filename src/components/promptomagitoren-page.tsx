@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Clipboard, Loader2, Info, ArrowDownCircle } from 'lucide-react';
+import { Clipboard, Loader2, Info, Download } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast"
 import { PromptForm, formSchema, defaultValues, type FormValues } from './prompt-form';
 import { adaptivePromptGeneration } from '@/lib/prompt-generator';
@@ -134,7 +134,7 @@ export default function PromptomagitorenPage() {
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Button onClick={scrollToPreview} variant="ghost" size="icon" className="text-red-500 hover:text-red-600 hover:bg-red-50/50 rounded-full">
-                                    <ArrowDownCircle className="h-6 w-6" />
+                                    <Download className="h-6 w-6" />
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent side="bottom" align="end">
