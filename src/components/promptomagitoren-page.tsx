@@ -1,13 +1,13 @@
 
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Clipboard, Loader2, Info } from 'lucide-react';
+import { Clipboard, Loader2, Info, ArrowDownCircle } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast"
 import { PromptForm, formSchema, defaultValues, type FormValues } from './prompt-form';
 import { adaptivePromptGeneration } from '@/lib/prompt-generator';
@@ -20,7 +20,8 @@ export default function PromptomagitorenPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [isInitial, setIsInitial] = useState(true);
     const { toast } = useToast();
-    
+    const previewRef = useRef<HTMLDivElement>(null);
+
     const methods = useForm<FormValues>({
         resolver: zodResolver(formSchema),
         defaultValues,
@@ -32,11 +33,8 @@ export default function PromptomagitorenPage() {
         setIsInitial(false);
         setPromptText('');
 
-        // Create a deep copy to avoid direct mutation of form state
         const cleanedData = JSON.parse(JSON.stringify(data));
         
-        // Explicitly clean data based on the disabled flags.
-        // This ensures no data from a disabled section is ever sent.
         if (cleanedData.copywritingStyle_disabled || cleanedData.aiRole !== 'Copywriter') {
             delete cleanedData.copywritingStyle;
         }
@@ -97,6 +95,10 @@ export default function PromptomagitorenPage() {
             description: "Prompten är redo att användas.",
         });
     };
+    
+    const scrollToPreview = () => {
+        previewRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
 
     const renderContent = () => {
         if (isLoading) {
@@ -124,11 +126,21 @@ export default function PromptomagitorenPage() {
         <div className="container mx-auto p-4 md:p-8 lg:p-12">
             <header className="relative text-center mb-8">
                 <div className="flex justify-center items-center gap-4">
-                    <Image src="https://placehold.co/64x64.png" alt="Promptomagitören logotyp" width={64} height={64} data-ai-hint="wizard code" />
+                    <Image src="https://iili.io/FZ0W72a.png" alt="Promptmagitören logotyp" width={64} height={64} data-ai-hint="wizard code" />
                     <h1 className="text-4xl lg:text-5xl font-headline font-bold text-primary">Promptomagitören</h1>
                 </div>
-                 <div className="absolute top-0 right-0">
+                 <div className="absolute top-0 right-0 flex items-center gap-2">
                     <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button onClick={scrollToPreview} variant="ghost" size="icon" className="text-red-500 hover:text-red-600 hover:bg-red-50/50 rounded-full">
+                                    <ArrowDownCircle className="h-6 w-6" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom" align="end">
+                                <p>Till förhandsgranskning av text</p>
+                            </TooltipContent>
+                        </Tooltip>
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Button variant="ghost" size="icon">
@@ -162,7 +174,7 @@ export default function PromptomagitorenPage() {
                 </form>
             </FormProvider>
             
-            <div className="w-full mt-8">
+            <div className="w-full mt-8" ref={previewRef}>
                 <Card>
                     <CardHeader>
                         <CardTitle className="font-headline text-lg">Preview</CardTitle>
