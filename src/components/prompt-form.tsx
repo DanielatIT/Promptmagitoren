@@ -487,9 +487,8 @@ export function PromptForm() {
                         name="tonalityCustom"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Annan tonalitet</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="Beskriv en egen tonalitet..." {...field} />
+                                    <Input placeholder="Annan tonalitet..." {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -740,3 +739,5 @@ export function PromptForm() {
         </div>
     );
 }
+
+    
