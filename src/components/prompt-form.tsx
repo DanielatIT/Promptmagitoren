@@ -551,15 +551,27 @@ export function PromptForm() {
                     control={control}
                     name="language"
                     render={({ field }) => (
-                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                            <FormLabel className={cn(field.value === 'Svenska' ? 'text-foreground' : 'text-muted-foreground', 'transition-colors')}>Svenska</FormLabel>
+                        <FormItem>
                             <FormControl>
-                                <Switch
-                                    checked={field.value === 'Engelska'}
-                                    onCheckedChange={(checked) => field.onChange(checked ? 'Engelska' : 'Svenska')}
-                                />
+                                <RadioGroup
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value}
+                                    className="flex items-center space-x-4 rounded-lg border p-3 shadow-sm"
+                                >
+                                    <FormItem className="flex items-center space-x-2">
+                                        <FormControl>
+                                            <RadioGroupItem value="Svenska" id="svenska" />
+                                        </FormControl>
+                                        <FormLabel htmlFor="svenska" className="font-normal">Svenska</FormLabel>
+                                    </FormItem>
+                                    <FormItem className="flex items-center space-x-2">
+                                        <FormControl>
+                                            <RadioGroupItem value="Engelska" id="engelska" />
+                                        </FormControl>
+                                        <FormLabel htmlFor="engelska" className="font-normal">Engelska</FormLabel>
+                                    </FormItem>
+                                </RadioGroup>
                             </FormControl>
-                            <FormLabel className={cn(field.value === 'Engelska' ? 'text-foreground' : 'text-muted-foreground', 'transition-colors')}>Engelska</FormLabel>
                         </FormItem>
                     )}
                 />
