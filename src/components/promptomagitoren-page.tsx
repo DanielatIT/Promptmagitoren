@@ -149,12 +149,6 @@ export default function PromptomagitorenPage() {
                             </Tooltip>
                         </TooltipProvider>
                      </div>
-                     <div className="absolute top-0 right-0">
-                        <Button onClick={scrollToPreview} variant="outline" className="bg-green-100 hover:bg-green-200 text-green-800 border-green-200 hover:border-green-300">
-                            <Download className="mr-2 h-4 w-4" />
-                            Till förhandsgranskning
-                        </Button>
-                    </div>
                 </header>
                 
                 <div className="max-w-4xl mx-auto">
@@ -193,8 +187,23 @@ export default function PromptomagitorenPage() {
                     </div>
                 </div>
             </div>
+            <TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                         <Button
+                            onClick={scrollToPreview}
+                            variant="outline"
+                            size="icon"
+                            className="fixed bottom-8 right-8 h-14 w-14 rounded-full bg-background/80 backdrop-blur-sm shadow-lg hover:bg-background"
+                        >
+                            <Download className="h-6 w-6" />
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="left">
+                        <p>Till förhandsgranskning</p>
+                    </TooltipContent>
+                </Tooltip>
+            </TooltipProvider>
         </FormProvider>
     );
 }
-
-    
