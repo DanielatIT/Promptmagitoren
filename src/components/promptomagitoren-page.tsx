@@ -40,6 +40,7 @@ export default function PromptomagitorenPage() {
         }
         if (cleanedData.tonality_disabled) {
             delete cleanedData.tonality;
+            delete cleanedData.tonalityCustom;
         }
         if (cleanedData.textLength_disabled) {
             delete cleanedData.textLength;
@@ -150,11 +151,11 @@ export default function PromptomagitorenPage() {
                             </Tooltip>
                         </TooltipProvider>
                      </div>
-                     <div className="absolute top-0 right-0 flex flex-col items-center gap-1">
-                        <Button onClick={scrollToPreview} variant="ghost" size="icon" className="text-red-500 hover:text-red-600 hover:bg-red-50/50 rounded-full h-12 w-12">
-                            <Download className="h-8 w-8" />
+                     <div className="absolute top-0 right-0">
+                        <Button onClick={scrollToPreview} variant="outline" className="bg-green-100 hover:bg-green-200 text-green-800 border-green-200 hover:border-green-300">
+                            <Download className="mr-2 h-4 w-4" />
+                            Till förhandsgranskning
                         </Button>
-                        <p className="text-xs text-muted-foreground">Till förhandsgranskning</p>
                     </div>
                 </header>
                 
