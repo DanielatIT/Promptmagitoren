@@ -126,19 +126,9 @@ export default function PromptomagitorenPage() {
         <FormProvider {...methods}>
             <div className="container mx-auto p-4 md:p-8 lg:p-12">
                 <header className="relative text-center mb-8">
-                    <h1 className="text-4xl lg:text-5xl font-headline font-bold text-primary">Promptmagitören</h1>
-                     <div className="absolute top-0 right-0 flex items-center gap-2">
+                     <div className="flex justify-center items-center gap-2">
+                        <h1 className="text-4xl lg:text-5xl font-headline font-bold text-primary">Promptmagitören</h1>
                         <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button onClick={scrollToPreview} variant="ghost" size="icon" className="text-red-500 hover:text-red-600 hover:bg-red-50/50 rounded-full">
-                                        <Download className="h-6 w-6" />
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent side="bottom" align="end">
-                                    <p>Till förhandsgranskning av text</p>
-                                </TooltipContent>
-                            </Tooltip>
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button variant="ghost" size="icon">
@@ -150,7 +140,7 @@ export default function PromptomagitorenPage() {
                                         <h3 className="font-bold font-headline mb-2">Version 0.3</h3>
                                         <h4 className="font-semibold text-foreground mb-1 mt-3">Rättighetsförklaring</h4>
                                         <p className="text-muted-foreground text-xs leading-relaxed">
-                                            Promptomagitören är utvecklad av Daniel Wölfing för Industritorget. Alla immateriella rättigheter, inklusive men inte begränsat till upphovsrätt och varumärkesrätt, tillhör Industritorget. Ingen del av denna applikation får reproduceras, distribueras eller användas i kommersiellt eller icke-kommersiellt syfte utan skriftligt medgivande från Industritorget.
+                                            Promptmagitören är utvecklad av Daniel Wölfing för Industritorget. Alla immateriella rättigheter, inklusive men inte begränsat till upphovsrätt och varumärkesrätt, tillhör Industritorget. Ingen del av denna applikation får reproduceras, distribueras eller användas i kommersiellt eller icke-kommersiellt syfte utan skriftligt medgivande från Industritorget.
                                         </p>
                                         <p className="text-muted-foreground text-xs mt-2">
                                             Vid frågor eller behov av kontakt hänvisar vi till vår support: support@industritorget.se.
@@ -159,10 +149,16 @@ export default function PromptomagitorenPage() {
                                 </TooltipContent>
                             </Tooltip>
                         </TooltipProvider>
+                     </div>
+                     <div className="absolute top-0 right-0 flex flex-col items-center gap-1">
+                        <Button onClick={scrollToPreview} variant="ghost" size="icon" className="text-red-500 hover:text-red-600 hover:bg-red-50/50 rounded-full h-12 w-12">
+                            <Download className="h-8 w-8" />
+                        </Button>
+                        <p className="text-xs text-muted-foreground">Till förhandsgranskning</p>
                     </div>
                 </header>
                 
-                <div className="max-w-5xl mx-auto">
+                <div className="max-w-4xl mx-auto">
                     <form onSubmit={methods.handleSubmit(onGenerate)} className="w-full">
                         <PromptForm />
                         <Button type="submit" className="w-full mt-6" disabled={isLoading}>
