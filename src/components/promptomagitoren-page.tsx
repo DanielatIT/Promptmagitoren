@@ -7,13 +7,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Clipboard, Loader2, Info, Download } from 'lucide-react';
+import { Clipboard, Loader2, Info, Download, Wand2 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast"
 import { PromptForm, formSchema, defaultValues, type FormValues } from './prompt-form';
 import { adaptivePromptGeneration } from '@/lib/prompt-generator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
-import Image from 'next/image';
-
 
 export default function PromptomagitorenPage() {
     const [promptText, setPromptText] = useState('');
@@ -163,8 +161,9 @@ export default function PromptomagitorenPage() {
                     <form onSubmit={methods.handleSubmit(onGenerate)} className="w-full">
                         <PromptForm />
                         <Button type="submit" className="w-full mt-6" disabled={isLoading}>
-                            {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                            {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="text-red-500" />}
                             Magitera prompt
+                            {!isLoading && <Wand2 className="text-red-500" />}
                         </Button>
                     </form>
                     
@@ -175,15 +174,11 @@ export default function PromptomagitorenPage() {
                             </CardHeader>
                             <CardContent>
                                 <div className="space-y-4">
-                                    <Button onClick={handleCopy} type="button" className="w-full" variant="outline">
-                                        <Clipboard className="mr-2 h-4 w-4" /> Copy Text
-                                    </Button>
-
                                     <ScrollArea className="h-96 rounded-md border p-4 bg-muted/20">
                                         {renderContent()}
                                     </ScrollArea>
-                                     <Button onClick={handleCopy} type="button" className="w-full" variant="outline">
-                                        <Clipboard className="mr-2 h-4 w-4" /> Copy Text
+                                     <Button onClick={handleCopy} type="button" className="w-full" variant="destructive">
+                                        <Clipboard className="mr-2 h-4 w-4" /> Kopiera prompten
                                      </Button>
                                 </div>
                             </CardContent>
