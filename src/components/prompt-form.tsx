@@ -27,7 +27,7 @@ const aiRoleOptions = [
     'SEO expert', 'Skribent för bloggar', 'Copywriter', 'Korrekturläsare', 'Programmerare för HTML, CSS och Javascript', 'Researcher'
 ] as const;
 
-const taskTypeRadioOptions = ['Artikel', 'Seo onpage text', 'Korrekturläsning'] as const;
+const taskTypeRadioOptions = ['Seo onpage text', 'Artikel', 'Korrekturläsning'] as const;
 
 const tonalityOptions = [
     { id: 'professional', label: 'Professionell/Formell' },
@@ -37,11 +37,11 @@ const tonalityOptions = [
 ] as const;
 
 const avoidWordsOptions = [
-    { id: 'upptäck', label: 'Upptäck' },
-    { id: 'utforska', label: 'Utforska' },
-    { id: 'oumbärligt', label: 'Oumbärligt' },
-    { id: 'särskiljt', label: 'Särskiljt' },
-    { id: 'idealiskt', label: 'idealiskt (och dess böjningsformer)' },
+    { id: 'upptäck', label: '"Upptäck"' },
+    { id: 'utforska', label: '"Utforska"' },
+    { id: 'oumbärligt', label: '"Oumbärligt"' },
+    { id: 'särskiljt', label: '"Särskiljt"' },
+    { id: 'idealiskt', label: '"idealiskt" (och dess böjningsformer)' },
 ];
 
 export const copywritingStyles = [
@@ -245,7 +245,7 @@ export type FormValues = z.infer<typeof formSchema>;
 export const defaultValues: Partial<FormValues> = {
   topicGuideline: '',
   aiRole: 'SEO expert',
-  taskTypeRadio: 'Artikel',
+  taskTypeRadio: 'Seo onpage text',
   taskTypeCustom: '',
   copywritingStyle: 'none',
   copywritingStyle_disabled: false,
@@ -549,54 +549,61 @@ export function PromptForm() {
 
             <FormSection
                 title="Regler på texten"
-                description="Alla ibockade regler gäller, bocka av om du inte vill använda regel."
                 onToggle={() => toggleDisabled('rules_disabled')}
                 isDisabled={values.rules_disabled}
             >
-                <div className="space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <FormField control={control} name="rules.avoidSuperlatives" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Undvik superlativ</FormLabel></FormItem>)} />
-                        <FormField control={control} name="rules.avoidPraise" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Undvik lovord</FormLabel></FormItem>)} />
-                        <FormField control={control} name="rules.avoidAcclaim" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Undvik beröm</FormLabel></FormItem>)} />
-                        <FormField control={control} name="rules.isInformative" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Informativ text</FormLabel></FormItem>)} />
-                        <FormField control={control} name="rules.useWeForm" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Skriv i vi-form</FormLabel></FormItem>)} />
-                        <FormField control={control} name="rules.addressReaderAsYou" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Benämn läsaren som "ni"</FormLabel></FormItem>)} />
-                        <FormField control={control} name="rules.avoidXYPhrase" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Undvik "i en X är Y värdefullt..."</FormLabel></FormItem>)} />
-                        <FormField control={control} name="rules.avoidVilket" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Undvik ", vilket..."</FormLabel></FormItem>)} />
-                        <FormField control={control} name="rules.avoidEmDash" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Undvik em-tecken (—)</FormLabel></FormItem>)} />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                    {/* Kolumn 1: Undvik... */}
+                    <div className="space-y-4">
+                        <h4 className="font-medium text-foreground">Undvik...</h4>
+                        <FormField control={control} name="rules.avoidSuperlatives" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Superlativ</FormLabel></FormItem>)} />
+                        <FormField control={control} name="rules.avoidPraise" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Lovord</FormLabel></FormItem>)} />
+                        <FormField control={control} name="rules.avoidAcclaim" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Beröm</FormLabel></FormItem>)} />
+                        <FormField control={control} name="rules.avoidXYPhrase" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Frasen "i en X är Y värdefullt..."</FormLabel></FormItem>)} />
+                        <FormField control={control} name="rules.avoidVilket" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">", vilket..."</FormLabel></FormItem>)} />
+                        <FormField control={control} name="rules.avoidEmDash" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Em-tecken (—)</FormLabel></FormItem>)} />
+                        
+                        <div>
+                            <FormField control={control} name="rules.avoidWords.enabled" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Specifika ord</FormLabel></FormItem>)} />
+                            {avoidWordsEnabled && (
+                                <div className="pl-6 pt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    <Controller
+                                        name="rules.avoidWords.words"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <>
+                                            {avoidWordsOptions.map(word => (
+                                                <FormItem key={word.id} className="flex flex-row items-start space-x-3 space-y-0">
+                                                    <FormControl>
+                                                    <Checkbox
+                                                        checked={field.value?.includes(word.id)}
+                                                        onCheckedChange={checked => {
+                                                            const newValue = checked
+                                                                ? [...(field.value || []), word.id]
+                                                                : (field.value || []).filter(v => v !== word.id);
+                                                            field.onChange(newValue);
+                                                        }}
+                                                    />
+                                                    </FormControl>
+                                                    <FormLabel className="text-sm font-normal">{word.label}</FormLabel>
+                                                </FormItem>
+                                            ))}
+                                            </>
+                                        )}
+                                    />
+                                </div>
+                            )}
+                        </div>
                     </div>
-                    <div>
-                        <FormField control={control} name="rules.avoidWords.enabled" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Undvik specifika ord</FormLabel></FormItem>)} />
-                        {avoidWordsEnabled && (
-                            <div className="pl-6 pt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                <Controller
-                                    name="rules.avoidWords.words"
-                                    control={control}
-                                    render={({ field }) => (
-                                        <>
-                                        {avoidWordsOptions.map(word => (
-                                            <FormItem key={word.id} className="flex flex-row items-start space-x-3 space-y-0">
-                                                <FormControl>
-                                                <Checkbox
-                                                    checked={field.value?.includes(word.id)}
-                                                    onCheckedChange={checked => {
-                                                        const newValue = checked
-                                                            ? [...(field.value || []), word.id]
-                                                            : (field.value || []).filter(v => v !== word.id);
-                                                        field.onChange(newValue);
-                                                    }}
-                                                />
-                                                </FormControl>
-                                                <FormLabel className="text-sm font-normal">{word.label}</FormLabel>
-                                            </FormItem>
-                                        ))}
-                                        </>
-                                    )}
-                                />
-                            </div>
-                        )}
+
+                    {/* Kolumn 2: Övriga regler */}
+                    <div className="space-y-4">
+                         <h4 className="font-medium text-foreground">Övrigt</h4>
+                         <FormField control={control} name="rules.isInformative" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Informativ text</FormLabel></FormItem>)} />
+                         <FormField control={control} name="rules.useWeForm" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Skriv i vi-form</FormLabel></FormItem>)} />
+                         <FormField control={control} name="rules.addressReaderAsYou" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Benämn läsaren som "ni"</FormLabel></FormItem>)} />
+                         <FormField control={control} name="rules.customRules" render={({ field }) => (<FormItem><FormLabel>Fler regler</FormLabel><FormControl><Textarea placeholder="Lägg till egna regler, en per rad..." {...field} /></FormControl></FormItem>)} />
                     </div>
-                    <FormField control={control} name="rules.customRules" render={({ field }) => (<FormItem><FormLabel>Fler regler</FormLabel><FormControl><Textarea placeholder="Lägg till egna regler, en per rad..." {...field} /></FormControl></FormItem>)} />
                 </div>
             </FormSection>
 

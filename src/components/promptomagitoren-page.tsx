@@ -127,7 +127,6 @@ export default function PromptomagitorenPage() {
             <div className="container mx-auto p-4 md:p-8 lg:p-12">
                 <header className="relative text-center mb-8">
                     <div className="flex justify-center items-center gap-4">
-                        <Image src="https://placehold.co/64x64.png" alt="Promptmagitören logotyp" width={64} height={64} data-ai-hint="wizard magic" />
                         <h1 className="text-4xl lg:text-5xl font-headline font-bold text-primary">Promptomagitören</h1>
                     </div>
                      <div className="absolute top-0 right-0 flex items-center gap-2">
