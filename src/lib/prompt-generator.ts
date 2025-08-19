@@ -140,11 +140,11 @@ const tonalityMap: Record<string, string> = {
 };
 
 const avoidWordsMap: Record<string, string> = {
-    upptäck: 'Upptäck',
-    utforska: 'Utforska',
-    oumbärligt: 'Oumbärligt',
-    särskiljt: 'Särskiljt',
-    idealiskt: 'idealiskt',
+    upptäck: '"Upptäck"',
+    utforska: '"Utforska"',
+    oumbärligt: '"Oumbärligt"',
+    särskiljt: '"Särskiljt"',
+    idealiskt: '"idealiskt"',
 };
 
 export async function adaptivePromptGeneration(data: FormValues): Promise<AdaptivePromptGenerationOutput> {
@@ -173,13 +173,13 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
       promptText += `Använd följande copywriting-stil: \n${copywritingStyleMap[validatedData.copywritingStyle]}\n\n`;
   }
 
-  if ((validatedData.tonality && validatedData.tonality.length > 0) || validatedData.tonalityCustom) {
+  if ((validatedData.tonality && validatedData.tonality.length > 0) || (validatedData.tonalityCustom && validatedData.tonalityCustom.trim() !== '')) {
     const tonalityDescriptions = validatedData.tonality
       ?.map(t => tonalityMap[t])
       .filter(Boolean) || [];
     
-    if (validatedData.tonalityCustom) {
-        tonalityDescriptions.push(validatedData.tonalityCustom);
+    if (validatedData.tonalityCustom && validatedData.tonalityCustom.trim() !== '') {
+        tonalityDescriptions.push(validatedData.tonalityCustom.trim());
     }
 
     if (tonalityDescriptions.length > 0) {

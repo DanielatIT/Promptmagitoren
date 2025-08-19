@@ -136,7 +136,7 @@ export default function PromptomagitorenPage() {
                                 </TooltipTrigger>
                                 <TooltipContent side="bottom" align="end" className="w-80">
                                     <div className="text-sm p-2 text-left">
-                                        <h3 className="font-bold font-headline mb-2">Version 0.3</h3>
+                                        <h3 className="font-bold font-headline mb-2">Version 0.4</h3>
                                         <h4 className="font-semibold text-foreground mb-1 mt-3">Rättighetsförklaring</h4>
                                         <p className="text-muted-foreground text-xs leading-relaxed">
                                             Promptmagitören är utvecklad av Daniel Wölfing för Industritorget. Alla immateriella rättigheter, inklusive men inte begränsat till upphovsrätt och varumärkesrätt, tillhör Industritorget. Ingen del av denna applikation får reproduceras, distribueras eller användas i kommersiellt eller icke-kommersiellt syfte utan skriftligt medgivande från Industritorget.
@@ -161,9 +161,9 @@ export default function PromptomagitorenPage() {
                     <form onSubmit={methods.handleSubmit(onGenerate)} className="w-full">
                         <PromptForm />
                         <Button type="submit" className="w-full mt-6" disabled={isLoading}>
-                            {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="text-red-500" />}
+                            {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4 text-red-500" />}
                             Magitera prompt
-                            {!isLoading && <Wand2 className="text-red-500" />}
+                            {!isLoading && <Wand2 className="h-4 w-4 text-red-500" />}
                         </Button>
                     </form>
                     
