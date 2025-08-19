@@ -110,14 +110,14 @@ export default function PromptomagitorenPage() {
         }
         if (isInitial) {
             return (
-                <div className="flex items-center justify-center h-full text-muted-foreground">
+                <div className="flex items-center justify-center h-full text-muted-foreground p-4">
                     <p>Din genererade prompt kommer att visas här.</p>
                 </div>
             );
         }
         return (
             <Textarea
-                className="text-sm whitespace-pre-wrap font-body leading-relaxed h-full resize-none border-0 focus-visible:ring-0"
+                className="w-full h-full resize-none border-0 focus-visible:ring-0 bg-transparent p-4"
                 value={promptText}
                 onChange={(e) => setPromptText(e.target.value)}
                 placeholder="Din genererade prompt kommer att visas här."
