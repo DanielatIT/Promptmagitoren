@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast"
 import { PromptForm, formSchema, defaultValues, type FormValues } from './prompt-form';
 import { adaptivePromptGeneration } from '@/lib/prompt-generator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
+import { Textarea } from './ui/textarea';
 
 export default function PromptomagitorenPage() {
     const [promptText, setPromptText] = useState('');
@@ -115,9 +116,12 @@ export default function PromptomagitorenPage() {
             );
         }
         return (
-            <pre className="text-sm whitespace-pre-wrap font-body leading-relaxed">
-                {promptText}
-            </pre>
+            <Textarea
+                className="text-sm whitespace-pre-wrap font-body leading-relaxed h-full resize-none border-0 focus-visible:ring-0"
+                value={promptText}
+                onChange={(e) => setPromptText(e.target.value)}
+                placeholder="Din genererade prompt kommer att visas här."
+            />
         );
     };
 
@@ -155,20 +159,20 @@ export default function PromptomagitorenPage() {
                     <form onSubmit={methods.handleSubmit(onGenerate)} className="w-full">
                         <PromptForm />
                         <Button type="submit" className="w-full mt-6" disabled={isLoading}>
-                            {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4 text-red-500" />}
+                            {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
                             Magitera prompt
-                            {!isLoading && <Wand2 className="h-4 w-4 text-red-500" />}
+                            {!isLoading && <Wand2 className="h-4 w-4" />}
                         </Button>
                     </form>
                     
                     <div className="w-full mt-8" ref={previewRef}>
                         <Card>
                             <CardHeader>
-                                <CardTitle className="font-headline text-lg">Preview</CardTitle>
+                                <CardTitle className="font-headline text-lg">Förhandsgranskning</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <div className="space-y-4">
-                                    <ScrollArea className="h-96 rounded-md border p-4 bg-muted/20">
+                                    <ScrollArea className="h-96 rounded-md border bg-muted/20">
                                         {renderContent()}
                                     </ScrollArea>
                                     <div className="flex gap-4">
