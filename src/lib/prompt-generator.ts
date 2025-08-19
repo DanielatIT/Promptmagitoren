@@ -35,6 +35,8 @@ const AdaptivePromptGenerationInputSchema = z.object({
   
   language: z.enum(['Engelska', 'Svenska']),
   
+  websiteUrl: z.string().optional(),
+
   rules: z.object({
     avoidSuperlatives: z.boolean().default(true),
     avoidPraise: z.boolean().default(true),
@@ -212,6 +214,10 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
   }
 
   promptText += languageOutputs[validatedData.language] + '\n\n';
+
+  if (validatedData.websiteUrl) {
+    promptText += `När du skriver denna text, utgå från denna sida, i detta fall: ${validatedData.websiteUrl}, som texten ska publiceras på, Ta hänsyn till sidans syfte, målgrupp och innehåll, så att texten passar in naturligt.\n\n`;
+  }
 
   if (validatedData.rules) {
     const rules: string[] = [];

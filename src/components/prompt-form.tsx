@@ -197,6 +197,9 @@ export const formSchema = z.object({
   lists_disabled: z.boolean().default(false),
   
   language: z.enum(['Engelska', 'Svenska']),
+
+  websiteUrl: z.string().optional(),
+  websiteUrl_disabled: z.boolean().default(false),
   
   rules: z.object({
     avoidSuperlatives: z.boolean().default(true),
@@ -260,6 +263,8 @@ export const defaultValues: Partial<FormValues> = {
   excludeLists: false,
   lists_disabled: false,
   language: 'Svenska',
+  websiteUrl: '',
+  websiteUrl_disabled: false,
   rules: {
     avoidSuperlatives: true,
     avoidPraise: true,
@@ -544,37 +549,53 @@ export function PromptForm() {
                     </div>
                 </FormSection>
             </div>
-
-            <FormSection title="Språk">
-                <FormField
-                    control={control}
-                    name="language"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormControl>
-                                <RadioGroup
-                                    onValueChange={field.onChange}
-                                    defaultValue={field.value}
-                                    className="flex items-center space-x-4 rounded-lg border p-3 shadow-sm"
-                                >
-                                    <FormItem className="flex items-center space-x-2">
-                                        <FormControl>
-                                            <RadioGroupItem value="Svenska" id="svenska" />
-                                        </FormControl>
-                                        <FormLabel htmlFor="svenska" className="font-normal">Svenska</FormLabel>
-                                    </FormItem>
-                                    <FormItem className="flex items-center space-x-2">
-                                        <FormControl>
-                                            <RadioGroupItem value="Engelska" id="engelska" />
-                                        </FormControl>
-                                        <FormLabel htmlFor="engelska" className="font-normal">Engelska</FormLabel>
-                                    </FormItem>
-                                </RadioGroup>
-                            </FormControl>
-                        </FormItem>
-                    )}
-                />
-            </FormSection>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormSection title="Språk">
+                    <FormField
+                        control={control}
+                        name="language"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormControl>
+                                    <RadioGroup
+                                        onValueChange={field.onChange}
+                                        defaultValue={field.value}
+                                        className="flex items-center space-x-4 rounded-lg border p-3 shadow-sm"
+                                    >
+                                        <FormItem className="flex items-center space-x-2">
+                                            <FormControl>
+                                                <RadioGroupItem value="Svenska" id="svenska" />
+                                            </FormControl>
+                                            <FormLabel htmlFor="svenska" className="font-normal">Svenska</FormLabel>
+                                        </FormItem>
+                                        <FormItem className="flex items-center space-x-2">
+                                            <FormControl>
+                                                <RadioGroupItem value="Engelska" id="engelska" />
+                                            </FormControl>
+                                            <FormLabel htmlFor="engelska" className="font-normal">Engelska</FormLabel>
+                                        </FormItem>
+                                    </RadioGroup>
+                                </FormControl>
+                            </FormItem>
+                        )}
+                    />
+                </FormSection>
+                <FormSection title="Plats?" description="Vilken webbplats skall texten befinna sig på?" onToggle={() => toggleDisabled('websiteUrl_disabled')} isDisabled={values.websiteUrl_disabled}>
+                    <FormField
+                        control={control}
+                        name="websiteUrl"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormControl>
+                                    <Input placeholder="https://exempel.se/sida" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </FormSection>
+            </div>
 
             <FormSection
                 title="Regler på texten"

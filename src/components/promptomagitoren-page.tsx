@@ -48,6 +48,9 @@ export default function PromptomagitorenPage() {
             delete cleanedData.numberOfLists;
             delete cleanedData.excludeLists;
         }
+        if (cleanedData.websiteUrl_disabled) {
+            delete cleanedData.websiteUrl;
+        }
         if (cleanedData.rules_disabled) {
             delete cleanedData.rules;
         }
