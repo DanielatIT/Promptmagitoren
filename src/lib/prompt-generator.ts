@@ -278,8 +278,3 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
   
   return { prompt: promptText };
 }
-
-    
-
-    
-
