@@ -216,7 +216,7 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
   promptText += languageOutputs[validatedData.language] + '\n\n';
 
   if (validatedData.websiteUrl) {
-    promptText += `När du skriver denna text, utgå från denna sida, i detta fall: ${validatedData.websiteUrl}, som texten ska publiceras på, Ta hänsyn till sidans syfte, målgrupp och innehåll, så att texten passar in naturligt.\n\n`;
+    promptText += `När du skriver denna text, utgå från denna sida: ${validatedData.websiteUrl}, som texten ska publiceras på, Ta hänsyn till sidans syfte, målgrupp och innehåll, så att texten passar in naturligt.\n\n`;
   }
 
   if (validatedData.rules) {
