@@ -308,21 +308,6 @@ export function PromptForm() {
 
     return (
         <div className="space-y-6">
-            <FormSection title="Lägg in information" required>
-                <FormField
-                    control={control}
-                    name="topicGuideline"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormControl>
-                                <Textarea placeholder="All information som AI:n behöver för att kunna skriva texten..." {...field} rows={6} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-            </FormSection>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormSection title="Vad skall AIn aggera som?" required>
                   <FormField
@@ -399,6 +384,21 @@ export function PromptForm() {
                   )}
                 </FormSection>
             </div>
+
+            <FormSection title="Lägg in information" required>
+                <FormField
+                    control={control}
+                    name="topicGuideline"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormControl>
+                                <Textarea placeholder="All information som AI:n behöver för att kunna skriva texten..." {...field} rows={6} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+            </FormSection>
             
             {aiRole === 'Copywriter' && (
                 <FormSection title="Copywriting-stil?" description="Om någon, vilken copywriting-stil skall texten ha" onToggle={() => toggleDisabled('copywritingStyle_disabled')} isDisabled={values.copywritingStyle_disabled}>
