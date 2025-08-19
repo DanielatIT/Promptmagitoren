@@ -185,6 +185,7 @@ export const formSchema = z.object({
   copywritingStyle_disabled: z.boolean().default(false),
   
   tonality: z.array(z.string()).optional(),
+  tonalityCustom: z.string().optional(),
   tonality_disabled: z.boolean().default(false),
   
   textLength: z.string().optional(),
@@ -250,6 +251,7 @@ export const defaultValues: Partial<FormValues> = {
   copywritingStyle: 'none',
   copywritingStyle_disabled: false,
   tonality: [],
+  tonalityCustom: '',
   tonality_disabled: false,
   textLength: '',
   textLength_disabled: false,
@@ -448,36 +450,51 @@ export function PromptForm() {
 
 
             <FormSection title="Vilken tonalitet ska texten ha?" onToggle={() => toggleDisabled('tonality_disabled')} isDisabled={values.tonality_disabled}>
-                <FormField
-                    control={control}
-                    name="tonality"
-                    render={() => (
-                        <FormItem className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {tonalityOptions.map((item) => (
-                                <FormField
-                                    key={item.id}
-                                    control={control}
-                                    name="tonality"
-                                    render={({ field }) => (
-                                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                                            <FormControl>
-                                                <Checkbox
-                                                    checked={field.value?.includes(item.label)}
-                                                    onCheckedChange={(checked) => {
-                                                        return checked
-                                                            ? field.onChange([...(field.value || []), item.label])
-                                                            : field.onChange(field.value?.filter((value) => value !== item.label));
-                                                    }}
-                                                />
-                                            </FormControl>
-                                            <FormLabel className="font-normal">{item.label}</FormLabel>
-                                        </FormItem>
-                                    )}
-                                />
-                            ))}
-                        </FormItem>
-                    )}
-                />
+                <div className="space-y-4">
+                    <FormField
+                        control={control}
+                        name="tonality"
+                        render={() => (
+                            <FormItem className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {tonalityOptions.map((item) => (
+                                    <FormField
+                                        key={item.id}
+                                        control={control}
+                                        name="tonality"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                                                <FormControl>
+                                                    <Checkbox
+                                                        checked={field.value?.includes(item.label)}
+                                                        onCheckedChange={(checked) => {
+                                                            return checked
+                                                                ? field.onChange([...(field.value || []), item.label])
+                                                                : field.onChange(field.value?.filter((value) => value !== item.label));
+                                                        }}
+                                                    />
+                                                </FormControl>
+                                                <FormLabel className="font-normal">{item.label}</FormLabel>
+                                            </FormItem>
+                                        )}
+                                    />
+                                ))}
+                            </FormItem>
+                        )}
+                    />
+                     <FormField
+                        control={control}
+                        name="tonalityCustom"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Annan tonalitet</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="Beskriv en egen tonalitet..." {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </div>
             </FormSection>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -549,6 +566,7 @@ export function PromptForm() {
 
             <FormSection
                 title="Regler på texten"
+                description="Alla ibockade regler gäller, bocka av om du inte vill använda regel."
                 onToggle={() => toggleDisabled('rules_disabled')}
                 isDisabled={values.rules_disabled}
             >

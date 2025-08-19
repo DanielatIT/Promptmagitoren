@@ -26,6 +26,7 @@ const AdaptivePromptGenerationInputSchema = z.object({
   copywritingStyle: z.string().optional(),
   
   tonality: z.array(z.string()).optional(),
+  tonalityCustom: z.string().optional(),
   
   textLength: z.string().optional(),
   
@@ -172,13 +173,17 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
       promptText += `Använd följande copywriting-stil: \n${copywritingStyleMap[validatedData.copywritingStyle]}\n\n`;
   }
 
-  if (validatedData.tonality && validatedData.tonality.length > 0) {
+  if ((validatedData.tonality && validatedData.tonality.length > 0) || validatedData.tonalityCustom) {
     const tonalityDescriptions = validatedData.tonality
-      .map(t => tonalityMap[t])
-      .filter(Boolean)
-      .join('\n');
-    if (tonalityDescriptions) {
-      promptText += `Tonaliteten ska följa dessa riktlinjer:\n${tonalityDescriptions}\n\n`;
+      ?.map(t => tonalityMap[t])
+      .filter(Boolean) || [];
+    
+    if (validatedData.tonalityCustom) {
+        tonalityDescriptions.push(validatedData.tonalityCustom);
+    }
+
+    if (tonalityDescriptions.length > 0) {
+      promptText += `Tonaliteten ska följa dessa riktlinjer:\n${tonalityDescriptions.join('\n')}\n\n`;
     }
   }
 
