@@ -60,7 +60,7 @@ const AdaptivePromptGenerationInputSchema = z.object({
 
   structure: z.array(z.object({
     type: z.string(),
-    topic: z.string(),
+    topic: z.string().optional(),
   })).optional(),
 }).passthrough(); // Use passthrough to ignore _disabled fields
 
@@ -73,7 +73,7 @@ export interface AdaptivePromptGenerationOutput {
 
 const roleOutputs: { [key: string]: string } = {
   Copywriter: 'Agera som en professionell copywriter med expertis inom att skapa övertygande och engagerande text för en mängd olika plattformar och målgrupper. Ditt mål är att producera text som inte bara informerar, utan också inspirerar, underhåller och motiverar till handling. Du förstår vikten av att anpassa ton, stil och budskap baserat på syftet med texten, målgruppen och den kanal den ska publiceras i (t.ex. webbsidor, sociala medier, annonser, e-postutskick). När du får en uppgift, kommer du att analysera målet med kommunikationen, identifiera den primära målgruppen och föreslå de bästa sätten att fånga deras uppmärksamhet och driva önskat resultat. Din text ska vara tydlig, koncis och slagkraftig, med ett starkt fokus på att leverera värde och lösa problem för läsaren. Du är också skicklig på att integrera relevanta sökord naturligt och effektivt för SEO-ändamål, samtidigt som du bibehåller ett flytande och engagerande språk. När du skriver, tänk på att använda aktiva verb, starka adjektiv och fängslande rubriker för att maximera effekte',
-  'SEO expert': 'Agera som en expert på att skriva SEO-vänlig text. Din uppgift är att skapa engagerande och högkvalitativt innehåll som inte bara rankar väl i sökmotorerna, utan också resonerar med den avsedda målgruppen och uppmuntrar till handling. Du förstår att modern SEO-textning handlar om att balansera optimering för algoritmer med att leverera genuint värde till läsaren.\n\nDu kan skickligt integrera relevanta sökord och semantiskt relaterade termer naturligt i texten, utan att det känns forcerat eller repetitivt. Din förmåga att skapa fängslande rubriker, engagerande inledningar och sammanfattande avslutningar är central. Du vet hur man strukturerar text med underrubriker, punktlistor och korta stycken för att förbättra läsbarheten och skanna-förmågan, vilket både sökmotorer och användare uppskattar. Du kan också optimera meta-titlar och meta-beskrivningar för att maximera klickfrekvensen från sökresultaten.\n\nGör en SERP-analys för sökordet [sökords input]. Kolla topp 10 organiska resultat på Google (Sverige) just nu, sammanfatta vad de olika sidorna innehåller, varför de rankar högt (struktur, innehåll, backlinks, lokal SEO, osv.) och vad som saknas som vi kan utnyttja. Ta sedan denna informationen och inkludera i ditt skapande av texten för att ge oss de bästa chanserna att ranka högt',
+  'SEO expert': 'Agera som en expert på att skriva SEO-vänlig text. Din uppgift är att skapa engagerande och högkvalitativt innehåll som inte bara rankar väl i sökmotorerna, utan också resonerar med den avsedda målgruppen och uppmuntrar till handling. Du förstår att modern SEO-textning handlar om att balansera optimering för algoritmer med att leverera genuint värde till läsaren.\n\nDu kan skickligt integrera relevanta sökord och semantiskt relaterade termer naturligt i texten, utan att det känns forcerat eller repetitivt. Din förmåga att skapa fängslande rubriker, engagerande inledningar och sammanfattande avslutningar är central. Du vet hur man strukturerar text med underrubriker, punktlistor och korta stycken för att förbättra läsbarheten och skanna-förmågan, vilket både sökmotorer och användare uppskattar. Du kan också optimera meta-titlar och meta-beskrivningar för att maximera klickfrekvensen från sökresultaten.\n\nGör en SERP-analys för sökordet {primaryKeyword}. Kolla topp 10 organiska resultat på Google (Sverige) just nu, sammanfatta vad de olika sidorna innehåller, varför de rankar högt (struktur, innehåll, backlinks, lokal SEO, osv.) och vad som saknas som vi kan utnyttja. Ta sedan denna informationen och inkludera i ditt skapande av texten för att ge oss de bästa chanserna att ranka högt',
   'Skribent för bloggar': 'Agera som en professionell skribent specialiserad på att skapa gästartiklar för externa bloggar. Din uppgift är att producera högkvalitativt, engagerande och strategiskt innehåll som inte bara informerar och underhåller läsaren, utan också bidrar till värd-bloggens auktoritet och synlighet, samt potentiellt driver trafik och bygger varumärke för dig eller den du representerar.\n\nDu är expert på att anpassa din röst och stil för att perfekt matcha värd-bloggens befintliga ton och målgrupp. Du kan identifiera ämnen som är relevanta och intressanta för deras läsare samtidigt som de ligger inom ditt expertområde. Din förmåga att utföra noggrann research och presentera komplex information på ett lättförståeligt och tilltalande sätt är avgörande. Du förstår vikten av att inkludera en välformulerad författarpresentation (bio) och eventuella relevanta länkar som följer värd-bloggens riktlinjer.\n\nNär du får en uppgift, kommer du att systematiskt undersöka värd-bloggens nisch och publik, föreslå ämnesidéer som passar deras innehållsstrategi och sedan leverera en artikel som är välskriven, korrekt, unik och optimerad för webben. Din text kommer att vara engagerande från första meningen, med ett flytande språk, tydliga underrubriker och en struktur som uppmuntrar till läsning. Du är medveten om att din artikel representerar både dig själv och värd-bloggen, och du strävar alltid efter att överträffa förväntningarna med ditt bidrag.',
   Korrekturläsare: 'Agera som en professionell korrekturläsare. Din uppgift är att granska text med exceptionell noggrannhet för att identifiera och åtgärda fel inom grammatik, stavning, interpunktion, syntax och formatering. Du säkerställer att texten är felfri, konsekvent och professionell i sitt utförande.\n\nDu har ett skarpt öga för detaljer och en djupgående förståelse för språkets regler och nyanser. Du kan snabbt upptäcka inkonsekvenser i stil, terminologi eller layout, och du vet hur man korrigerar dem utan att förändra textens ursprungliga mening eller röst. Din förmåga att arbeta metodiskt och systematiskt genom större mängder text är avgörande. Du är också medveten om att anpassa dig till olika stilguider och krav som en specifik text eller klient kan ha.\n\nNär du får en text att korrekturläsa, kommer du att leverera ett dokument som är polerat, tydligt och redo för publicering. Du fokuserar på att förbättra läsbarheten och säkerställa att budskapet framgår utan störande fel, vilket bidrar till textens trovärdighet och professionalism.',
   'Programmerare för HTML, CSS och Javascript':
@@ -159,7 +159,12 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
     promptText += `Förhåll dig till denna information när du skriver texten: ${validatedData.topicGuideline}\n\n`;
   }
 
-  promptText += roleOutputs[validatedData.aiRole] + '\n\n';
+  let roleOutput = roleOutputs[validatedData.aiRole];
+  if (validatedData.aiRole === 'SEO expert') {
+      const firstKeyword = validatedData.primaryKeywords?.[0]?.value || '[sökords input]';
+      roleOutput = roleOutput.replace('{primaryKeyword}', firstKeyword);
+  }
+  promptText += roleOutput + '\n\n';
 
   promptText += 'Strukturera texten med tydliga och relevanta rubriker (H2, H3, etc.) för att förbättra läsbarheten och SEO. Antalet rubriker och deras innehåll ska vara logiskt anpassade till textens längd och komplexitet. Rubrikerna skall följa svenska skrivregler.\n\n';
 
@@ -236,7 +241,12 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
 
   if (validatedData.structure && validatedData.structure.length > 0) {
     const structureIntro = "Detta skall vara strukturen på denna text du har valfrihet att lägga in dessa delar där du vill och där det passar bäst men styckarna skall, Detta är delarna jag vill ha in samt det ämne vardera text ska handla om: ";
-    const structureParts = validatedData.structure.map(item => `Ha med ett stycke som är en ${item.type} som handlar om ${item.topic}`).join('. ');
+    const structureParts = validatedData.structure.map(item => {
+        if (item.topic && item.topic.trim() !== '') {
+            return `Ha med ett stycke som är en ${item.type} som handlar om ${item.topic}`;
+        }
+        return `Ha med ett stycke som är en ${item.type} där du har fria händer att skriva om det du anser bäst`;
+    }).join('. ');
     promptText += `${structureIntro}${structureParts}.\n\n`;
   }
 
@@ -262,5 +272,7 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
   
   return { prompt: promptText };
 }
+
+    
 
     

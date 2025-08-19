@@ -227,7 +227,7 @@ export const formSchema = z.object({
 
   structure: z.array(z.object({
     type: z.string().min(1, "Styckestyp är obligatoriskt"),
-    topic: z.string().min(1, "Ämne är obligatoriskt"),
+    topic: z.string().optional(),
   })).optional(),
   structure_disabled: z.boolean().default(false),
 
@@ -667,7 +667,7 @@ export function PromptForm() {
                                     name={`structure.${index}.topic`}
                                     render={({ field }) => (
                                         <FormItem className="flex-1">
-                                            <FormLabel>Ämne för stycket</FormLabel>
+                                            <FormLabel>Ämne (frivilligt)</FormLabel>
                                             <FormControl>
                                                 <Input {...field} placeholder="Beskriv ämnet..." />
                                             </FormControl>
@@ -739,6 +739,8 @@ export function PromptForm() {
         </div>
     );
 }
+
+    
 
     
 

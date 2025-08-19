@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Clipboard, Loader2, Info, Download, Wand2 } from 'lucide-react';
+import { Clipboard, Loader2, Info, Download, Wand2, Bot } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast"
 import { PromptForm, formSchema, defaultValues, type FormValues } from './prompt-form';
 import { adaptivePromptGeneration } from '@/lib/prompt-generator';
@@ -177,9 +177,16 @@ export default function PromptomagitorenPage() {
                                     <ScrollArea className="h-96 rounded-md border p-4 bg-muted/20">
                                         {renderContent()}
                                     </ScrollArea>
-                                     <Button onClick={handleCopy} type="button" className="w-full" variant="destructive">
-                                        <Clipboard className="mr-2 h-4 w-4" /> Kopiera prompten
-                                     </Button>
+                                    <div className="flex gap-4">
+                                        <Button onClick={handleCopy} type="button" className="w-full" variant="destructive">
+                                            <Clipboard className="mr-2 h-4 w-4" /> Kopiera prompten
+                                        </Button>
+                                        <a href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer" className="w-full">
+                                            <Button type="button" className="w-full bg-green-600 hover:bg-green-700 text-white">
+                                                <Bot className="mr-2 h-4 w-4" /> Öppna ChatGPT
+                                            </Button>
+                                        </a>
+                                     </div>
                                 </div>
                             </CardContent>
                         </Card>
@@ -189,3 +196,5 @@ export default function PromptomagitorenPage() {
         </FormProvider>
     );
 }
+
+    
