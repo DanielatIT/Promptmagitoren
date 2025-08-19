@@ -27,7 +27,7 @@ const aiRoleOptions = [
     'SEO expert', 'Skribent för bloggar', 'Copywriter', 'Korrekturläsare', 'Programmerare för HTML, CSS och Javascript', 'Researcher'
 ] as const;
 
-const taskTypeRadioOptions = ['Seo onpage text', 'Artikel', 'Korrekturläsning'] as const;
+const taskTypeRadioOptions = ['Seo onpage text', 'Artikel', 'Korrekturläsning', 'Analysera text'] as const;
 
 const tonalityOptions = [
     { id: 'professional', label: 'Professionell/Formell' },
@@ -308,7 +308,7 @@ export function PromptForm() {
 
     return (
         <div className="space-y-6">
-            <FormSection title="Förklara vad texten skall handla om" required>
+            <FormSection title="Lägg in information" required>
                 <FormField
                     control={control}
                     name="topicGuideline"
@@ -739,5 +739,7 @@ export function PromptForm() {
         </div>
     );
 }
+
+    
 
     

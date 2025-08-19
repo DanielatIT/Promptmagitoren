@@ -20,7 +20,7 @@ const aiRoleOptions = [
 const AdaptivePromptGenerationInputSchema = z.object({
   topicGuideline: z.string().min(1),
   aiRole: z.enum(aiRoleOptions),
-  taskTypeRadio: z.enum(['Artikel', 'Seo onpage text', 'Korrekturläsning', 'custom']).optional(),
+  taskTypeRadio: z.enum(['Artikel', 'Seo onpage text', 'Korrekturläsning', 'Analysera text', 'custom']).optional(),
   taskTypeCustom: z.string().optional(),
   
   copywritingStyle: z.string().optional(),
@@ -90,6 +90,7 @@ const taskTypeMap: Record<string, string> = {
     'Artikel': 'Skriv en artikel för en av våra bloggar där du inte nämner kundens namn eller företag utan utgår från att vi bara vill ge läsaren ett värde',
     'Seo onpage text': 'Skriv en SEO-optimerad on-page-text för en webbsida. Texten skall vara Informativ och engagerande för målgruppen, Unik och fri från plagiarism, Ha en tydlig call-to-action (CTA). Optimera för läsbarhet med korta stycken och enkla meningar. I slutet av texten skriv en meta-titel (max 60 tecken) och en meta-beskrivning (max 160 tecken) som är lockande och innehåller huvudnyckelordet.',
     'Korrekturläsning': 'Korrekturläs följande text noggrant med fullt fokus på svensk grammatik och språkriktighet. Gå igenom texten för att identifiera och korrigera alla typer av fel. Detta inkluderar bland annat stavfel (även sär- och sammanskrivningar), grammatikfel som felaktig böjning av ord, otydlig satskonstruktion, ordföljd och tempusfel. Se också över interpunktionen och justera användningen av kommatecken, punkter, semikolon, kolon, tankstreck och bindestreck.\n\nVar uppmärksam på syftningsfel, så att pronomen och adverb otvetydigt syftar på rätt ord eller fras. Granska meningsbyggnaden för att försäkra att formuleringarna är klara och koncisa, och att det inte förekommer onödigt långa meningar eller anakoluter. Kontrollera även att det inte finns några inkonsekvenser i texten, exempelvis gällande stavning av namn, användning av siffror, förkortningar eller inkonsekvent terminologi. Fokusera även på språkriktighet och stil, vilket innefattar ordval, textens flyt och att tonen är anpassad till syftet. Slutligen, sök efter typografiska fel som dubbla mellanslag, felaktig användning av stora/små bokstäver eller indrag.\n\nMålet är att texten ska vara idiomatiskt korrekt, lättläst, begriplig och professionell på svenska. När du presenterar de föreslagna ändringarna kan du antingen visa den fullständigt korrigerade texten eller lista specifika ändringar med en kort förklaring för varje justering, exempelvis "Original: \'dom\' -> Korrigerat: \'de\' - grammatikfel, personligt pronomen". Sträva efter att bevara författarens ursprungliga stil och ton så långt det är möjligt, samtidigt som språkriktigheten garanteras.',
+    'Analysera text': 'Analysera den bifogade texten noggrant utifrån ett SEO-perspektiv. Identifiera styrkor, svagheter och ge konkreta, handlingsbara rekommendationer för förbättringar. Din analys ska presenteras i punktform och täcka följande områden:\n\n1.  **Sökordsanvändning:** Bedöm hur väl primära och sekundära sökord är integrerade. Är densiteten lämplig? Finns det variation och semantiska sökord?\n2.  **Rubrikstruktur (H1, H2, H3, etc.):** Är rubrikerna logiskt strukturerade och relevanta? Innehåller de sökord?\n3.  **Läsbarhet och engagemang:** Är texten lättläst? Är styckena korta? Används punktlistor eller fetstil för att bryta upp texten?\n4.  **Meta-data:** Föreslå en optimerad meta-titel (max 60 tecken) och meta-beskrivning (max 160 tecken).\n5.  **Interna och externa länkar:** Finns det möjligheter att lägga till relevanta länkar? Är befintliga länkar optimerade?\n6.  **Sammanfattande bedömning och nästa steg:** Ge en övergripande bedömning av textens SEO-potential och lista de 3 viktigaste åtgärderna för att förbättra den.',
 };
 
 const copywritingStyleMap: Record<string, string> = {
@@ -249,7 +250,7 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
   if (validatedData.primaryKeywords && validatedData.primaryKeywords.length > 0) {
     const keywords = validatedData.primaryKeywords.map(kw => kw.value).filter(Boolean);
     if (keywords.length > 0) {
-      promptText += `Denna text skall innehålla följande sökord/sökfraser: ${keywords.join(', ')}. Fördela dessa naturligt i texten med en densitet på cirka 1% av textens totala antal ord för varje sökord.\n\n`;
+      promptText += `Denna text skall innehålla följande sökord/sökfraser: ${keywords.join(', ')}. Fördela dessa naturligt i texten med en densitet på cirka 2% av textens totala antal ord för varje sökord.\n\n`;
     }
   }
 
@@ -261,3 +262,5 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
   
   return { prompt: promptText };
 }
+
+    
