@@ -123,48 +123,48 @@ export default function PromptomagitorenPage() {
     };
 
     return (
-        <div className="container mx-auto p-4 md:p-8 lg:p-12">
-            <header className="relative text-center mb-8">
-                <div className="flex justify-center items-center gap-4">
-                    <Image src="https://iili.io/FZ0W72a.png" alt="Promptmagitören logotyp" width={64} height={64} data-ai-hint="wizard code" />
-                    <h1 className="text-4xl lg:text-5xl font-headline font-bold text-primary">Promptomagitören</h1>
-                </div>
-                 <div className="absolute top-0 right-0 flex items-center gap-2">
-                    <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button onClick={scrollToPreview} variant="ghost" size="icon" className="text-red-500 hover:text-red-600 hover:bg-red-50/50 rounded-full">
-                                    <Download className="h-6 w-6" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent side="bottom" align="end">
-                                <p>Till förhandsgranskning av text</p>
-                            </TooltipContent>
-                        </Tooltip>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button variant="ghost" size="icon">
-                                    <Info className="h-5 w-5 text-muted-foreground" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent side="bottom" align="end" className="w-80">
-                                <div className="text-sm p-2 text-left">
-                                    <h3 className="font-bold font-headline mb-2">Version 0.3</h3>
-                                    <h4 className="font-semibold text-foreground mb-1 mt-3">Rättighetsförklaring</h4>
-                                    <p className="text-muted-foreground text-xs leading-relaxed">
-                                        Promptomagitören är utvecklad av Daniel Wölfing för Industritorget. Alla immateriella rättigheter, inklusive men inte begränsat till upphovsrätt och varumärkesrätt, tillhör Industritorget. Ingen del av denna applikation får reproduceras, distribueras eller användas i kommersiellt eller icke-kommersiellt syfte utan skriftligt medgivande från Industritorget.
-                                    </p>
-                                    <p className="text-muted-foreground text-xs mt-2">
-                                        Vid frågor eller behov av kontakt hänvisar vi till vår support: support@industritorget.se.
-                                    </p>
-                                </div>
-                            </TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
-                </div>
-            </header>
-            
-            <FormProvider {...methods}>
+        <FormProvider {...methods}>
+            <div className="container mx-auto p-4 md:p-8 lg:p-12">
+                <header className="relative text-center mb-8">
+                    <div className="flex justify-center items-center gap-4">
+                        <Image src="https://iili.io/FZ0W72a.png" alt="Promptmagitören logotyp" width={64} height={64} data-ai-hint="wizard code" />
+                        <h1 className="text-4xl lg:text-5xl font-headline font-bold text-primary">Promptomagitören</h1>
+                    </div>
+                     <div className="absolute top-0 right-0 flex items-center gap-2">
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button onClick={scrollToPreview} variant="ghost" size="icon" className="text-red-500 hover:text-red-600 hover:bg-red-50/50 rounded-full">
+                                        <Download className="h-6 w-6" />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom" align="end">
+                                    <p>Till förhandsgranskning av text</p>
+                                </TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button variant="ghost" size="icon">
+                                        <Info className="h-5 w-5 text-muted-foreground" />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom" align="end" className="w-80">
+                                    <div className="text-sm p-2 text-left">
+                                        <h3 className="font-bold font-headline mb-2">Version 0.3</h3>
+                                        <h4 className="font-semibold text-foreground mb-1 mt-3">Rättighetsförklaring</h4>
+                                        <p className="text-muted-foreground text-xs leading-relaxed">
+                                            Promptomagitören är utvecklad av Daniel Wölfing för Industritorget. Alla immateriella rättigheter, inklusive men inte begränsat till upphovsrätt och varumärkesrätt, tillhör Industritorget. Ingen del av denna applikation får reproduceras, distribueras eller användas i kommersiellt eller icke-kommersiellt syfte utan skriftligt medgivande från Industritorget.
+                                        </p>
+                                        <p className="text-muted-foreground text-xs mt-2">
+                                            Vid frågor eller behov av kontakt hänvisar vi till vår support: support@industritorget.se.
+                                        </p>
+                                    </div>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                    </div>
+                </header>
+                
                 <form onSubmit={methods.handleSubmit(onGenerate)} className="w-full">
                     <PromptForm />
                     <Button type="submit" className="w-full mt-6" disabled={isLoading}>
@@ -172,29 +172,29 @@ export default function PromptomagitorenPage() {
                         Magitera prompt
                     </Button>
                 </form>
-            </FormProvider>
-            
-            <div className="w-full mt-8" ref={previewRef}>
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="font-headline text-lg">Preview</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="space-y-4">
-                            <Button onClick={handleCopy} type="button" className="w-full" variant="outline">
-                                <Clipboard className="mr-2 h-4 w-4" /> Copy Text
-                            </Button>
+                
+                <div className="w-full mt-8" ref={previewRef}>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="font-headline text-lg">Preview</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-4">
+                                <Button onClick={handleCopy} type="button" className="w-full" variant="outline">
+                                    <Clipboard className="mr-2 h-4 w-4" /> Copy Text
+                                </Button>
 
-                            <ScrollArea className="h-96 rounded-md border p-4 bg-muted/20">
-                                {renderContent()}
-                            </ScrollArea>
-                             <Button onClick={handleCopy} type="button" className="w-full" variant="outline">
-                                <Clipboard className="mr-2 h-4 w-4" /> Copy Text
-                             </Button>
-                        </div>
-                    </CardContent>
-                </Card>
+                                <ScrollArea className="h-96 rounded-md border p-4 bg-muted/20">
+                                    {renderContent()}
+                                </ScrollArea>
+                                 <Button onClick={handleCopy} type="button" className="w-full" variant="outline">
+                                    <Clipboard className="mr-2 h-4 w-4" /> Copy Text
+                                 </Button>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
             </div>
-        </div>
+        </FormProvider>
     );
 }
