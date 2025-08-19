@@ -553,7 +553,6 @@ export function PromptForm() {
                 isDisabled={values.rules_disabled}
             >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-                    {/* Kolumn 1: Undvik... */}
                     <div className="space-y-4">
                         <h4 className="font-medium text-foreground">Undvik...</h4>
                         <FormField control={control} name="rules.avoidSuperlatives" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Superlativ</FormLabel></FormItem>)} />
@@ -596,7 +595,6 @@ export function PromptForm() {
                         </div>
                     </div>
 
-                    {/* Kolumn 2: Övriga regler */}
                     <div className="space-y-4">
                          <h4 className="font-medium text-foreground">Övrigt</h4>
                          <FormField control={control} name="rules.isInformative" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Informativ text</FormLabel></FormItem>)} />

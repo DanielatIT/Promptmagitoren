@@ -126,9 +126,7 @@ export default function PromptomagitorenPage() {
         <FormProvider {...methods}>
             <div className="container mx-auto p-4 md:p-8 lg:p-12">
                 <header className="relative text-center mb-8">
-                    <div className="flex justify-center items-center gap-4">
-                        <h1 className="text-4xl lg:text-5xl font-headline font-bold text-primary">Promptomagitören</h1>
-                    </div>
+                    <h1 className="text-4xl lg:text-5xl font-headline font-bold text-primary">Promptmagitören</h1>
                      <div className="absolute top-0 right-0 flex items-center gap-2">
                         <TooltipProvider>
                             <Tooltip>
@@ -164,7 +162,7 @@ export default function PromptomagitorenPage() {
                     </div>
                 </header>
                 
-                <div className="max-w-6xl mx-auto">
+                <div className="max-w-5xl mx-auto">
                     <form onSubmit={methods.handleSubmit(onGenerate)} className="w-full">
                         <PromptForm />
                         <Button type="submit" className="w-full mt-6" disabled={isLoading}>
