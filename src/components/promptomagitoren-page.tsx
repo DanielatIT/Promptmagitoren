@@ -127,7 +127,7 @@ export default function PromptomagitorenPage() {
             <div className="container mx-auto p-4 md:p-8 lg:p-12">
                 <header className="relative text-center mb-8">
                     <div className="flex justify-center items-center gap-4">
-                        <Image src="https://iili.io/FZ0W72a.png" alt="Promptmagitören logotyp" width={64} height={64} data-ai-hint="wizard code" />
+                        <Image src="https://placehold.co/64x64.png" alt="Promptmagitören logotyp" width={64} height={64} data-ai-hint="wizard magic" />
                         <h1 className="text-4xl lg:text-5xl font-headline font-bold text-primary">Promptomagitören</h1>
                     </div>
                      <div className="absolute top-0 right-0 flex items-center gap-2">
@@ -165,34 +165,36 @@ export default function PromptomagitorenPage() {
                     </div>
                 </header>
                 
-                <form onSubmit={methods.handleSubmit(onGenerate)} className="w-full">
-                    <PromptForm />
-                    <Button type="submit" className="w-full mt-6" disabled={isLoading}>
-                        {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                        Magitera prompt
-                    </Button>
-                </form>
-                
-                <div className="w-full mt-8" ref={previewRef}>
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="font-headline text-lg">Preview</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="space-y-4">
-                                <Button onClick={handleCopy} type="button" className="w-full" variant="outline">
-                                    <Clipboard className="mr-2 h-4 w-4" /> Copy Text
-                                </Button>
+                <div className="max-w-6xl mx-auto">
+                    <form onSubmit={methods.handleSubmit(onGenerate)} className="w-full">
+                        <PromptForm />
+                        <Button type="submit" className="w-full mt-6" disabled={isLoading}>
+                            {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                            Magitera prompt
+                        </Button>
+                    </form>
+                    
+                    <div className="w-full mt-8" ref={previewRef}>
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="font-headline text-lg">Preview</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="space-y-4">
+                                    <Button onClick={handleCopy} type="button" className="w-full" variant="outline">
+                                        <Clipboard className="mr-2 h-4 w-4" /> Copy Text
+                                    </Button>
 
-                                <ScrollArea className="h-96 rounded-md border p-4 bg-muted/20">
-                                    {renderContent()}
-                                </ScrollArea>
-                                 <Button onClick={handleCopy} type="button" className="w-full" variant="outline">
-                                    <Clipboard className="mr-2 h-4 w-4" /> Copy Text
-                                 </Button>
-                            </div>
-                        </CardContent>
-                    </Card>
+                                    <ScrollArea className="h-96 rounded-md border p-4 bg-muted/20">
+                                        {renderContent()}
+                                    </ScrollArea>
+                                     <Button onClick={handleCopy} type="button" className="w-full" variant="outline">
+                                        <Clipboard className="mr-2 h-4 w-4" /> Copy Text
+                                     </Button>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
                 </div>
             </div>
         </FormProvider>
