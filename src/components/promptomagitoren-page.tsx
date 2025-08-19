@@ -117,7 +117,7 @@ export default function PromptomagitorenPage() {
         }
         return (
             <Textarea
-                className="w-full h-full resize-none border-0 focus-visible:ring-0 bg-transparent p-4"
+                className="w-full h-96 resize-none border-0 focus-visible:ring-0 bg-transparent p-4"
                 value={promptText}
                 onChange={(e) => setPromptText(e.target.value)}
                 placeholder="Din genererade prompt kommer att visas här."
@@ -172,7 +172,7 @@ export default function PromptomagitorenPage() {
                             </CardHeader>
                             <CardContent>
                                 <div className="space-y-4">
-                                    <ScrollArea className="h-96 rounded-md border bg-muted/20">
+                                    <ScrollArea className="rounded-md border bg-muted/20">
                                         {renderContent()}
                                     </ScrollArea>
                                     <div className="flex gap-4">
