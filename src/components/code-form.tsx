@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useFormContext, Controller, useWatch } from 'react-hook-form';
 import { z } from 'zod';
 import {
@@ -17,6 +17,7 @@ import { FormSection } from './form-section';
 
 const webLanguages = ["HTML", "Javascript", "CSS"] as const;
 const exclusiveLanguages = ["C#", "Python"] as const;
+const allLanguages = [...webLanguages, ...exclusiveLanguages];
 
 export const codeFormSchema = z.object({
   languages: z.array(z.string()).nonempty("Välj minst ett språk."),
@@ -36,25 +37,27 @@ export function CodeForm() {
     const { control, setValue, getValues } = useFormContext<CodeFormValues>();
     const selectedLanguages = useWatch({ control, name: 'languages', defaultValue: [] });
 
-    useEffect(() => {
-        const languages = getValues('languages');
-        const lastSelected = languages[languages.length - 1];
+    const handleLanguageChange = (language: string, checked: boolean) => {
+        let currentLanguages = getValues('languages') || [];
 
-        if (exclusiveLanguages.includes(lastSelected as any)) {
-            // If an exclusive language is selected, deselect all others
-            setValue('languages', [lastSelected]);
-        } else if (webLanguages.includes(lastSelected as any)) {
-            // If a web language is selected, deselect any exclusive language
-            const filtered = languages.filter(lang => !exclusiveLanguages.includes(lang as any));
-            setValue('languages', filtered);
+        if (checked) {
+            if (exclusiveLanguages.includes(language as any)) {
+                currentLanguages = [language];
+            } else if (webLanguages.includes(language as any)) {
+                currentLanguages = [...currentLanguages.filter(lang => !exclusiveLanguages.includes(lang as any)), language];
+            } else {
+                 currentLanguages.push(language);
+            }
+        } else {
+            currentLanguages = currentLanguages.filter(lang => lang !== language);
         }
+        
+        setValue('languages', [...new Set(currentLanguages)], { shouldValidate: true });
 
-        // If HTML is not selected, uncheck inlineHtml
-        if (!languages.includes('HTML')) {
+        if (!currentLanguages.includes('HTML')) {
             setValue('inlineHtml', false);
         }
-
-    }, [selectedLanguages, setValue, getValues]);
+    };
 
     return (
         <div className="space-y-6">
@@ -65,7 +68,7 @@ export function CodeForm() {
                     render={() => (
                         <FormItem className="space-y-3">
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                {[...webLanguages, ...exclusiveLanguages].map((item) => (
+                                {allLanguages.map((item) => (
                                     <FormField
                                         key={item}
                                         control={control}
@@ -76,10 +79,7 @@ export function CodeForm() {
                                                     <Checkbox
                                                         checked={field.value?.includes(item)}
                                                         onCheckedChange={(checked) => {
-                                                            const currentValues = field.value || [];
-                                                            return checked
-                                                                ? field.onChange([...currentValues, item])
-                                                                : field.onChange(currentValues.filter((value) => value !== item));
+                                                            handleLanguageChange(item, !!checked);
                                                         }}
                                                     />
                                                 </FormControl>
