@@ -4,7 +4,7 @@
 import { z } from 'zod';
 
 const codeFormSchema = z.object({
-  languages: z.array(z.string()).nonempty(),
+  language: z.string().min(1),
   inlineHtml: z.boolean().optional(),
   description: z.string().min(1),
 });
@@ -35,12 +35,16 @@ export async function generateCodePrompt(data: CodeFormValues): Promise<Generate
   promptText += roleOutput + '\n\n';
 
   promptText += "Språkkrav:\n";
-  validatedData.languages.forEach(lang => {
-      if (languageInstructions[lang]) {
-          promptText += `- ${lang}: ${languageInstructions[lang]}\n`;
-      }
-  });
-  if (validatedData.languages.includes('HTML') && validatedData.inlineHtml) {
+  
+  if (validatedData.language === 'HTML, CSS & Javascript') {
+      promptText += `- HTML: ${languageInstructions['HTML']}\n`;
+      promptText += `- CSS: ${languageInstructions['CSS']}\n`;
+      promptText += `- Javascript: ${languageInstructions['Javascript']}\n`;
+  } else if (languageInstructions[validatedData.language]) {
+      promptText += `- ${validatedData.language}: ${languageInstructions[validatedData.language]}\n`;
+  }
+
+  if ((validatedData.language.includes('HTML')) && validatedData.inlineHtml) {
       promptText += `\n${inlineHtmlInstruction}\n`;
   }
   promptText += '\n';
