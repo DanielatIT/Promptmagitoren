@@ -15,7 +15,14 @@ export interface GenerateCodePromptOutput {
   prompt: string;
 }
 
-const roleOutput = 'Agera som en senior fullstack-utvecklare med specialistkompetens inom HTML, CSS och JavaScript. Din uppgift är att skriva robust, effektiv och skalbar kod för webben, både på klientsidan och i integrationen med backend-system. Du har en djup förståelse för webbstandarder, bästa praxis och de senaste trenderna inom frontend-utveckling.\n\nDu kan arkitektera och implementera responsiva webbgränssnitt med ren HTML, styla dem med semantisk och modulär CSS (inklusive preprocessorer som SASS/LESS och moderna CSS-metoder som Flexbox/Grid), och lägga till dynamisk interaktivitet med avancerad JavaScript (inklusive ES6+ funktioner, ramverk/bibliotek som React/Vue/Angular, och asynkron programmering). Du förstår vikten av prestandaoptimering, tillgänglighet (WCAG) och SEO-vänlig kod.\n\nNär du får en uppgift, kommer du att leverera kod som är väldokumenterad, lätt att underhålla och optimerad för en utmärkt användarupplevelse. Du kan analysera problem, föreslå tekniska lösningar och implementera dem med precision, alltid med fokus på både funktionalitet och kodkvalitet. Din förmåga att felsöka och lösa komplexa problem i webbläsare är exceptionell.';
+const roleOutputs: Record<string, string> = {
+  'HTML, CSS & Javascript': 'Agera som en senior fullstack-utvecklare med specialistkompetens inom HTML, CSS och JavaScript. Din uppgift är att skriva robust, effektiv och skalbar kod för webben, både på klientsidan och i integrationen med backend-system. Du har en djup förståelse för webbstandarder, bästa praxis och de senaste trenderna inom frontend-utveckling.\n\nDu kan arkitektera och implementera responsiva webbgränssnitt med ren HTML, styla dem med semantisk och modulär CSS (inklusive preprocessorer som SASS/LESS och moderna CSS-metoder som Flexbox/Grid), och lägga till dynamisk interaktivitet med avancerad JavaScript (inklusive ES6+ funktioner, ramverk/bibliotek som React/Vue/Angular, och asynkron programmering). Du förstår vikten av prestandaoptimering, tillgänglighet (WCAG) och SEO-vänlig kod.\n\nNär du får en uppgift, kommer du att leverera kod som är väldokumenterad, lätt att underhålla och optimerad för en utmärkt användarupplevelse. Du kan analysera problem, föreslå tekniska lösningar och implementera dem med precision, alltid med fokus på både funktionalitet och kodkvalitet. Din förmåga att felsöka och lösa komplexa problem i webbläsare är exceptionell.',
+  HTML: 'Agera som en expert på HTML. Din uppgift är att skriva robust, effektiv och semantiskt korrekt HTML-kod. Du har en djup förståelse för webbstandarder, bästa praxis, tillgänglighet (WCAG) och SEO-vänlig kod.',
+  Javascript: 'Agera som en expert på JavaScript. Din uppgift är att skriva robust, väldokumenterad och fullt fungerande JavaScript-kod. Du har en djup förståelse för ES6+ funktioner, ramverk/bibliotek och asynkron programmering.',
+  CSS: 'Agera som en expert på CSS. Din uppgift är att skapa ren, välskriven och debuggad CSS-kod. Du har en djup förståelse för moderna tekniker för att skapa optimerade, intelligenta och responsiva layouter.',
+  'C#': 'Agera som en expert på C#. Din uppgift är att skriva ren, effektiv och fullt fungerande C#-kod som följer bästa praxis för att säkerställa hög kvalitet.',
+  Python: 'Agera som en expert på Python. Din uppgift är att skapa tydlig, effektiv och fullt fungerande Python-kod som följer standardiserade kodningskonventioner för att vara så intelligent och optimerad som möjligt.',
+};
 
 const languageInstructions: Record<string, string> = {
   HTML: "Generera välstrukturerad och semantisk HTML-kod. I den mån det går ska koden vara minifierad och optimerad för prestanda. Koden ska följa de senaste standarderna för att säkerställa högsta möjliga kvalitet.",
@@ -32,6 +39,7 @@ export async function generateCodePrompt(data: CodeFormValues): Promise<Generate
 
   let promptText = "Dessa regler nedan skall följas väldigt strikt, kolla konstant att du alltid följer det instruktioner jag ger dig här och återkom med en fråga om vad du skall göra istället för att göra något annat än vad instruktioner hänvisar. \n\n";
 
+  const roleOutput = roleOutputs[validatedData.language] || roleOutputs['HTML, CSS & Javascript'];
   promptText += roleOutput + '\n\n';
 
   promptText += "Språkkrav:\n";
