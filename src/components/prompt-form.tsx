@@ -17,17 +17,16 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
-import { X, Plus, Trash2, Info, CheckCircle, XCircle } from "lucide-react"
+import { X, Plus, Trash2 } from "lucide-react"
 import { FormSection } from './form-section';
 import { cn } from "@/lib/utils";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 const aiRoleOptions = [
-    'Copywriter', 'SEO expert', 'Skribent för bloggar', 'Korrekturläsare', 'Programmerare för HTML, CSS och Javascript', 'Researcher'
+    'SEO expert', 'Skribent för bloggar'
 ] as const;
 
-const taskTypeRadioOptions = ['Artikel', 'Seo onpage text', 'Korrekturläsning', 'Analysera text'] as const;
+const taskTypeRadioOptions = ['Artikel', 'Seo onpage text'] as const;
 
 const tonalityOptions = [
     { id: 'professional', label: 'Professionell/Formell' },
@@ -45,145 +44,13 @@ const avoidWordsOptions = [
     { id: 'central-del-av', label: '"central del av"' },
 ];
 
-export const copywritingStyles = [
-    {
-        id: 'AIDA',
-        label: 'AIDA-modellen'
-    },
-    {
-        id: 'Fyra P',
-        label: 'Fyra P-modellen'
-    },
-    {
-        id: 'Före-Efter-Bro',
-        label: 'Före-efter-bro-modellen'
-    },
-    {
-        id: 'PAS',
-        label: 'PAS-modellen'
-    },
-    {
-        id: 'Star-Story-Solution',
-        label: 'Star Story Solution-modellen'
-    },
-];
-
-const copywritingStyleInfo: Record<string, any> = {
-    'AIDA': {
-        title: 'AIDA-modellen',
-        description: 'AIDA kommer från de engelska orden Attention, Interest, Desire och Action. Med AIDA lär du dig skriva på ett klassiskt vis med en beprövad struktur.',
-        steps: [
-            { title: 'Attention (uppmärksamhet)', text: 'Fånga dina läsares uppmärksamhet med en intressant introduktion.' },
-            { title: 'Interest (intresse)', text: 'Berätta varför läsaren borde fortsätta läsa.' },
-            { title: 'Desire (begär)', text: 'Skapa ett begär hos läsaren att göra något. Det kan till exempel vara att följa din sida, köpa en produkt eller prenumerera på ett nyhetsbrev.' },
-            { title: 'Action (handling)', text: 'Nu kan du använda en CTA-knapp för att dra nytta av läsarens intresse.' }
-        ],
-        pros: ['Enkel att komma ihåg och jobba med.', 'Fångar läsarens intresse.', 'Gör det tydligt för läsaren vilken handling de ska göra.'],
-        cons: ['Kan vara svår att använda för nyanserad kommunikation.', 'Kan vara ineffektiv vid mer komplex kommunikation.']
-    },
-    'Fyra P': {
-        title: 'Fyra P-modellen',
-        description: 'Här kommer ännu en klassisk skrivmodell! Fyra P används på flera sätt inom marknadsföring. Fyra P kan dels handla om en modell för marknadsföringsmix men i detta fallet pratar vi om Fyra P för copywriting. Dessa Fyra P är engelskans: Picture, Promise, Prove och Push.',
-        steps: [
-            { title: 'Picture (föreställ)', text: 'Du börjar med att skapa en bild av ett positivt resultat eller en bra framtid för ett nuvarande problem.' },
-            { title: 'Promise (utlova)', text: 'Du fortsätter genom att berätta hur din produkt eller tjänst kan ge det positiva resultat som läsaren föreställer sig.' },
-            { title: 'Prove (bevisa)', text: 'Bevisa att ditt löfte stämmer. Presentera konkreta bevis på att du kan uppfylla dina löften och att din produkt eller tjänst kan leverera det du lovar.' },
-            { title: 'Push (driv)', text: 'Använd en CTA för att ta läsaren till handling.' }
-        ],
-        pros: ['Det är enkelt för läsaren att snabbt se fördelarna med något.', 'Sociala bevis fungerar bra för att skapa varumärkesförtroende.', 'Kan användas för både texter och videor.'],
-        cons: ['Kräver att du vet något om målgrupper.', 'Fungerar bäst för etablerade företag som redan har sociala bevis.']
-    },
-    'Före-Efter-Bro': {
-        title: 'Före – efter – bro',
-        description: 'Med denna skrivmodell är det enkelt att skriva och den kan vara mycket effektiv. Namnet ”Före – efter – bro” kommer av att skribenten presenterar ett problem, visar hur bra livet blir efter lösningen och berättar sedan hur läsaren kan ta del av lösningen.',
-        steps: [
-            { title: 'Före', text: 'Beskriv läsarens nuvarande verklighet och de problem som hen har.' },
-            { title: 'Efter', text: 'Berätta hur bra framtiden kan vara när problemet är löst.' },
-            { title: 'Bro', text: 'Berätta hur din produkt eller tjänst kan ta läsaren till en ljus framtid.' }
-        ],
-        pros: ['Enkelt för copywritern.', 'Läsaren får läsa om ett problem som de kan relatera till.', 'Det är enkelt för läsaren att förstå.'],
-        cons: ['Inte särskilt anpassningsbart.']
-    },
-    'PAS': {
-        title: 'PAS-modellen',
-        description: 'PAS står för engelskans Pain, Agitation och Solution. Detta är en skrivmodell som används flitigt inom marknadsföring.',
-        steps: [
-            { title: 'Pain (smärta)', text: 'Du börjar med att beskriva din målgrupps största och viktigaste problem.' },
-            { title: 'Agitation (reta)', text: 'Du fortsätter med att konkretisera problemet genom att använda ord som associeras med problemet för läsaren. Det ökar behovet av en lösning.' },
-            { title: 'Solution (lösning)', text: 'Slutligen presenteras lösningen. Berätta hur din produkt eller tjänst löser deras problem och hur ”smärtan” kan försvinna.' }
-        ],
-        pros: ['Modellen gör det enkelt att vara konkret.', 'Lösningen är mer tillfredsställande när problemet känns större.', 'Kan användas för många olika situationer.'],
-        cons: ['Ett stort fokus på problem kan överskugga fördelarna med en lösning.']
-    },
-    'Star-Story-Solution': {
-        title: 'Star Story Solution',
-        description: 'Star Story Solution är en skrivmodell som gör det enkelt att skapa texter som fokuserar på storytelling. Det är detta fokus som gör denna skrivmodell så bra.',
-        steps: [
-            { title: 'Star (stjärna)', text: 'Introducera stjärnan i berättelsen. Det kan vara en verklig person eller påhittad karaktär som har ett problem som läsaren kan känna igen sig i.' },
-            { title: 'Story (berättelse)', text: 'En berättelse presenteras, med stjärnan i centrum.' },
-            { title: 'Solution (lösning)', text: 'Här är ditt mål att visa hur stjärnan löser sitt problem med hjälp av en produkt eller tjänst.' }
-        ],
-        pros: ['Personen i berättelsen får texten att kännas mer personlig.', 'Storytelling fångar läsarens uppmärksamhet.', 'Det är enkelt att skapa en mer nyanserad berättelse.'],
-        cons: ['Passar inte lika bra för korta texter.', 'Valet av person kan ha stor betydelse för målgruppen.']
-    }
-};
-
 const paragraphTypes = ['Ingress', 'Brödtext & underrubrik', 'Fristående text', 'CTA', 'Titel'];
-
-const FormattedCopywritingInfo = ({ styleId }: { styleId: string }) => {
-    const info = copywritingStyleInfo[styleId];
-    if (!info) return null;
-
-    return (
-        <div className="text-sm p-2">
-            <h3 className="text-base font-bold font-headline mb-2">{info.title}</h3>
-            <p className="mb-4 text-muted-foreground">{info.description}</p>
-            <div className="space-y-3 mb-4">
-                {info.steps.map((step: any, index: number) => (
-                    <div key={index}>
-                        <h4 className="font-semibold text-foreground">{step.title}</h4>
-                        <p className="text-muted-foreground">{step.text}</p>
-                    </div>
-                ))}
-            </div>
-            {info.pros && info.pros.length > 0 && (
-                <div className="mb-4">
-                    <h4 className="font-semibold mb-2 text-foreground">Fördelar</h4>
-                    <ul className="space-y-1.5">
-                        {info.pros.map((pro: string, i: number) => (
-                            <li key={i} className="flex items-start gap-2 text-muted-foreground">
-                                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
-                                <span>{pro}</span>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            )}
-            {info.cons && info.cons.length > 0 && (
-                <div>
-                    <h4 className="font-semibold mb-2 text-foreground">Nackdelar</h4>
-                    <ul className="space-y-1.5">
-                        {info.cons.map((con: string, i: number) => (
-                            <li key={i} className="flex items-start gap-2 text-muted-foreground">
-                                <XCircle className="h-4 w-4 text-red-500 mt-0.5 shrink-0" />
-                                <span>{con}</span>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            )}
-        </div>
-    );
-};
 
 export const formSchema = z.object({
   topicGuideline: z.string().min(1, 'Detta fält är obligatoriskt.'),
   aiRole: z.enum(aiRoleOptions),
   taskTypeRadio: z.enum([...taskTypeRadioOptions, 'custom']).optional(),
   taskTypeCustom: z.string().optional(),
-  
-  copywritingStyle: z.string().optional(),
-  copywritingStyle_disabled: z.boolean().default(false),
   
   tonality: z.array(z.string()).optional(),
   tonalityCustom: z.string().optional(),
@@ -252,8 +119,6 @@ export const defaultValues: Partial<FormValues> = {
   aiRole: 'SEO expert',
   taskTypeRadio: 'Seo onpage text',
   taskTypeCustom: '',
-  copywritingStyle: 'none',
-  copywritingStyle_disabled: false,
   tonality: [],
   tonalityCustom: '',
   tonality_disabled: false,
@@ -300,7 +165,6 @@ export function PromptForm() {
     const structureFields = useFieldArray({ control, name: "structure" });
     
     const values = useWatch({ control });
-    const aiRole = useWatch({ control, name: "aiRole" });
 
     const toggleDisabled = (fieldName: keyof FormValues | `${string}_disabled`) => {
         const currentVal = getValues(fieldName as any);
@@ -404,56 +268,6 @@ export function PromptForm() {
                     )}
                 />
             </FormSection>
-            
-            {aiRole === 'Copywriter' && (
-                <FormSection title="Copywriting-stil?" description="Om någon, vilken copywriting-stil skall texten ha" onToggle={() => toggleDisabled('copywritingStyle_disabled')} isDisabled={values.copywritingStyle_disabled}>
-                    <FormField
-                        control={control}
-                        name="copywritingStyle"
-                        render={({ field }) => (
-                            <FormItem className="space-y-3">
-                                <FormControl>
-                                    <TooltipProvider>
-                                        <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2">
-                                            <FormItem className="flex items-center space-x-3 space-y-0">
-                                                <FormControl>
-                                                    <RadioGroupItem value="none" />
-                                                </FormControl>
-                                                <FormLabel className="font-normal">Ingen specifik stil</FormLabel>
-                                            </FormItem>
-                                            {copywritingStyles.map((style) => (
-                                                <FormItem key={style.id} className="flex items-center space-x-3 space-y-0">
-                                                    <FormControl>
-                                                        <RadioGroupItem value={style.id} />
-                                                    </FormControl>
-                                                    <FormLabel className="font-normal flex items-center gap-2">{style.label}
-                                                        <Tooltip>
-                                                            <TooltipTrigger asChild>
-                                                                <button type="button">
-                                                                    <Info className="h-4 w-4 text-muted-foreground" />
-                                                                </button>
-                                                            </TooltipTrigger>
-                                                            <TooltipContent 
-                                                                side="right" 
-                                                                align="center" 
-                                                                sideOffset={20}
-                                                                className="w-96 max-h-[calc(100vh-2rem)] overflow-y-auto bg-card">
-                                                                <FormattedCopywritingInfo styleId={style.id} />
-                                                            </TooltipContent>
-                                                        </Tooltip>
-                                                    </FormLabel>
-                                                </FormItem>
-                                            ))}
-                                        </RadioGroup>
-                                    </TooltipProvider>
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                </FormSection>
-            )}
-
 
             <FormSection title="Vilken tonalitet ska texten ha?" onToggle={() => toggleDisabled('tonality_disabled')} isDisabled={values.tonality_disabled}>
                 <div className="space-y-4">
@@ -760,3 +574,5 @@ export function PromptForm() {
         </div>
     );
 }
+
+    

@@ -14,13 +14,12 @@ import {
     roleOutputs, 
     languageOutputs, 
     taskTypeMap, 
-    copywritingStyleMap, 
     tonalityMap, 
     avoidWordsMap 
 } from './prompt-data';
 
 const aiRoleOptions = [
-    'Copywriter', 'SEO expert', 'Skribent för bloggar', 'Korrekturläsare', 'Programmerare för HTML, CSS och Javascript', 'Researcher'
+    'SEO expert', 'Skribent för bloggar'
 ] as const;
 
 
@@ -28,10 +27,8 @@ const aiRoleOptions = [
 const AdaptivePromptGenerationInputSchema = z.object({
   topicGuideline: z.string().min(1),
   aiRole: z.enum(aiRoleOptions),
-  taskTypeRadio: z.enum(['Artikel', 'Seo onpage text', 'Korrekturläsning', 'Analysera text', 'custom']).optional(),
+  taskTypeRadio: z.enum(['Artikel', 'Seo onpage text', 'custom']).optional(),
   taskTypeCustom: z.string().optional(),
-  
-  copywritingStyle: z.string().optional(),
   
   tonality: z.array(z.string()).optional(),
   tonalityCustom: z.string().optional(),
@@ -106,11 +103,6 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
     
   if (taskTypeInstruction) {
       promptText += `Din uppgift är att: ${taskTypeInstruction}\n\n`;
-  }
-
-  if (validatedData.copywritingStyle && validatedData.copywritingStyle !== 'none') {
-      const copywritingStyleDescription = copywritingStyleMap[validatedData.copywritingStyle] || '';
-      promptText += `Använd följande copywriting-stil: \n${copywritingStyleDescription}\n\n`;
   }
 
   if ((validatedData.tonality && validatedData.tonality.length > 0) || (validatedData.tonalityCustom && validatedData.tonalityCustom.trim() !== '')) {
