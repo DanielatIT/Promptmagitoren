@@ -1,4 +1,4 @@
-Category,Identifier,Text Output
+"Category","Identifier","Text Output"
 "Static Prompt Fragments","Initial Instruction","Dessa regler nedan skall följas väldigt strikt, kolla konstant att du alltid följer det instruktioner jag ger dig här och återkom med en fråga om vad du skall göra istället för att göra något annat än vad instruktioner hänvisar."
 "Static Prompt Fragments","Topic Guideline","Förhåll dig till denna information när du skriver texten: {topicGuideline}"
 "Static Prompt Fragments","Standard Structure Rule","Strukturera texten med tydliga och relevanta rubriker (H2, H3, etc.) för att förbättra läsbarheten och SEO. Antalet rubriker och deras innehåll ska vara logiskt anpassade till textens längd och komplexitet. Rubrikerna skall följa svenska skrivregler."
@@ -11,7 +11,7 @@ Category,Identifier,Text Output
 "Static Prompt Fragments","Rules Prefix","Regler för texten: {rules.join('. ')}"
 "Static Prompt Fragments","Structure Intro","Detta skall vara strukturen på denna text du har valfrihet att lägga in dessa delar där du vill och där det passar bäst men styckarna skall, Detta är delarna jag vill ha in samt det ämne vardera text ska handla om: "
 "Static Prompt Fragments","Structure Item (With Topic)","Ha med ett stycke som är en {item.type} som handlar om {item.topic}"
-"Static-Prompt-Fragments","Structure-Item-(No-Topic)","Ha-med-ett-stycke-som-är-en-{item.type}-där-du-har-fria-händer-att-skriva-om-det-du-anser-bäst"
+"Static Prompt Fragments","Structure Item (No Topic)","Ha med ett stycke som är en {item.type} där du har fria händer att skriva om det du anser bäst"
 "Static Prompt Fragments","Link Insertion","Lägg in hyperlänkar i texten, länken är: {link.url}. På detta sökord: {link.anchorText}"
 "Static Prompt Fragments","Primary Keywords","Denna text skall innehålla följande sökord/sökfraser: {keywords}. Fördela dessa naturligt i texten med en densitet på cirka 2.5% av textens totala antal ord för varje sökord."
 "Static Prompt Fragments","Author (With Author)","Denna texten är skriven av {author} och kan nämnas i en CTA."
@@ -43,4 +43,3 @@ Category,Identifier,Text Output
 "Words to Avoid","idealiskt","""idealiskt"""
 "Words to Avoid","central-del-av","""central del av"""
 
-    
