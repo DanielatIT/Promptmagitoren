@@ -24,10 +24,10 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/t
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 const aiRoleOptions = [
-    'SEO expert', 'Skribent för bloggar', 'Copywriter'
+    'Copywriter', 'SEO expert', 'Skribent för bloggar', 'Korrekturläsare', 'Programmerare för HTML, CSS och Javascript', 'Researcher'
 ] as const;
 
-const taskTypeRadioOptions = ['Seo onpage text', 'Artikel'] as const;
+const taskTypeRadioOptions = ['Artikel', 'Seo onpage text', 'Korrekturläsning', 'Analysera text'] as const;
 
 const tonalityOptions = [
     { id: 'professional', label: 'Professionell/Formell' },
@@ -760,5 +760,3 @@ export function PromptForm() {
         </div>
     );
 }
-
-    
