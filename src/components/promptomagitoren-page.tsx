@@ -1,20 +1,91 @@
 
 "use client";
 
-import React from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { TextPromptTab } from './text-prompt-tab';
-import { CodePromptTab } from './code-prompt-tab';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Info } from 'lucide-react';
-import { Button } from './ui/button';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
+import React, { useState } from 'react';
+import { useForm, FormProvider } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Button } from '@/components/ui/button';
+import { Wand2, Loader2, Info } from 'lucide-react';
+import { useToast } from "@/hooks/use-toast";
+import { PromptForm, formSchema, defaultValues, type FormValues } from './prompt-form';
+import { adaptivePromptGeneration } from '@/lib/prompt-generator';
+import { PromptPreview } from './prompt-preview';
+import { Tooltip, TooltipProvider, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
 export default function PromptomagitorenPage() {
+    const [promptText, setPromptText] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [isInitial, setIsInitial] = useState(true);
+    const { toast } = useToast();
+
+    const methods = useForm<FormValues>({
+        resolver: zodResolver(formSchema),
+        defaultValues,
+        mode: 'onSubmit'
+    });
+
+    const onGenerate = async (data: FormValues) => {
+        setIsLoading(true);
+        setIsInitial(false);
+        setPromptText('');
+
+        // Create a deep copy to avoid direct mutation of form state
+        const cleanedData = JSON.parse(JSON.stringify(data));
+
+        // Explicitly clean data based on the disabled flags.
+        // This ensures no data from a disabled section is ever sent.
+        if (cleanedData.copywritingStyle_disabled || cleanedData.aiRole !== 'Copywriter') {
+            delete cleanedData.copywritingStyle;
+        }
+        if (cleanedData.tonality_disabled) {
+            delete cleanedData.tonality;
+            delete cleanedData.tonalityCustom;
+        }
+        if (cleanedData.textLength_disabled) {
+            delete cleanedData.textLength;
+        }
+        if (cleanedData.lists_disabled) {
+            delete cleanedData.numberOfLists;
+            delete cleanedData.excludeLists;
+        }
+        if (cleanedData.websiteUrl_disabled) {
+            delete cleanedData.websiteUrl;
+        }
+        if (cleanedData.rules_disabled) {
+            delete cleanedData.rules;
+        }
+        if (cleanedData.links_disabled) {
+            delete cleanedData.links;
+        }
+        if (cleanedData.primaryKeywords_disabled) {
+            delete cleanedData.primaryKeywords;
+        }
+        if (cleanedData.author_disabled) {
+            delete cleanedData.author;
+        }
+        if (cleanedData.structure_disabled) {
+            delete cleanedData.structure;
+        }
+
+        try {
+            const result = await adaptivePromptGeneration(cleanedData);
+            setPromptText(result.prompt);
+        } catch (error) {
+            console.error(error);
+            toast({
+                title: "Error generating content",
+                description: "An error occurred while generating the content. Please try again.",
+                variant: "destructive"
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <div className="container mx-auto p-4 md:p-8 lg:p-12">
             <header className="relative text-center mb-8">
-                 <div className="flex justify-center items-center gap-2">
+                <div className="flex justify-center items-center gap-2">
                     <h1 className="text-4xl lg:text-5xl font-headline font-bold text-primary">Promptmagitören</h1>
                     <TooltipProvider>
                         <Tooltip>
@@ -37,34 +108,28 @@ export default function PromptomagitorenPage() {
                             </TooltipContent>
                         </Tooltip>
                     </TooltipProvider>
-                 </div>
+                </div>
             </header>
-            
             <div className="max-w-4xl mx-auto">
-                <Tabs defaultValue="text-prompt">
-                    <TabsList className="grid w-full grid-cols-3">
-                        <TabsTrigger value="text-prompt">Prompta text</TabsTrigger>
-                        <TabsTrigger value="code-prompt">Skapa kod</TabsTrigger>
-                        <TabsTrigger value="image-prompt">Skapa en bild</TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="text-prompt">
-                        <TextPromptTab />
-                    </TabsContent>
-                    <TabsContent value="code-prompt">
-                        <CodePromptTab />
-                    </TabsContent>
-                    <TabsContent value="image-prompt">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Skapa en bild</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <p>UNDER KONSTRUKTION</p>
-                            </CardContent>
-                        </Card>
-                    </TabsContent>
-                </Tabs>
+                <FormProvider {...methods}>
+                    <form onSubmit={methods.handleSubmit(onGenerate)} className="w-full mt-6">
+                        <PromptForm />
+                        <Button type="submit" className="w-full mt-6" disabled={isLoading}>
+                            {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
+                            Magitera prompt
+                            {!isLoading && <Wand2 className="h-4 w-4" />}
+                        </Button>
+                    </form>
+                    <PromptPreview
+                        promptText={promptText}
+                        setPromptText={setPromptText}
+                        isLoading={isLoading}
+                        isInitial={isInitial}
+                    />
+                </FormProvider>
             </div>
         </div>
     );
 }
+
+    
