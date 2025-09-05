@@ -85,7 +85,7 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
   // Validate input data
   const validatedData = AdaptivePromptGenerationInputSchema.parse(data);
 
-  let promptText = "Dessa regler nedan skall följas väldigt strikt, kolla konstant att du alltid följer det instruktioner jag ger dig här och återkom med en fråga om vad du skall göra istället för att göra något annat än vad instruktioner hänvisar. \n\n";
+  let promptText = "Dessa regler nedan skall följas väldigt strikt, kolla konstant att du alltid följer det instruktioner jag ger dig här och återkom med en fråga om vad du skall göra istället för att göra något annat än vad instruktioner hänvisar.\n\n";
 
   if (validatedData.topicGuideline) {
     promptText += `Förhåll dig till denna information när du skriver texten: ${validatedData.topicGuideline}\n\n`;
@@ -109,7 +109,8 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
   }
 
   if (validatedData.copywritingStyle && validatedData.copywritingStyle !== 'none') {
-      promptText += `Använd följande copywriting-stil: \n${copywritingStyleMap[validatedData.copywritingStyle]}\n\n`;
+      const copywritingStyleDescription = copywritingStyleMap[validatedData.copywritingStyle] || '';
+      promptText += `Använd följande copywriting-stil: \n${copywritingStyleDescription}\n\n`;
   }
 
   if ((validatedData.tonality && validatedData.tonality.length > 0) || (validatedData.tonalityCustom && validatedData.tonalityCustom.trim() !== '')) {
@@ -129,7 +130,7 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
   if (validatedData.textLength) {
     const textLengthNum = parseInt(validatedData.textLength, 10);
     if (!isNaN(textLengthNum)) {
-      const lowerBound = textLengthNum - 50;
+      const lowerBound = Math.max(0, textLengthNum - 50); // Ensure lower bound isn't negative
       promptText += `Längd på denna text skall vara ${textLengthNum}, och skall hållas till detta så gott det går. Texten får ej överskridas mer än med 20 ord och får ej vara mindre än ${lowerBound} ord.\n\n`;
     }
   }
@@ -208,3 +209,5 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
   
   return { prompt: promptText };
 }
+
+    
