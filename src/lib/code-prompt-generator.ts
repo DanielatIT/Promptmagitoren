@@ -16,10 +16,36 @@ export interface GenerateCodePromptOutput {
 }
 
 const roleTemplate = (language: string) => {
+  const hasHtml = language.includes('HTML');
   const hasCss = language.includes('CSS');
-  const cssPart = hasCss ? ", styla dem med semantisk och modulär CSS (inklusive preprocessorer som SASS/LESS och moderna CSS-metoder som Flexbox/Grid)" : "";
+  const hasJs = language.includes('Javascript');
 
-  return `Agera som en senior fullstack-utvecklare med specialistkompetens inom ${language}. Din uppgift är att skriva robust, effektiv och skalbar kod för webben, både på klientsidan och i integrationen med backend-system. Du har en djup förståelse för webbstandarder, bästa praxis och de senaste trenderna inom frontend-utveckling.\n\nDu kan arkitektera och implementera responsiva webbgränssnitt med ren HTML${cssPart} och lägga till dynamisk interaktivitet med avancerad JavaScript (inklusive ES6+ funktioner, ramverk/bibliotek som React/Vue/Angular, och asynkron programmering). Du förstår vikten av prestandaoptimering, tillgänglighet (WCAG) och SEO-vänlig kod.`;
+  let mainTaskDescription = '';
+
+  if (hasHtml || hasCss || hasJs) {
+    const parts = [];
+    if (hasHtml) {
+      parts.push('arkitektera och implementera responsiva webbgränssnitt med ren HTML');
+    }
+    if (hasCss) {
+      parts.push('styla dem med semantisk och modulär CSS (inklusive preprocessorer som SASS/LESS och moderna CSS-metoder som Flexbox/Grid)');
+    }
+    if (hasJs) {
+      parts.push('lägga till dynamisk interaktivitet med avancerad JavaScript (inklusive ES6+ funktioner, ramverk/bibliotek som React/Vue/Angular, och asynkron programmering)');
+    }
+    mainTaskDescription = `Du kan ${parts.join(' och ')}.`;
+  } else {
+    mainTaskDescription = `Du kan arkitektera och implementera robusta och effektiva applikationer med ${language}.`;
+  }
+  
+  const baseDescription = `Agera som en senior fullstack-utvecklare med specialistkompetens inom ${language}. Din uppgift är att skriva robust, effektiv och skalbar kod för webben, både på klientsidan och i integrationen med backend-system. Du har en djup förståelse för webbstandarder, bästa praxis och de senaste trenderna inom frontend-utveckling.`;
+  const closingDescription = 'Du förstår vikten av prestandaoptimering, tillgänglighet (WCAG) och SEO-vänlig kod.';
+
+  if (hasHtml || hasCss || hasJs) {
+    return `${baseDescription}\n\n${mainTaskDescription} ${closingDescription}`;
+  }
+  
+  return `Agera som en senior utvecklare med specialistkompetens inom ${language}. Din uppgift är att skriva robust, effektiv och skalbar kod. Du har en djup förståelse för bästa praxis och de senaste trenderna inom mjukvaruutveckling.\n\n${mainTaskDescription} Du förstår vikten av prestandaoptimering och att skriva underhållbar kod.`;
 }
 
 
