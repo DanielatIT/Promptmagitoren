@@ -1,8 +1,9 @@
-"Category","Identifier","Text Output"
+Category,Identifier,Text Output
 "Static Prompt Fragments","Initial Instruction","Dessa regler nedan skall följas väldigt strikt, kolla konstant att du alltid följer det instruktioner jag ger dig här och återkom med en fråga om vad du skall göra istället för att göra något annat än vad instruktioner hänvisar."
 "Static Prompt Fragments","Topic Guideline","Förhåll dig till denna information när du skriver texten: {topicGuideline}"
 "Static Prompt Fragments","Standard Structure Rule","Strukturera texten med tydliga och relevanta rubriker (H2, H3, etc.) för att förbättra läsbarheten och SEO. Antalet rubriker och deras innehåll ska vara logiskt anpassade till textens längd och komplexitet. Rubrikerna skall följa svenska skrivregler."
 "Static Prompt Fragments","Task Type","Din uppgift är att: {taskTypeInstruction}"
+"Static Prompt Fragments","Copywriting Style","Använd följande copywriting-stil: {copywritingStyleDescription}"
 "Static Prompt Fragments","Tonality","Tonaliteten ska följa dessa riktlinjer: {tonalityDescriptions}"
 "Static Prompt Fragments","Text Length","Längd på denna text skall vara {textLengthNum}, och skall hållas till detta så gott det går. Texten får ej överskridas mer än med 20 ord och får ej vara mindre än {lowerBound} ord."
 "Static Prompt Fragments","Exclude Lists Rule","Texten får inte innehålla några listor alls."
@@ -40,6 +41,3 @@
 "Words to Avoid","utforska","""Utforska"""
 "Words to Avoid","oumbärligt","""Oumbärligt"""
 "Words to Avoid","särskiljt","""Särskiljt"""
-"Words to Avoid","idealiskt","""idealiskt"""
-"Words to Avoid","central-del-av","""central del av"""
-

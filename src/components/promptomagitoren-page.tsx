@@ -34,9 +34,6 @@ export default function PromptomagitorenPage() {
 
         // Explicitly clean data based on the disabled flags.
         // This ensures no data from a disabled section is ever sent.
-        if (cleanedData.copywritingStyle_disabled || cleanedData.aiRole !== 'Copywriter') {
-            delete cleanedData.copywritingStyle;
-        }
         if (cleanedData.tonality_disabled) {
             delete cleanedData.tonality;
             delete cleanedData.tonalityCustom;
@@ -131,5 +128,3 @@ export default function PromptomagitorenPage() {
         </div>
     );
 }
-
-    
