@@ -41,11 +41,8 @@ export default function PromptomagitorenPage() {
         setIsInitial(false);
         setPromptText('');
 
-        // Create a deep copy to avoid direct mutation of form state
         const cleanedData = JSON.parse(JSON.stringify(data));
 
-        // Explicitly clean data based on the disabled flags.
-        // This ensures no data from a disabled section is ever sent.
         if (cleanedData.tonality_disabled) {
             delete cleanedData.tonality;
             delete cleanedData.tonalityCustom;
@@ -94,7 +91,8 @@ export default function PromptomagitorenPage() {
     return (
         <div className="container mx-auto p-4 md:p-8 lg:p-12">
             <header className="relative text-center mb-8">
-                <div className="flex justify-center items-center gap-2">
+                <div className="flex justify-center items-center gap-4">
+                    <Wand2 className="h-8 w-8 text-primary" />
                     <h1 className="text-4xl lg:text-5xl font-headline font-bold text-primary">Promptmagitören</h1>
                     <TooltipProvider>
                         <Tooltip>
