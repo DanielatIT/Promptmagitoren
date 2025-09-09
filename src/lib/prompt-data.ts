@@ -31,5 +31,7 @@ export const avoidWordsMap: Record<string, string> = {
     upptäck: '"Upptäck"',
     utforska: '"Utforska"',
     oumbärligt: '"Oumbärligt"',
-    särskiljt: '"Särskiljt"'
+    särskiljt: '"Särskiljt"',
+    idealiskt: '"idealiskt"',
+    'central-del-av': '"central del av"',
 };

@@ -40,6 +40,8 @@ const avoidWordsOptions = [
     { id: 'utforska', label: '"Utforska"' },
     { id: 'oumbärligt', label: '"Oumbärligt"' },
     { id: 'särskiljt', label: '"Särskiljt"' },
+    { id: 'idealiskt', label: '"idealiskt"' },
+    { id: 'central-del-av', label: '"central del av"' },
 ];
 
 const paragraphTypes = ['Ingress', 'Brödtext & underrubrik', 'Fristående text', 'CTA', 'Titel'];
@@ -137,7 +139,7 @@ export const defaultValues: Partial<FormValues> = {
     addressReaderAsYou: true,
     avoidWords: {
         enabled: true,
-        words: ['upptäck', 'utforska', 'oumbärligt', 'särskiljt'],
+        words: ['upptäck', 'utforska', 'oumbärligt', 'särskiljt', 'idealiskt', 'central-del-av'],
     },
     avoidXYPhrase: true,
     avoidVilket: true,
