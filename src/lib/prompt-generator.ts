@@ -105,7 +105,7 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
       promptText += roleOutput + '\n\n';
   }
 
-  promptText += 'Strukturera texten med tydliga och relevanta rubriker (H2, H3, etc.) för att förbättra läsbarheten och SEO. Antalet rubriker och deras innehåll ska vara logiskt anpassade till textens längd och komplexitet. Rubrikerna skall följa svenska skrivregler.\n\n';
+  promptText += 'Strukturera texten med tydliga och relevanta rubriker (H2, H3, etc.) för att förbättra läsbarheten och SEO. Dessa rubriker skall alltid börja med stor bokstav var på resten av rubriken skall vara små bokstäver. Rubrikerna får inte innehålla några EM tecken (-).\n\n';
 
   const taskTypeInstruction = validatedData.taskTypeRadio === 'custom'
     ? validatedData.taskTypeCustom
