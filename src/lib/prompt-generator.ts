@@ -26,7 +26,8 @@ const aiRoleOptions = [
 // Define a strict schema for the form input.
 const AdaptivePromptGenerationInputSchema = z.object({
   topicGuideline: z.string().min(1),
-  aiRole: z.enum(aiRoleOptions),
+  aiRole: z.enum([...aiRoleOptions, 'custom']),
+  aiRoleCustom: z.string().optional(),
   taskTypeRadio: z.enum(['Artikel', 'Seo onpage text', 'custom']).optional(),
   taskTypeCustom: z.string().optional(),
   
@@ -88,12 +89,21 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
     promptText += `Förhåll dig till denna information när du skriver texten: ${validatedData.topicGuideline}\n\n`;
   }
 
-  let roleOutput = roleOutputs[validatedData.aiRole];
-  if (validatedData.aiRole === 'SEO expert') {
+  let roleOutput = '';
+  if (validatedData.aiRole === 'custom') {
+      roleOutput = validatedData.aiRoleCustom || '';
+  } else {
+      roleOutput = roleOutputs[validatedData.aiRole];
+  }
+
+  if (validatedData.aiRole === 'SEO expert' && roleOutput) {
       const firstKeyword = validatedData.primaryKeywords?.[0]?.value || '[sökords input]';
       roleOutput = roleOutput.replace('{primaryKeyword}', firstKeyword);
   }
-  promptText += roleOutput + '\n\n';
+  
+  if (roleOutput) {
+      promptText += roleOutput + '\n\n';
+  }
 
   promptText += 'Strukturera texten med tydliga och relevanta rubriker (H2, H3, etc.) för att förbättra läsbarheten och SEO. Antalet rubriker och deras innehåll ska vara logiskt anpassade till textens längd och komplexitet. Rubrikerna skall följa svenska skrivregler.\n\n';
 
@@ -201,5 +211,3 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
   
   return { prompt: promptText };
 }
-
-    

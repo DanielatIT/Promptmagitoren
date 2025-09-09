@@ -48,7 +48,8 @@ const paragraphTypes = ['Ingress', 'Brödtext & underrubrik', 'Fristående text'
 
 export const formSchema = z.object({
   topicGuideline: z.string().min(1, 'Detta fält är obligatoriskt.'),
-  aiRole: z.enum(aiRoleOptions),
+  aiRole: z.enum([...aiRoleOptions, 'custom']),
+  aiRoleCustom: z.string().optional(),
   taskTypeRadio: z.enum([...taskTypeRadioOptions, 'custom']).optional(),
   taskTypeCustom: z.string().optional(),
   
@@ -109,6 +110,13 @@ export const formSchema = z.object({
         path: ['taskTypeCustom'],
       });
     }
+    if (data.aiRole === 'custom' && (!data.aiRoleCustom || data.aiRoleCustom.trim() === '')) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Beskrivning av AI-roll är obligatoriskt när 'Annan...' är valt.",
+        path: ['aiRoleCustom'],
+      });
+    }
 });
 
 
@@ -117,6 +125,7 @@ export type FormValues = z.infer<typeof formSchema>;
 export const defaultValues: Partial<FormValues> = {
   topicGuideline: '',
   aiRole: 'SEO expert',
+  aiRoleCustom: '',
   taskTypeRadio: 'Seo onpage text',
   taskTypeCustom: '',
   tonality: [],
@@ -173,6 +182,7 @@ export function PromptForm() {
     
     const avoidWordsEnabled = useWatch({ control, name: "rules.avoidWords.enabled" });
     const taskType = useWatch({ control, name: "taskTypeRadio" });
+    const aiRole = useWatch({ control, name: "aiRole" });
 
 
     return (
@@ -198,12 +208,32 @@ export function PromptForm() {
                                               <FormLabel className="font-normal">{role}</FormLabel>
                                           </FormItem>
                                       ))}
+                                      <FormItem className="flex items-center space-x-3 space-y-0">
+                                          <FormControl>
+                                              <RadioGroupItem value="custom" />
+                                          </FormControl>
+                                          <FormLabel className="font-normal">Annan...</FormLabel>
+                                      </FormItem>
                                   </RadioGroup>
                               </FormControl>
                               <FormMessage />
                           </FormItem>
                       )}
                   />
+                   {aiRole === 'custom' && (
+                      <FormField
+                          control={control}
+                          name="aiRoleCustom"
+                          render={({ field }) => (
+                              <FormItem className="mt-4">
+                                  <FormControl>
+                                      <Textarea placeholder="Beskriv AI:ns roll..." {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                              </FormItem>
+                          )}
+                      />
+                  )}
                 </FormSection>
                 <FormSection title="Vilken typ av text som skall produceras" required>
                   <Controller
