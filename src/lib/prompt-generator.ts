@@ -28,7 +28,7 @@ const AdaptivePromptGenerationInputSchema = z.object({
   topicGuideline: z.string().min(1),
   aiRole: z.enum([...aiRoleOptions, 'custom']),
   aiRoleCustom: z.string().optional(),
-  taskTypeRadio: z.enum(['Artikel', 'Seo onpage text', 'custom']).optional(),
+  taskTypeRadio: z.enum(['Seo onpage text', 'Artikel', 'custom']).optional(),
   taskTypeCustom: z.string().optional(),
   
   tonality: z.array(z.string()).optional(),

@@ -26,7 +26,7 @@ const aiRoleOptions = [
     'SEO expert', 'Skribent för bloggar'
 ] as const;
 
-const taskTypeRadioOptions = ['Artikel', 'Seo onpage text'] as const;
+const taskTypeRadioOptions = ['Seo onpage text', 'Artikel'] as const;
 
 const tonalityOptions = [
     { id: 'professional', label: 'Professionell/Formell' },
