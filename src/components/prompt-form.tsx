@@ -512,7 +512,7 @@ export function PromptForm() {
                     </div>
 
                     <div className="space-y-4">
-                         <h4 className="font-medium text-foreground">Övrigt</h4>
+                         <h4 className="font-medium text-foreground">Övrigt (Texten skall vara...)</h4>
                          <FormField control={control} name="rules.isInformative" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Informativ text</FormLabel></FormItem>)} />
                          <FormField control={control} name="rules.isTechnical" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Tekniskt skriven text</FormLabel></FormItem>)} />
                          <FormField control={control} name="rules.useWeForm" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Skriv i vi-form</FormLabel></FormItem>)} />
