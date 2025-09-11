@@ -57,6 +57,7 @@ const AdaptivePromptGenerationInputSchema = z.object({
     avoidXYPhrase: z.boolean().default(true),
     avoidVilket: z.boolean().default(true),
     avoidEmDash: z.boolean().default(true),
+    avoidKeywordAsSubject: z.boolean().default(true),
     customRules: z.string().optional(),
   }).optional(),
   
@@ -169,6 +170,17 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
     if (validatedData.rules.avoidXYPhrase) rules.push('skriv aldrig en mening som liknar eller är i närheten av detta “...i en X värld/industri/område är “sökordet” värdefullt för Y anledning”');
     if (validatedData.rules.avoidVilket) rules.push('Undvik att använda ",vilket..." och använd bara den där det mest passar. ", vilket" får bara finnas i texten 1 gång och ersätts med "och" "som" "detta" och andra ord');
     if (validatedData.rules.avoidEmDash) rules.push('Undvik att använda em-tecken (—) i texten.');
+    if (validatedData.rules.avoidKeywordAsSubject) {
+      const firstKeyword = validatedData.primaryKeywords?.[0]?.value || '[sökord]';
+      const forbiddenWords = [
+        "centrala", "viktiga", "nödvändiga", "oumbärliga", "grundläggande", 
+        "bärande", "avgörbara", "primära", "betydelsefulla", "kritiska", 
+        "essentiella", "fundamentala", "ledande", "huvud­rollsinnehavande", 
+        "nyckelbetydande", "styrande", "obligatoriska", "bestämmande", 
+        "tongivande", "konstitutiva"
+      ].join('/');
+      rules.push(`Du får aldrig använda denna mening eller någon form av denna meningsuppbyggnad, som första mening av en text och skall undvikas att skrivas om det inte är av yttersta vikt för att förstå senare in i texten: "${firstKeyword} är ${forbiddenWords} för.." Sen anledning. Det ord jag inkluderat i outputen är då det ord som skall undvikas i denna spesifika mening.`);
+    }
     if (validatedData.rules.customRules) {
         rules.push(...validatedData.rules.customRules.split('\n').filter(rule => rule.trim() !== ''));
     }

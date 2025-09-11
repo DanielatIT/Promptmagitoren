@@ -83,6 +83,7 @@ export const formSchema = z.object({
     avoidXYPhrase: z.boolean().default(true),
     avoidVilket: z.boolean().default(true),
     avoidEmDash: z.boolean().default(true),
+    avoidKeywordAsSubject: z.boolean().default(true),
     customRules: z.string().optional(),
   }).optional(),
   rules_disabled: z.boolean().default(false),
@@ -153,6 +154,7 @@ export const defaultValues: Partial<FormValues> = {
     avoidXYPhrase: true,
     avoidVilket: true,
     avoidEmDash: true,
+    avoidKeywordAsSubject: true,
     customRules: '',
   },
   rules_disabled: false,
@@ -456,6 +458,7 @@ export function PromptForm() {
                         <FormField control={control} name="rules.avoidXYPhrase" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Frasen "i en X är Y värdefullt..."</FormLabel></FormItem>)} />
                         <FormField control={control} name="rules.avoidVilket" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">", vilket..."</FormLabel></FormItem>)} />
                         <FormField control={control} name="rules.avoidEmDash" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Em-tecken (—)</FormLabel></FormItem>)} />
+                        <FormField control={control} name="rules.avoidKeywordAsSubject" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Frasen "[sökordet] är avgörande/viktig/betydlig för..."</FormLabel></FormItem>)} />
                         
                         <div>
                             <FormField control={control} name="rules.avoidWords.enabled" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Specifika ord</FormLabel></FormItem>)} />
