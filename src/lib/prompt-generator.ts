@@ -48,6 +48,7 @@ const AdaptivePromptGenerationInputSchema = z.object({
     avoidPraise: z.boolean().default(true),
     avoidAcclaim: z.boolean().default(true),
     isInformative: z.boolean().default(true),
+    isTechnical: z.boolean().default(false),
     useWeForm: z.boolean().default(true),
     addressReaderAsYou: z.boolean().default(true),
     avoidWords: z.object({
@@ -159,6 +160,7 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
     if (validatedData.rules.avoidPraise) rules.push('Undvik lovord');
     if (validatedData.rules.avoidAcclaim) rules.push('Undvik beröm.');
     if (validatedData.rules.isInformative) rules.push('Texten skall vara informativ med fokus på att ge läsaren kunskap för ämnet');
+    if (validatedData.rules.isTechnical) rules.push('Texten ska vara tekniskt skriven och fokusera på den tekniska aspekten av ämnet. Inkludera tekniska specifikationer och data organiskt i texten eller som en egen sektion som beskriver ämnets specifika tekniska egenskaper.');
     if (validatedData.rules.useWeForm) rules.push('Skriv i vi-form, som att vi är företaget.');
     if (validatedData.rules.addressReaderAsYou) rules.push('Läsaren skall benämnas som ni.');
     if (validatedData.rules.avoidWords?.enabled && validatedData.rules.avoidWords.words && validatedData.rules.avoidWords.words.length > 0) {
