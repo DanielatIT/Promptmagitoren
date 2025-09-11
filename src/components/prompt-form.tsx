@@ -74,17 +74,20 @@ export const formSchema = z.object({
     avoidPraise: z.boolean().default(true),
     avoidAcclaim: z.boolean().default(true),
     isInformative: z.boolean().default(true),
-    isTechnical: z.boolean().default(false),
+    isTechnical: z.boolean().default(true),
     useWeForm: z.boolean().default(true),
     addressReaderAsYou: z.boolean().default(true),
     avoidWords: z.object({
         enabled: z.boolean().default(true),
         words: z.array(z.string()).optional(),
     }),
-    avoidXYPhrase: z.boolean().default(true),
-    avoidVilket: z.boolean().default(true),
+    avoidPhrases: z.object({
+        enabled: z.boolean().default(true),
+        avoidXYPhrase: z.boolean().default(true),
+        avoidVilket: z.boolean().default(true),
+        avoidKeywordAsSubject: z.boolean().default(true),
+    }),
     avoidEmDash: z.boolean().default(true),
-    avoidKeywordAsSubject: z.boolean().default(true),
     customRules: z.string().optional(),
   }).optional(),
   rules_disabled: z.boolean().default(false),
@@ -146,17 +149,20 @@ export const defaultValues: Partial<FormValues> = {
     avoidPraise: true,
     avoidAcclaim: true,
     isInformative: true,
-    isTechnical: false,
+    isTechnical: true,
     useWeForm: true,
     addressReaderAsYou: true,
     avoidWords: {
         enabled: true,
         words: ['upptäck', 'utforska', 'oumbärligt', 'särskiljt', 'idealiskt', 'central-del-av'],
     },
-    avoidXYPhrase: true,
-    avoidVilket: true,
+    avoidPhrases: {
+        enabled: true,
+        avoidXYPhrase: true,
+        avoidVilket: true,
+        avoidKeywordAsSubject: true,
+    },
     avoidEmDash: true,
-    avoidKeywordAsSubject: true,
     customRules: '',
   },
   rules_disabled: false,
@@ -185,6 +191,7 @@ export function PromptForm() {
     }
     
     const avoidWordsEnabled = useWatch({ control, name: "rules.avoidWords.enabled" });
+    const avoidPhrasesEnabled = useWatch({ control, name: "rules.avoidPhrases.enabled" });
     const taskType = useWatch({ control, name: "taskTypeRadio" });
     const aiRole = useWatch({ control, name: "aiRole" });
 
@@ -457,10 +464,7 @@ export function PromptForm() {
                         <FormField control={control} name="rules.avoidSuperlatives" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Superlativ</FormLabel></FormItem>)} />
                         <FormField control={control} name="rules.avoidPraise" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Lovord</FormLabel></FormItem>)} />
                         <FormField control={control} name="rules.avoidAcclaim" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Beröm</FormLabel></FormItem>)} />
-                        <FormField control={control} name="rules.avoidXYPhrase" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Frasen "i en X är Y värdefullt..."</FormLabel></FormItem>)} />
-                        <FormField control={control} name="rules.avoidVilket" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">", vilket..."</FormLabel></FormItem>)} />
                         <FormField control={control} name="rules.avoidEmDash" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Em-tecken (—)</FormLabel></FormItem>)} />
-                        <FormField control={control} name="rules.avoidKeywordAsSubject" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Frasen "[sökordet] är avgörande/viktig/betydlig för..."</FormLabel></FormItem>)} />
                         
                         <div>
                             <FormField control={control} name="rules.avoidWords.enabled" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Specifika ord</FormLabel></FormItem>)} />
@@ -493,6 +497,18 @@ export function PromptForm() {
                                 </div>
                             )}
                         </div>
+
+                         <div>
+                            <FormField control={control} name="rules.avoidPhrases.enabled" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal">Fraser</FormLabel></FormItem>)} />
+                             {avoidPhrasesEnabled && (
+                                <div className="pl-6 pt-2 space-y-2">
+                                    <FormField control={control} name="rules.avoidPhrases.avoidXYPhrase" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal text-sm">Frasen "i en X är Y värdefullt..."</FormLabel></FormItem>)} />
+                                    <FormField control={control} name="rules.avoidPhrases.avoidVilket" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal text-sm">", vilket..."</FormLabel></FormItem>)} />
+                                    <FormField control={control} name="rules.avoidPhrases.avoidKeywordAsSubject" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="font-normal text-sm">Frasen "[sökordet] är avgörande/viktig/betydlig för..."</FormLabel></FormItem>)} />
+                                </div>
+                            )}
+                        </div>
+
                     </div>
 
                     <div className="space-y-4">
