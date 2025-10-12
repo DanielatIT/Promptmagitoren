@@ -21,7 +21,7 @@ export function RandomQuote() {
     }, []);
 
     return (
-        <Card className="h-full">
+        <Card>
             <CardHeader>
                 <CardTitle className="font-headline text-lg flex items-center gap-2">
                     <Bot className="h-5 w-5" />
