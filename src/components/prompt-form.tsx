@@ -311,52 +311,91 @@ export function PromptForm() {
             </FormSection>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormSection title="Vilken tonalitet ska texten ha?" onToggle={() => toggleDisabled('tonality_disabled')} isDisabled={values.tonality_disabled}>
-                    <div className="space-y-4">
+                 <div className="space-y-6">
+                    <FormSection title="Vilken tonalitet ska texten ha?" onToggle={() => toggleDisabled('tonality_disabled')} isDisabled={values.tonality_disabled}>
+                        <div className="space-y-4">
+                            <FormField
+                                control={control}
+                                name="tonality"
+                                render={() => (
+                                    <FormItem className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        {tonalityOptions.map((item) => (
+                                            <FormField
+                                                key={item.id}
+                                                control={control}
+                                                name="tonality"
+                                                render={({ field }) => (
+                                                    <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                                                        <FormControl>
+                                                            <Checkbox
+                                                                checked={field.value?.includes(item.label)}
+                                                                onCheckedChange={(checked) => {
+                                                                    return checked
+                                                                        ? field.onChange([...(field.value || []), item.label])
+                                                                        : field.onChange(field.value?.filter((value) => value !== item.label));
+                                                                }}
+                                                            />
+                                                        </FormControl>
+                                                        <FormLabel className="font-normal">
+                                                            {item.label.split('/').map((part, index) => (
+                                                                <React.Fragment key={index}>
+                                                                    {part}
+                                                                    {index === 0 && item.label.includes('/') && <br />}
+                                                                </React.Fragment>
+                                                            ))}
+                                                        </FormLabel>
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        ))}
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={control}
+                                name="tonalityCustom"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormControl>
+                                            <Input placeholder="Annan tonalitet..." {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                    </FormSection>
+                    <FormSection title="Språk">
                         <FormField
                             control={control}
-                            name="tonality"
-                            render={() => (
-                                <FormItem className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    {tonalityOptions.map((item) => (
-                                        <FormField
-                                            key={item.id}
-                                            control={control}
-                                            name="tonality"
-                                            render={({ field }) => (
-                                                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                                                    <FormControl>
-                                                        <Checkbox
-                                                            checked={field.value?.includes(item.label)}
-                                                            onCheckedChange={(checked) => {
-                                                                return checked
-                                                                    ? field.onChange([...(field.value || []), item.label])
-                                                                    : field.onChange(field.value?.filter((value) => value !== item.label));
-                                                            }}
-                                                        />
-                                                    </FormControl>
-                                                    <FormLabel className="font-normal">{item.label}</FormLabel>
-                                                </FormItem>
-                                            )}
-                                        />
-                                    ))}
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={control}
-                            name="tonalityCustom"
+                            name="language"
                             render={({ field }) => (
                                 <FormItem>
                                     <FormControl>
-                                        <Input placeholder="Annan tonalitet..." {...field} />
+                                        <RadioGroup
+                                            onValueChange={field.onChange}
+                                            defaultValue={field.value}
+                                            className="flex items-center space-x-4 rounded-lg border p-3 shadow-sm"
+                                        >
+                                            <FormItem className="flex items-center space-x-2">
+                                                <FormControl>
+                                                    <RadioGroupItem value="Svenska" id="svenska" />
+                                                </FormControl>
+                                                <FormLabel htmlFor="svenska" className="font-normal">Svenska</FormLabel>
+                                            </FormItem>
+                                            <FormItem className="flex items-center space-x-2">
+                                                <FormControl>
+                                                    <RadioGroupItem value="Engelska" id="engelska" />
+                                                </FormControl>
+                                                <FormLabel htmlFor="engelska" className="font-normal">Engelska</FormLabel>
+                                            </FormItem>
+                                        </RadioGroup>
                                     </FormControl>
-                                    <FormMessage />
                                 </FormItem>
                             )}
                         />
-                    </div>
-                </FormSection>
+                    </FormSection>
+                </div>
                 <div className="space-y-6">
                     <FormSection title="Längd på texten" onToggle={() => toggleDisabled('textLength_disabled')} isDisabled={values.textLength_disabled}>
                         <FormField
@@ -405,43 +444,11 @@ export function PromptForm() {
                     </FormSection>
                 </div>
             </div>
-            
-            <FormSection title="Språk">
-                <FormField
-                    control={control}
-                    name="language"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormControl>
-                                <RadioGroup
-                                    onValueChange={field.onChange}
-                                    defaultValue={field.value}
-                                    className="flex items-center space-x-4 rounded-lg border p-3 shadow-sm"
-                                >
-                                    <FormItem className="flex items-center space-x-2">
-                                        <FormControl>
-                                            <RadioGroupItem value="Svenska" id="svenska" />
-                                        </FormControl>
-                                        <FormLabel htmlFor="svenska" className="font-normal">Svenska</FormLabel>
-                                    </FormItem>
-                                    <FormItem className="flex items-center space-x-2">
-                                        <FormControl>
-                                            <RadioGroupItem value="Engelska" id="engelska" />
-                                        </FormControl>
-                                        <FormLabel htmlFor="engelska" className="font-normal">Engelska</FormLabel>
-                                    </FormItem>
-                                </RadioGroup>
-                            </FormControl>
-                        </FormItem>
-                    )}
-                />
-            </FormSection>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormSection title="Vem skriver texten?" onToggle={() => toggleDisabled('author_disabled')} isDisabled={values.author_disabled}>
+                 <FormSection title="Vem skriver texten?" onToggle={() => toggleDisabled('author_disabled')} isDisabled={values.author_disabled}>
                     <FormField control={control} name="author" render={({ field }) => (<FormItem><FormControl><Input placeholder="Ditt namn eller företagsnamn" {...field} /></FormControl></FormItem>)} />
                 </FormSection>
-
                 <FormSection title="Plats?" description="Vilken webbplats skall texten befinna sig på?" onToggle={() => toggleDisabled('websiteUrl_disabled')} isDisabled={values.websiteUrl_disabled}>
                     <FormField
                         control={control}
@@ -627,4 +634,5 @@ export function PromptForm() {
     );
 }
 
+    
     
