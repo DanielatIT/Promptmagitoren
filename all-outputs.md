@@ -17,6 +17,7 @@ Category,Identifier,Text Output
 "Static Prompt Fragments","Primary Keywords","Denna text skall innehålla följande sökord/sökfraser: {keywords}. Fördela dessa naturligt i texten med en densitet på cirka 2.5% av textens totala antal ord för varje sökord."
 "Static Prompt Fragments","Author (With Author)","Denna texten är skriven av {author} och kan nämnas i en CTA."
 "Static Prompt Fragments","Author (No Author)","Texten skall skrivas ut ett neutralt perspektiv där vi som skriver inte benämns."
+"Static Prompt Fragments","HTML Conversion Rule","Texten som produceras skall konverteras till inline HTML kod enligt best best practice/bästa praxis för hur HTML kod skall skrivas i SEO syfte. Inline kod i detta fallet menas att denna komma inkluderas på en sida i ett redan implementerat fält så som i ett text fält i wordpress/elementor"
 "Rule-Specific Outputs","Avoid Superlatives","Undvik superlativ"
 "Rule-Specific Outputs","Avoid Praise","Undvik lovord"
 "Rule-Specific Outputs","Avoid Acclaim","Undvik beröm."
@@ -56,5 +57,3 @@ Category,Identifier,Text Output
 "Words to Avoid","särskiljt","""Särskiljt"""
 "Words to Avoid","idealiskt","""idealiskt"""
 "Words to Avoid","central-del-av","""central del av"""
-
-    

@@ -40,6 +40,7 @@ const AdaptivePromptGenerationInputSchema = z.object({
   excludeLists: z.boolean().optional(),
   
   language: z.enum(['Engelska', 'Svenska']),
+  convertToHtml: z.boolean().optional(),
   
   websiteUrl: z.string().optional(),
 
@@ -231,7 +232,9 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
     promptText += 'Texten skall skrivas ut ett neutralt perspektiv där vi som skriver inte benämns.\n\n';
   }
   
+  if (validatedData.convertToHtml) {
+    promptText += "Texten som produceras skall konverteras till inline HTML kod enligt best best practice/bästa praxis för hur HTML kod skall skrivas i SEO syfte. Inline kod i detta fallet menas att denna komma inkluderas på en sida i ett redan implementerat fält så som i ett text fält i wordpress/elementor\n\n";
+  }
+
   return { prompt: promptText };
 }
-
-    

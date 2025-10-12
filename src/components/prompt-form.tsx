@@ -65,6 +65,7 @@ export const formSchema = z.object({
   lists_disabled: z.boolean().default(false),
   
   language: z.enum(['Engelska', 'Svenska']),
+  convertToHtml: z.boolean().default(false),
 
   websiteUrl: z.string().optional(),
   websiteUrl_disabled: z.boolean().default(false),
@@ -142,6 +143,7 @@ export const defaultValues: Partial<FormValues> = {
   excludeLists: false,
   lists_disabled: false,
   language: 'Svenska',
+  convertToHtml: false,
   websiteUrl: '',
   websiteUrl_disabled: false,
   rules: {
@@ -394,11 +396,33 @@ export function PromptForm() {
                                 </FormItem>
                             )}
                         />
+                        <FormField
+                            control={control}
+                            name="convertToHtml"
+                            render={({ field }) => (
+                                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm mt-4">
+                                    <FormLabel className="font-normal">Konvertera text till HTML?</FormLabel>
+                                    <FormControl>
+                                        <div className="flex items-center gap-2">
+                                            <span className={cn("text-sm", !field.value && "text-muted-foreground")}>Nej</span>
+                                            <Switch
+                                                checked={field.value}
+                                                onCheckedChange={field.onChange}
+                                            />
+                                            <span className={cn("text-sm", field.value && "text-muted-foreground")}>Ja</span>
+                                        </div>
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                        />
                     </FormSection>
                 </div>
                 <div className="space-y-6">
-                    <FormSection title="Längd på texten" onToggle={() => toggleDisabled('textLength_disabled')} isDisabled={values.textLength_disabled}>
-                        <FormField
+                    <FormSection title="Längd och listor" onToggle={() => {
+                        toggleDisabled('textLength_disabled');
+                        toggleDisabled('lists_disabled');
+                    }} isDisabled={values.textLength_disabled || values.lists_disabled}>
+                         <FormField
                             control={control}
                             name="textLength"
                             render={({ field }) => (
@@ -410,9 +434,6 @@ export function PromptForm() {
                                 </FormItem>
                             )}
                         />
-                    </FormSection>
-                    
-                    <FormSection title="Antal listor" onToggle={() => toggleDisabled('lists_disabled')} isDisabled={values.lists_disabled}>
                         <div className="space-y-4">
                             <FormField
                                 control={control}
@@ -445,25 +466,29 @@ export function PromptForm() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                 <FormSection title="Vem skriver texten?" onToggle={() => toggleDisabled('author_disabled')} isDisabled={values.author_disabled}>
-                    <FormField control={control} name="author" render={({ field }) => (<FormItem><FormControl><Input placeholder="Ditt namn eller företagsnamn" {...field} /></FormControl></FormItem>)} />
-                </FormSection>
-                <FormSection title="Plats?" description="Vilken webbplats skall texten befinna sig på?" onToggle={() => toggleDisabled('websiteUrl_disabled')} isDisabled={values.websiteUrl_disabled}>
-                    <FormField
-                        control={control}
-                        name="websiteUrl"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormControl>
-                                    <Input placeholder="https://exempel.se/sida" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                </FormSection>
-            </div>
+            <FormSection title="Författare och plats" onToggle={() => {
+                toggleDisabled('author_disabled');
+                toggleDisabled('websiteUrl_disabled');
+            }} isDisabled={values.author_disabled || values.websiteUrl_disabled}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField control={control} name="author" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Vem skriver texten?</FormLabel>
+                            <FormControl><Input placeholder="Ditt namn eller företagsnamn" {...field} /></FormControl>
+                        </FormItem>
+                    )} />
+                    <FormField control={control} name="websiteUrl" render={({ field }) => (
+                        <FormItem>
+                             <FormLabel>Vilken webbplats skall texten befinna sig på?</FormLabel>
+                            <FormControl>
+                                <Input placeholder="https://exempel.se/sida" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                </div>
+            </FormSection>
 
             <FormSection
                 title="Regler på texten"
@@ -586,7 +611,7 @@ export function PromptForm() {
                     </div>
                 </FormSection>
 
-                <FormSection title="Länkar att inkludera" onToggle={() => toggleDisabled('links_disabled')} isDisabled={values.links_disabled}>
+                <FormSection title="Länkar att inkludera" description="Lägg till hyperlänkar, som kopplas till ett sökord" onToggle={() => toggleDisabled('links_disabled')} isDisabled={values.links_disabled}>
                     <div className="space-y-4">
                         {linkFields.fields.map((field, index) => (
                             <div key={field.id} className="flex items-end gap-2 p-3 border rounded-md">
@@ -633,8 +658,3 @@ export function PromptForm() {
         </div>
     );
 }
-
-    
-    
-
-    
