@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { PromptForm, formSchema, defaultValues, type FormValues } from './prompt-form';
 import { adaptivePromptGeneration } from '@/lib/prompt-generator';
 import { PromptPreview } from './prompt-preview';
-import { Tooltip, TooltipProvider, TooltipContent, TooltipTrigger } from './ui/tooltip';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 
 export default function PromptomagitorenPage() {
     const [promptText, setPromptText] = useState('');
@@ -94,27 +94,25 @@ export default function PromptomagitorenPage() {
                 <div className="flex justify-center items-center gap-4">
                     <Wand2 className="h-8 w-8 text-primary" />
                     <h1 className="text-4xl lg:text-5xl font-headline font-bold text-primary">Promptmagitören</h1>
-                    <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button variant="ghost" size="icon">
-                                    <Info className="h-5 w-5 text-muted-foreground" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent side="bottom" align="end" className="w-80">
-                                <div className="text-sm p-2 text-left">
-                                    <h3 className="font-bold font-headline mb-2">Version 0.5</h3>
-                                    <h4 className="font-semibold text-foreground mb-1 mt-3">Rättighetsförklaring</h4>
-                                    <p className="text-muted-foreground text-xs leading-relaxed">
-                                        Promptmagitören är utvecklad av Daniel Wölfing för Industritorget. Alla immateriella rättigheter, inklusive men inte begränsat till upphovsrätt och varumärkesrätt, tillhör Industritorget. Ingen del av denna applikation får reproduceras, distribueras eller användas i kommersiellt eller icke-kommersiellt syfte utan skriftligt medgivande från Industritorget.
-                                    </p>
-                                    <p className="text-muted-foreground text-xs mt-2">
-                                        Vid frågor eller behov av kontakt hänvisar vi till vår support: support@industritorget.se.
-                                    </p>
-                                </div>
-                            </TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                                <Info className="h-5 w-5 text-muted-foreground" />
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent side="bottom" align="end" className="w-80">
+                            <div className="text-sm p-2 text-left">
+                                <h3 className="font-bold font-headline mb-2">Version 1.0</h3>
+                                <h4 className="font-semibold text-foreground mb-1 mt-3">Rättighetsförklaring</h4>
+                                <p className="text-muted-foreground text-xs leading-relaxed">
+                                    Promptmagitören är utvecklad av Daniel Wölfing för Industritorget. Alla immateriella rättigheter, inklusive men inte begränsat till upphovsrätt och varumärkesrätt, tillhör Industritorget. Ingen del av denna applikation får reproduceras, distribueras eller användas i kommersiellt eller icke-kommersiellt syfte utan skriftligt medgivande från Industritorget.
+                                </p>
+                                <p className="text-muted-foreground text-xs mt-2">
+                                    Vid frågor eller behov av kontakt hänvisar vi till vår support: support@industritorget.se.
+                                </p>
+                            </div>
+                        </PopoverContent>
+                    </Popover>
                 </div>
             </header>
             <div className="max-w-4xl mx-auto">
