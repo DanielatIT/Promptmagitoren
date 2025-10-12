@@ -4,7 +4,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { quotes } from '@/lib/quotes';
-import { Bot } from 'lucide-react';
 
 interface Quote {
     quote: string;
@@ -24,8 +23,7 @@ export function RandomQuote() {
         <Card>
             <CardHeader>
                 <CardTitle className="font-headline text-lg flex items-center gap-2">
-                    <Bot className="h-5 w-5" />
-                    :D Dagens Visdom
+                    😂 Dagens lol
                 </CardTitle>
             </CardHeader>
             <CardContent>
