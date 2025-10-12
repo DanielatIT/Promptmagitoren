@@ -21,6 +21,7 @@ import { X, Plus, Trash2 } from "lucide-react"
 import { FormSection } from './form-section';
 import { cn } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { RandomQuote } from './random-quote';
 
 const aiRoleOptions = [
     'SEO expert', 'Skribent för bloggar'
@@ -463,6 +464,7 @@ export function PromptForm() {
                             />
                         </div>
                     </FormSection>
+                    <RandomQuote />
                 </div>
             </div>
 
