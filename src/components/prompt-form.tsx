@@ -314,7 +314,7 @@ export function PromptForm() {
             </FormSection>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                 <div className="space-y-6">
+                <div className="space-y-6">
                     <FormSection title="Vilken tonalitet ska texten ha?" onToggle={() => toggleDisabled('tonality_disabled')} isDisabled={values.tonality_disabled}>
                         <div className="space-y-4">
                             <FormField
@@ -487,8 +487,7 @@ export function PromptForm() {
                             </FormControl>
                             <FormMessage />
                         </FormItem>
-                    )}
-                />
+                    )} />
                 </div>
             </FormSection>
 
@@ -660,3 +659,5 @@ export function PromptForm() {
         </div>
     );
 }
+
+    
