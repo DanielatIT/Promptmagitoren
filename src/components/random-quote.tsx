@@ -25,7 +25,7 @@ export function RandomQuote() {
             <CardHeader>
                 <CardTitle className="font-headline text-lg flex items-center gap-2">
                     <Bot className="h-5 w-5" />
-                    Dagens Visdom
+                    :D Dagens Visdom
                 </CardTitle>
             </CardHeader>
             <CardContent>
