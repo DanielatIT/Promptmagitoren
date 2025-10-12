@@ -310,132 +310,138 @@ export function PromptForm() {
                 />
             </FormSection>
 
-            <FormSection title="Vilken tonalitet ska texten ha?" onToggle={() => toggleDisabled('tonality_disabled')} isDisabled={values.tonality_disabled}>
-                <div className="space-y-4">
-                    <FormField
-                        control={control}
-                        name="tonality"
-                        render={() => (
-                            <FormItem className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {tonalityOptions.map((item) => (
-                                    <FormField
-                                        key={item.id}
-                                        control={control}
-                                        name="tonality"
-                                        render={({ field }) => (
-                                            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                                                <FormControl>
-                                                    <Checkbox
-                                                        checked={field.value?.includes(item.label)}
-                                                        onCheckedChange={(checked) => {
-                                                            return checked
-                                                                ? field.onChange([...(field.value || []), item.label])
-                                                                : field.onChange(field.value?.filter((value) => value !== item.label));
-                                                        }}
-                                                    />
-                                                </FormControl>
-                                                <FormLabel className="font-normal">{item.label}</FormLabel>
-                                            </FormItem>
-                                        )}
-                                    />
-                                ))}
-                            </FormItem>
-                        )}
-                    />
-                     <FormField
-                        control={control}
-                        name="tonalityCustom"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormControl>
-                                    <Input placeholder="Annan tonalitet..." {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                </div>
-            </FormSection>
-            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormSection title="Längd på texten" onToggle={() => toggleDisabled('textLength_disabled')} isDisabled={values.textLength_disabled}>
-                    <FormField
-                        control={control}
-                        name="textLength"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Maximalt antal ord</FormLabel>
-                                <FormControl>
-                                    <Input type="number" placeholder="t.ex. 500" {...field} />
-                                </FormControl>
-                            </FormItem>
-                        )}
-                    />
-                </FormSection>
-                
-                <FormSection title="Antal listor" onToggle={() => toggleDisabled('lists_disabled')} isDisabled={values.lists_disabled}>
+                <FormSection title="Vilken tonalitet ska texten ha?" onToggle={() => toggleDisabled('tonality_disabled')} isDisabled={values.tonality_disabled}>
                     <div className="space-y-4">
                         <FormField
                             control={control}
-                            name="numberOfLists"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Maximalt antal listor</FormLabel>
-                                    <FormControl>
-                                        <Input type="number" placeholder="t.ex. 2" {...field} disabled={getValues('excludeLists')} />
-                                    </FormControl>
+                            name="tonality"
+                            render={() => (
+                                <FormItem className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    {tonalityOptions.map((item) => (
+                                        <FormField
+                                            key={item.id}
+                                            control={control}
+                                            name="tonality"
+                                            render={({ field }) => (
+                                                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                                                    <FormControl>
+                                                        <Checkbox
+                                                            checked={field.value?.includes(item.label)}
+                                                            onCheckedChange={(checked) => {
+                                                                return checked
+                                                                    ? field.onChange([...(field.value || []), item.label])
+                                                                    : field.onChange(field.value?.filter((value) => value !== item.label));
+                                                            }}
+                                                        />
+                                                    </FormControl>
+                                                    <FormLabel className="font-normal">{item.label}</FormLabel>
+                                                </FormItem>
+                                            )}
+                                        />
+                                    ))}
                                 </FormItem>
                             )}
                         />
                         <FormField
                             control={control}
-                            name="excludeLists"
+                            name="tonalityCustom"
                             render={({ field }) => (
-                                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                                    <div className="space-y-0.5">
-                                        <FormLabel>Exkludera listor helt</FormLabel>
-                                    </div>
+                                <FormItem>
                                     <FormControl>
-                                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                                        <Input placeholder="Annan tonalitet..." {...field} />
                                     </FormControl>
+                                    <FormMessage />
                                 </FormItem>
                             )}
                         />
                     </div>
                 </FormSection>
+                <div className="space-y-6">
+                    <FormSection title="Längd på texten" onToggle={() => toggleDisabled('textLength_disabled')} isDisabled={values.textLength_disabled}>
+                        <FormField
+                            control={control}
+                            name="textLength"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Maximalt antal ord</FormLabel>
+                                    <FormControl>
+                                        <Input type="number" placeholder="t.ex. 500" {...field} />
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                        />
+                    </FormSection>
+                    
+                    <FormSection title="Antal listor" onToggle={() => toggleDisabled('lists_disabled')} isDisabled={values.lists_disabled}>
+                        <div className="space-y-4">
+                            <FormField
+                                control={control}
+                                name="numberOfLists"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Maximalt antal listor</FormLabel>
+                                        <FormControl>
+                                            <Input type="number" placeholder="t.ex. 2" {...field} disabled={getValues('excludeLists')} />
+                                        </FormControl>
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={control}
+                                name="excludeLists"
+                                render={({ field }) => (
+                                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                                        <div className="space-y-0.5">
+                                            <FormLabel>Exkludera listor helt</FormLabel>
+                                        </div>
+                                        <FormControl>
+                                            <Switch checked={field.value} onCheckedChange={field.onChange} />
+                                        </FormControl>
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                    </FormSection>
+                </div>
             </div>
             
+            <FormSection title="Språk">
+                <FormField
+                    control={control}
+                    name="language"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormControl>
+                                <RadioGroup
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value}
+                                    className="flex items-center space-x-4 rounded-lg border p-3 shadow-sm"
+                                >
+                                    <FormItem className="flex items-center space-x-2">
+                                        <FormControl>
+                                            <RadioGroupItem value="Svenska" id="svenska" />
+                                        </FormControl>
+                                        <FormLabel htmlFor="svenska" className="font-normal">Svenska</FormLabel>
+                                    </FormItem>
+                                    <FormItem className="flex items-center space-x-2">
+                                        <FormControl>
+                                            <RadioGroupItem value="Engelska" id="engelska" />
+                                        </FormControl>
+                                        <FormLabel htmlFor="engelska" className="font-normal">Engelska</FormLabel>
+                                    </FormItem>
+                                </RadioGroup>
+                            </FormControl>
+                        </FormItem>
+                    )}
+                />
+            </FormSection>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormSection title="Språk">
-                    <FormField
-                        control={control}
-                        name="language"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormControl>
-                                    <RadioGroup
-                                        onValueChange={field.onChange}
-                                        defaultValue={field.value}
-                                        className="flex items-center space-x-4 rounded-lg border p-3 shadow-sm"
-                                    >
-                                        <FormItem className="flex items-center space-x-2">
-                                            <FormControl>
-                                                <RadioGroupItem value="Svenska" id="svenska" />
-                                            </FormControl>
-                                            <FormLabel htmlFor="svenska" className="font-normal">Svenska</FormLabel>
-                                        </FormItem>
-                                        <FormItem className="flex items-center space-x-2">
-                                            <FormControl>
-                                                <RadioGroupItem value="Engelska" id="engelska" />
-                                            </FormControl>
-                                            <FormLabel htmlFor="engelska" className="font-normal">Engelska</FormLabel>
-                                        </FormItem>
-                                    </RadioGroup>
-                                </FormControl>
-                            </FormItem>
-                        )}
-                    />
+                <FormSection title="Vem skriver texten?" onToggle={() => toggleDisabled('author_disabled')} isDisabled={values.author_disabled}>
+                    <FormField control={control} name="author" render={({ field }) => (<FormItem><FormControl><Input placeholder="Ditt namn eller företagsnamn" {...field} /></FormControl></FormItem>)} />
                 </FormSection>
+
                 <FormSection title="Plats?" description="Vilken webbplats skall texten befinna sig på?" onToggle={() => toggleDisabled('websiteUrl_disabled')} isDisabled={values.websiteUrl_disabled}>
                     <FormField
                         control={control}
@@ -587,42 +593,38 @@ export function PromptForm() {
                 </FormSection>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormSection title="Primärt sökord/sökfras" onToggle={() => toggleDisabled('primaryKeywords_disabled')} isDisabled={values.primaryKeywords_disabled}>
-                     <div className="space-y-4">
-                        {keywordFields.fields.map((field, index) => (
-                            <div key={field.id} className="flex items-center gap-2">
-                                <FormField
-                                    control={control}
-                                    name={`primaryKeywords.${index}.value`}
-                                    render={({ field }) => (
-                                        <FormItem className="flex-1">
-                                            <FormControl>
-                                                <Input placeholder={`Sökord ${index + 1}`} {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                {keywordFields.fields.length > 1 && (
-                                    <Button type="button" variant="destructive" size="icon" onClick={() => keywordFields.remove(index)}>
-                                        <Trash2 className="h-4 w-4" />
-                                    </Button>
+            <FormSection title="Primärt sökord/sökfras" onToggle={() => toggleDisabled('primaryKeywords_disabled')} isDisabled={values.primaryKeywords_disabled}>
+                 <div className="space-y-4">
+                    {keywordFields.fields.map((field, index) => (
+                        <div key={field.id} className="flex items-center gap-2">
+                            <FormField
+                                control={control}
+                                name={`primaryKeywords.${index}.value`}
+                                render={({ field }) => (
+                                    <FormItem className="flex-1">
+                                        <FormControl>
+                                            <Input placeholder={`Sökord ${index + 1}`} {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
                                 )}
-                            </div>
-                        ))}
-                        {keywordFields.fields.length < 3 && (
-                            <Button type="button" variant="outline" size="sm" onClick={() => keywordFields.append({ value: '' })}>
-                                <Plus className="mr-2 h-4 w-4" /> Lägg till sökord
-                            </Button>
-                        )}
-                    </div>
-                </FormSection>
-
-                <FormSection title="Vem skriver texten?" onToggle={() => toggleDisabled('author_disabled')} isDisabled={values.author_disabled}>
-                    <FormField control={control} name="author" render={({ field }) => (<FormItem><FormControl><Input placeholder="Ditt namn eller företagsnamn" {...field} /></FormControl></FormItem>)} />
-                </FormSection>
-            </div>
+                            />
+                            {keywordFields.fields.length > 1 && (
+                                <Button type="button" variant="destructive" size="icon" onClick={() => keywordFields.remove(index)}>
+                                    <Trash2 className="h-4 w-4" />
+                                </Button>
+                            )}
+                        </div>
+                    ))}
+                    {keywordFields.fields.length < 3 && (
+                        <Button type="button" variant="outline" size="sm" onClick={() => keywordFields.append({ value: '' })}>
+                            <Plus className="mr-2 h-4 w-4" /> Lägg till sökord
+                        </Button>
+                    )}
+                </div>
+            </FormSection>
         </div>
     );
 }
+
+    
