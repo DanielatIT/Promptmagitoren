@@ -16,15 +16,15 @@ export const languageOutputs: { [key: string]: string } = {
 };
 
 export const taskTypeMap: Record<string, string> = {
-  'Seo onpage text': 'Skriv en SEO-optimerad on-page-text för en webbsida. Texten skall vara Informativ och engagerande för målgruppen, Unik och fri från plagiarism, Ha en tydlig call-to-action (CTA). Optimera för läsbarhet med korta stycken och enkla meningar. I slutet av texten skriv en meta-titel (max 60 tecken) och en meta-beskrivning (max 160 tecken) som är lockande och innehåller huvudnyckelordet.',
+  'SEO on-page text': 'Skriv en SEO-optimerad on-page-text för en webbsida. Texten skall vara informativ och engagerande för målgruppen, unik och fri från plagiat, ha en tydlig call-to-action (CTA), och optimeras för läsbarhet med korta stycken och enkla meningar. I slutet av texten, skriv en meta-titel (max 60 tecken) och en meta-beskrivning (max 160 tecken) som är lockande och innehåller huvudnyckelordet.',
   'Artikel': 'Skriv en artikel för en av våra bloggar där du inte nämner kundens namn eller företag utan utgår från att vi bara vill ge läsaren ett värde'
 };
 
 export const tonalityMap: Record<string, string> = {
-    'Professionell/Formell': 'Denna tonalitet ska vara saklig, objektiv och använder ofta ett mer avancerat ordförråd. undviker slang och förkortningar. för B2B-kommunikation, juridiska texter, vetenskapliga rapporter och officiella meddelanden.',
-    'Vänlig/Tillgänglig': 'Skriv inbjudande och lättsam tonalitet som använder ett vardagligt språk och ofta tilltalar läsaren direkt. skapa en känsla av samhörighet.',
-    'Informativ/Faktapresenterande': 'använd en tonalitet som Fokuserar på att presentera fakta och data på ett tydligt och koncist sätt. Syftet är att utbilda eller upplysa läsaren, utan att vara för säljig eller personlig.',
-    'Övertygande/Säljande': 'Använd en tonalitet som engagera läsaren känslomässigt och intellektuellt för att motivera dem till en specifik handling (köp, anmälan etc.). Använder ofta starka verb, fördelar snarare än funktioner och call-to-actions.',
+    'Professionell/Formell': 'Denna tonalitet ska vara saklig, objektiv och använder ofta ett mer avancerat ordförråd. Undvik slang och förkortningar. För B2B-kommunikation, juridiska texter, vetenskapliga rapporter och officiella meddelanden.',
+    'Vänlig/Tillgänglig': 'Skriv en inbjudande och lättsam tonalitet som använder ett vardagligt språk och ofta tilltalar läsaren direkt. Skapa en känsla av samhörighet.',
+    'Informativ/Faktapresenterande': 'Använd en tonalitet som fokuserar på att presentera fakta och data på ett tydligt och koncist sätt. Syftet är att utbilda eller upplysa läsaren, utan att vara för säljande eller personlig.',
+    'Övertygande/Säljande': 'Använd en tonalitet som engagerar läsaren känslomässigt och intellektuellt för att motivera dem till en specifik handling (köp, anmälan etc.). Använd ofta starka verb, fördelar snarare än funktioner och call-to-actions.',
 };
 
 export const avoidWordsMap: Record<string, string> = {
@@ -35,3 +35,5 @@ export const avoidWordsMap: Record<string, string> = {
     idealiskt: '"idealiskt"',
     'central-del-av': '"central del av"',
 };
+
+    

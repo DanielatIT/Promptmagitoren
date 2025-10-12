@@ -26,7 +26,7 @@ const aiRoleOptions = [
     'SEO expert', 'Skribent för bloggar'
 ] as const;
 
-const taskTypeRadioOptions = ['Seo onpage text', 'Artikel'] as const;
+const taskTypeRadioOptions = ['SEO on-page text', 'Artikel'] as const;
 
 const tonalityOptions = [
     { id: 'professional', label: 'Professionell/Formell' },
@@ -131,7 +131,7 @@ export const defaultValues: Partial<FormValues> = {
   topicGuideline: '',
   aiRole: 'SEO expert',
   aiRoleCustom: '',
-  taskTypeRadio: 'Seo onpage text',
+  taskTypeRadio: 'SEO on-page text',
   taskTypeCustom: '',
   tonality: [],
   tonalityCustom: '',
@@ -199,7 +199,7 @@ export function PromptForm() {
     return (
         <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormSection title="Vad skall AIn aggera som?" required>
+                <FormSection title="Vad skall AIn agera som?" required>
                   <FormField
                       control={control}
                       name="aiRole"
@@ -635,4 +635,6 @@ export function PromptForm() {
 }
 
     
+    
+
     

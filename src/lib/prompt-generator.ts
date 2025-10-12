@@ -28,7 +28,7 @@ const AdaptivePromptGenerationInputSchema = z.object({
   topicGuideline: z.string().min(1),
   aiRole: z.enum([...aiRoleOptions, 'custom']),
   aiRoleCustom: z.string().optional(),
-  taskTypeRadio: z.enum(['Seo onpage text', 'Artikel', 'custom']).optional(),
+  taskTypeRadio: z.enum(['SEO on-page text', 'Artikel', 'custom']).optional(),
   taskTypeCustom: z.string().optional(),
   
   tonality: z.array(z.string()).optional(),
@@ -185,7 +185,7 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
           "nyckelbetydande", "styrande", "obligatoriska", "bestämmande", 
           "tongivande", "konstitutiva"
         ].join('/');
-        rules.push(`Du får aldrig använda denna mening eller någon form av denna meningsuppbyggnad, som första mening av en text och skall undvikas att skrivas om det inte är av yttersta vikt för att förstå senare in i texten: "${firstKeyword} är ${forbiddenWords} för.." Sen anledning. Det ord jag inkluderat i outputen är då det ord som skall undvikas i denna spesifika mening.`);
+        rules.push(`Du får aldrig använda denna mening eller någon form av denna meningsuppbyggnad, som första mening av en text och skall undvikas att skrivas om det inte är av yttersta vikt för att förstå senare in i texten: "${firstKeyword} är ${forbiddenWords} för.." Sen anledning. Det ord jag inkluderat i outputen är då det ord som skall undvikas i denna specifika mening.`);
       }
     }
     
@@ -233,3 +233,5 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
   
   return { prompt: promptText };
 }
+
+    
