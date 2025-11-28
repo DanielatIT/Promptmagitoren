@@ -2,7 +2,7 @@
 "use client";
 
 import { useToast } from "@/hooks/use-toast";
-import { Bot, Clipboard, Download, Loader2 } from "lucide-react";
+import { Bot, Clipboard, ArrowDown, Loader2 } from "lucide-react";
 import React, { useRef } from "react";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
@@ -102,7 +102,7 @@ export function PromptPreview({ promptText, setPromptText, isLoading, isInitial 
                             size="icon"
                             className="fixed bottom-8 right-8 h-14 w-14 rounded-full bg-background/80 backdrop-blur-sm shadow-lg hover:bg-background"
                         >
-                            <Download className="h-6 w-6" />
+                            <ArrowDown className="h-6 w-6" />
                         </Button>
                     </TooltipTrigger>
                     <TooltipContent side="left">
