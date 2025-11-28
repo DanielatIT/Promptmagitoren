@@ -15,7 +15,8 @@ import {
     languageOutputs, 
     taskTypeMap, 
     tonalityMap, 
-    avoidWordsMap 
+    avoidWordsMap,
+    serpAnalysisPrompt
 } from './prompt-data';
 
 const aiRoleOptions = [
@@ -28,6 +29,8 @@ const AdaptivePromptGenerationInputSchema = z.object({
   topicGuideline: z.string().min(1),
   aiRole: z.enum([...aiRoleOptions, 'custom']),
   aiRoleCustom: z.string().optional(),
+  performSerpAnalysis: z.boolean().optional(),
+  serpKeyword: z.string().optional(),
   taskTypeRadio: z.enum(['SEO on-page text', 'Artikel', 'custom']).optional(),
   taskTypeCustom: z.string().optional(),
   
@@ -101,15 +104,16 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
   } else {
       roleOutput = roleOutputs[validatedData.aiRole];
   }
-
-  if (validatedData.aiRole === 'SEO expert' && roleOutput) {
-      const firstKeyword = validatedData.primaryKeywords?.[0]?.value || '[sökords input]';
-      roleOutput = roleOutput.replace('{primaryKeyword}', firstKeyword);
-  }
   
   if (roleOutput) {
       promptText += roleOutput + '\n\n';
   }
+
+  if (validatedData.aiRole === 'SEO expert' && validatedData.performSerpAnalysis && validatedData.serpKeyword) {
+      let analysisPrompt = serpAnalysisPrompt.replace(/\[Text input\]/g, validatedData.serpKeyword);
+      promptText += analysisPrompt + '\n\n';
+  }
+
 
   promptText += 'Strukturera texten med tydliga och relevanta rubriker (H2, H3, etc.) för att förbättra läsbarheten och SEO. Dessa rubriker skall alltid börja med stor bokstav var på resten av rubriken skall vara små bokstäver. Rubrikerna får inte innehålla några EM tecken (-).\n\n';
 

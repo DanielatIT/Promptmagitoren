@@ -21,7 +21,6 @@ import { X, Plus, Trash2 } from "lucide-react"
 import { FormSection } from './form-section';
 import { cn } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { RandomQuote } from './random-quote';
 
 const aiRoleOptions = [
     'SEO expert', 'Skribent för bloggar'
@@ -51,6 +50,8 @@ export const formSchema = z.object({
   topicGuideline: z.string().min(1, 'Detta fält är obligatoriskt.'),
   aiRole: z.enum([...aiRoleOptions, 'custom']),
   aiRoleCustom: z.string().optional(),
+  performSerpAnalysis: z.boolean().default(false),
+  serpKeyword: z.string().optional(),
   taskTypeRadio: z.enum([...taskTypeRadioOptions, 'custom']).optional(),
   taskTypeCustom: z.string().optional(),
   
@@ -124,6 +125,13 @@ export const formSchema = z.object({
         path: ['aiRoleCustom'],
       });
     }
+    if (data.performSerpAnalysis && data.aiRole === 'SEO expert' && (!data.serpKeyword || data.serpKeyword.trim() === '')) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Sökord för SERP-analys är obligatoriskt.",
+        path: ['serpKeyword'],
+      });
+    }
 });
 
 
@@ -133,6 +141,8 @@ export const defaultValues: Partial<FormValues> = {
   topicGuideline: '',
   aiRole: 'SEO expert',
   aiRoleCustom: '',
+  performSerpAnalysis: false,
+  serpKeyword: '',
   taskTypeRadio: 'SEO on-page text',
   taskTypeCustom: '',
   tonality: [],
@@ -197,6 +207,7 @@ export function PromptForm() {
     const avoidPhrasesEnabled = useWatch({ control, name: "rules.avoidPhrases.enabled" });
     const taskType = useWatch({ control, name: "taskTypeRadio" });
     const aiRole = useWatch({ control, name: "aiRole" });
+    const performSerpAnalysis = useWatch({ control, name: "performSerpAnalysis"});
 
 
     return (
@@ -464,7 +475,43 @@ export function PromptForm() {
                             />
                         </div>
                     </FormSection>
-                    <RandomQuote />
+                     <FormSection title="Utför serp-analys?">
+                        <FormField
+                            control={control}
+                            name="performSerpAnalysis"
+                            render={({ field }) => (
+                                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                                    <FormLabel className="font-normal">Utför serp-analys?</FormLabel>
+                                    <FormControl>
+                                        <div className="flex items-center gap-2">
+                                            <span className={cn("text-sm", !field.value && "text-muted-foreground")}>Nej</span>
+                                            <Switch
+                                                checked={field.value}
+                                                onCheckedChange={field.onChange}
+                                                disabled={aiRole !== 'SEO expert'}
+                                            />
+                                            <span className={cn("text-sm", field.value && "text-muted-foreground")}>Ja</span>
+                                        </div>
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                        />
+                         {performSerpAnalysis && aiRole === 'SEO expert' && (
+                              <FormField
+                                control={control}
+                                name="serpKeyword"
+                                render={({ field }) => (
+                                    <FormItem className="mt-4">
+                                        <FormLabel>Sökord för SERP-analys</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="Ange sökord..." {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                         )}
+                    </FormSection>
                 </div>
             </div>
 
