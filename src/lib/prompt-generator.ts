@@ -45,8 +45,6 @@ const AdaptivePromptGenerationInputSchema = z.object({
   language: z.enum(['Engelska', 'Svenska']),
   convertToHtml: z.boolean().optional(),
   
-  websiteUrl: z.string().optional(),
-
   rules: z.object({
     avoidSuperlatives: z.boolean().default(true),
     avoidPraise: z.boolean().default(true),
@@ -73,8 +71,6 @@ const AdaptivePromptGenerationInputSchema = z.object({
 
   primaryKeywords: z.array(z.object({ value: z.string() })).optional(),
   
-  author: z.string().optional(),
-
   structure: z.array(z.object({
     type: z.string(),
     topic: z.string().optional(),
@@ -158,10 +154,6 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
 
   promptText += languageOutputs[validatedData.language] + '\n\n';
 
-  if (validatedData.websiteUrl) {
-    promptText += `När du skriver denna text, utgå från denna sida: ${validatedData.websiteUrl}, som texten ska publiceras på, Ta hänsyn till sidans syfte, målgrupp och innehåll, så att texten passar in naturligt.\n\n`;
-  }
-
   if (validatedData.rules) {
     const rules: string[] = [];
     if (validatedData.rules.avoidSuperlatives) rules.push('Undvik superlativ');
@@ -229,12 +221,8 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
       promptText += `Denna text skall innehålla följande sökord/sökfraser: ${keywords.join(', ')}. Fördela dessa naturligt i texten med en densitet på cirka 2.5% av textens totala antal ord för varje sökord.\n\n`;
     }
   }
-
-  if (validatedData.author) {
-    promptText += `Denna texten är skriven av ${validatedData.author} och kan nämnas i en CTA.\n\n`;
-  } else {
-    promptText += 'Texten skall skrivas ut ett neutralt perspektiv där vi som skriver inte benämns.\n\n';
-  }
+  
+  promptText += 'Texten skall skrivas ut ett neutralt perspektiv där vi som skriver inte benämns.\n\n';
   
   if (validatedData.convertToHtml) {
     promptText += "Texten som produceras skall konverteras till inline HTML kod enligt best best practice/bästa praxis för hur HTML kod skall skrivas i SEO syfte. Inline kod i detta fallet menas att denna komma inkluderas på en sida i ett redan implementerat fält så som i ett text fält i wordpress/elementor\n\n";
@@ -242,3 +230,5 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
 
   return { prompt: promptText };
 }
+
+    

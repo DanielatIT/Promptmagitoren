@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -54,9 +55,6 @@ export default function PromptomagitorenPage() {
             delete cleanedData.numberOfLists;
             delete cleanedData.excludeLists;
         }
-        if (cleanedData.websiteUrl_disabled) {
-            delete cleanedData.websiteUrl;
-        }
         if (cleanedData.rules_disabled) {
             delete cleanedData.rules;
         }
@@ -65,9 +63,6 @@ export default function PromptomagitorenPage() {
         }
         if (cleanedData.primaryKeywords_disabled) {
             delete cleanedData.primaryKeywords;
-        }
-        if (cleanedData.author_disabled) {
-            delete cleanedData.author;
         }
         if (cleanedData.structure_disabled) {
             delete cleanedData.structure;
@@ -136,3 +131,5 @@ export default function PromptomagitorenPage() {
         </div>
     );
 }
+
+    

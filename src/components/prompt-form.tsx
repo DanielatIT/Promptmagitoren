@@ -68,9 +68,6 @@ export const formSchema = z.object({
   
   language: z.enum(['Engelska', 'Svenska']),
   convertToHtml: z.boolean().default(false),
-
-  websiteUrl: z.string().optional(),
-  websiteUrl_disabled: z.boolean().default(false),
   
   rules: z.object({
     avoidSuperlatives: z.boolean().default(true),
@@ -101,9 +98,6 @@ export const formSchema = z.object({
   primaryKeywords: z.array(z.object({ value: z.string() })).max(3).optional(),
   primaryKeywords_disabled: z.boolean().default(false),
   
-  author: z.string().optional(),
-  author_disabled: z.boolean().default(false),
-
   structure: z.array(z.object({
     type: z.string().min(1, "Styckestyp är obligatoriskt"),
     topic: z.string().optional(),
@@ -155,8 +149,6 @@ export const defaultValues: Partial<FormValues> = {
   lists_disabled: false,
   language: 'Svenska',
   convertToHtml: false,
-  websiteUrl: '',
-  websiteUrl_disabled: false,
   rules: {
     avoidSuperlatives: true,
     avoidPraise: true,
@@ -183,8 +175,6 @@ export const defaultValues: Partial<FormValues> = {
   links_disabled: false,
   primaryKeywords: [{ value: '' }],
   primaryKeywords_disabled: false,
-  author: '',
-  author_disabled: false,
   structure: [],
   structure_disabled: false,
 };
@@ -322,6 +312,37 @@ export function PromptForm() {
                         </FormItem>
                     )}
                 />
+            </FormSection>
+
+             <FormSection title="Primärt sökord/sökfras" onToggle={() => toggleDisabled('primaryKeywords_disabled')} isDisabled={values.primaryKeywords_disabled}>
+                 <div className="space-y-4">
+                    {keywordFields.fields.map((field, index) => (
+                        <div key={field.id} className="flex items-center gap-2">
+                            <FormField
+                                control={control}
+                                name={`primaryKeywords.${index}.value`}
+                                render={({ field }) => (
+                                    <FormItem className="flex-1">
+                                        <FormControl>
+                                            <Input placeholder={`Sökord ${index + 1}`} {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            {keywordFields.fields.length > 1 && (
+                                <Button type="button" variant="destructive" size="icon" onClick={() => keywordFields.remove(index)}>
+                                    <Trash2 className="h-4 w-4" />
+                                </Button>
+                            )}
+                        </div>
+                    ))}
+                    {keywordFields.fields.length < 3 && (
+                        <Button type="button" variant="outline" size="sm" onClick={() => keywordFields.append({ value: '' })}>
+                            <Plus className="mr-2 h-4 w-4" /> Lägg till sökord
+                        </Button>
+                    )}
+                </div>
             </FormSection>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
@@ -515,29 +536,6 @@ export function PromptForm() {
                 </div>
             </div>
 
-            <FormSection title="Författare och plats" onToggle={() => {
-                toggleDisabled('author_disabled');
-                toggleDisabled('websiteUrl_disabled');
-            }} isDisabled={values.author_disabled || values.websiteUrl_disabled}>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <FormField control={control} name="author" render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Vem skriver texten?</FormLabel>
-                            <FormControl><Input placeholder="Ditt namn eller företagsnamn" {...field} /></FormControl>
-                        </FormItem>
-                    )} />
-                    <FormField control={control} name="websiteUrl" render={({ field }) => (
-                        <FormItem>
-                             <FormLabel>Vilken webbplats skall texten befinna sig på?</FormLabel>
-                            <FormControl>
-                                <Input placeholder="https://exempel.se/sida" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )} />
-                </div>
-            </FormSection>
-
             <FormSection
                 title="Regler på texten"
                 description="Alla ibockade regler gäller, bocka av om du inte vill använda regel."
@@ -673,38 +671,10 @@ export function PromptForm() {
                 </FormSection>
             </div>
             
-            <FormSection title="Primärt sökord/sökfras" onToggle={() => toggleDisabled('primaryKeywords_disabled')} isDisabled={values.primaryKeywords_disabled}>
-                 <div className="space-y-4">
-                    {keywordFields.fields.map((field, index) => (
-                        <div key={field.id} className="flex items-center gap-2">
-                            <FormField
-                                control={control}
-                                name={`primaryKeywords.${index}.value`}
-                                render={({ field }) => (
-                                    <FormItem className="flex-1">
-                                        <FormControl>
-                                            <Input placeholder={`Sökord ${index + 1}`} {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            {keywordFields.fields.length > 1 && (
-                                <Button type="button" variant="destructive" size="icon" onClick={() => keywordFields.remove(index)}>
-                                    <Trash2 className="h-4 w-4" />
-                                </Button>
-                            )}
-                        </div>
-                    ))}
-                    {keywordFields.fields.length < 3 && (
-                        <Button type="button" variant="outline" size="sm" onClick={() => keywordFields.append({ value: '' })}>
-                            <Plus className="mr-2 h-4 w-4" /> Lägg till sökord
-                        </Button>
-                    )}
-                </div>
-            </FormSection>
         </div>
     );
 }
+
+    
 
     
