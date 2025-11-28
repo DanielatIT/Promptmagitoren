@@ -100,7 +100,7 @@ export function PromptPreview({ promptText, setPromptText, isLoading, isInitial 
                             onClick={scrollToPreview}
                             variant="outline"
                             size="icon"
-                            className="fixed bottom-8 right-8 h-14 w-14 rounded-full bg-background/80 backdrop-blur-sm shadow-lg hover:bg-background"
+                            className="fixed bottom-8 right-8 h-14 w-14 rounded-full bg-background/80 backdrop-blur-sm shadow-lg hover:bg-destructive hover:text-destructive-foreground"
                         >
                             <ArrowDown className="h-6 w-6" />
                         </Button>
