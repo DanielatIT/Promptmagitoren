@@ -105,7 +105,8 @@ export default function PromptomagitorenPage() {
                         </PopoverTrigger>
                         <PopoverContent side="bottom" align="end" className="w-80">
                             <div className="text-sm p-2 text-left">
-                                <h3 className="font-bold font-headline mb-2">Version 1.5</h3>
+                                <h3 className="font-bold font-headline mb-2">Version 1.5.1</h3>
+                                <p className="text-red-600 text-xs italic mb-2">Notering version: Säkerhetsuppdatering.</p>
                                 <h4 className="font-semibold text-foreground mb-1 mt-3">Rättighetsförklaring</h4>
                                 <p className="text-muted-foreground text-xs leading-relaxed">
                                     Promptmagitören är utvecklad av Daniel Wölfing för Industritorget. Alla immateriella rättigheter, inklusive men inte begränsat till upphovsrätt och varumärkesrätt, tillhör Industritorget. Ingen del av denna applikation får reproduceras, distribueras eller användas i kommersiellt eller icke-kommersiellt syfte utan skriftligt medgivande från Industritorget.
@@ -139,5 +140,3 @@ export default function PromptomagitorenPage() {
         </div>
     );
 }
-
-    
