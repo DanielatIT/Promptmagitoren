@@ -21,19 +21,7 @@ import { X, Plus, Trash2 } from "lucide-react"
 import { FormSection } from './form-section';
 import { cn } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-
-const aiRoleOptions = [
-    'SEO expert', 'Skribent för bloggar'
-] as const;
-
-const taskTypeRadioOptions = ['SEO on-page text', 'Artikel'] as const;
-
-const tonalityOptions = [
-    { id: 'professional', label: 'Professionell/Formell' },
-    { id: 'friendly', label: 'Vänlig/Tillgänglig' },
-    { id: 'informative', label: 'Informativ/Faktapresenterande' },
-    { id: 'persuasive', label: 'Övertygande/Säljande' },
-] as const;
+import { aiRoleOptions, taskTypeMap, tonalityMap } from '@/lib/prompt-data';
 
 const avoidWordsOptions = [
     { id: 'upptäck', label: '"Upptäck"' },
@@ -52,7 +40,7 @@ export const formSchema = z.object({
   aiRoleCustom: z.string().optional(),
   performSerpAnalysis: z.boolean().default(false),
   serpKeyword: z.string().optional(),
-  taskTypeRadio: z.enum([...taskTypeRadioOptions, 'custom']).optional(),
+  taskTypeRadio: z.enum([...Object.keys(taskTypeMap), 'custom'] as [string, ...string[]]).optional(),
   taskTypeCustom: z.string().optional(),
   
   tonality: z.array(z.string()).optional(),
@@ -262,7 +250,7 @@ export function PromptForm() {
                                       defaultValue={field.value}
                                       className="space-y-2"
                                   >
-                                      {taskTypeRadioOptions.map((task) => (
+                                      {Object.keys(taskTypeMap).map((task) => (
                                           <FormItem key={task} className="flex items-center space-x-3 space-y-0">
                                               <FormControl>
                                                   <RadioGroupItem value={task} />
@@ -354,28 +342,28 @@ export function PromptForm() {
                                 name="tonality"
                                 render={() => (
                                     <FormItem className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        {tonalityOptions.map((item) => (
+                                        {Object.entries(tonalityMap).map(([label, _]) => (
                                             <FormField
-                                                key={item.id}
+                                                key={label}
                                                 control={control}
                                                 name="tonality"
                                                 render={({ field }) => (
                                                     <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                                                         <FormControl>
                                                             <Checkbox
-                                                                checked={field.value?.includes(item.label)}
+                                                                checked={field.value?.includes(label)}
                                                                 onCheckedChange={(checked) => {
                                                                     return checked
-                                                                        ? field.onChange([...(field.value || []), item.label])
-                                                                        : field.onChange(field.value?.filter((value) => value !== item.label));
+                                                                        ? field.onChange([...(field.value || []), label])
+                                                                        : field.onChange(field.value?.filter((value) => value !== label));
                                                                 }}
                                                             />
                                                         </FormControl>
                                                         <FormLabel className="font-normal">
-                                                            {item.label.split('/').map((part, index) => (
+                                                            {label.split('/').map((part, index) => (
                                                                 <React.Fragment key={index}>
                                                                     {part}
-                                                                    {index === 0 && item.label.includes('/') && <br />}
+                                                                    {index === 0 && label.includes('/') && <br />}
                                                                 </React.Fragment>
                                                             ))}
                                                         </FormLabel>
@@ -674,7 +662,5 @@ export function PromptForm() {
         </div>
     );
 }
-
-    
 
     

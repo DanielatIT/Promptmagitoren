@@ -26,8 +26,10 @@ export default function PromptomagitorenPage() {
     
     useEffect(() => {
         const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-            event.preventDefault();
-            event.returnValue = '';
+            if (methods.formState.isDirty) {
+                event.preventDefault();
+                event.returnValue = '';
+            }
         };
 
         window.addEventListener('beforeunload', handleBeforeUnload);
@@ -35,7 +37,7 @@ export default function PromptomagitorenPage() {
         return () => {
             window.removeEventListener('beforeunload', handleBeforeUnload);
         };
-    }, []);
+    }, [methods.formState.isDirty]);
 
     const onGenerate = async (data: FormValues) => {
         setIsLoading(true);
@@ -44,6 +46,7 @@ export default function PromptomagitorenPage() {
 
         const cleanedData = JSON.parse(JSON.stringify(data));
 
+        // This logic correctly removes sections that the user has disabled via the UI.
         if (cleanedData.tonality_disabled) {
             delete cleanedData.tonality;
             delete cleanedData.tonalityCustom;
@@ -75,11 +78,12 @@ export default function PromptomagitorenPage() {
         try {
             const result = await adaptivePromptGeneration(cleanedData);
             setPromptText(result.prompt);
+            methods.reset(data); // Resets the dirty state after successful generation
         } catch (error) {
             console.error(error);
             toast({
-                title: "Error generating content",
-                description: "An error occurred while generating the content. Please try again.",
+                title: "Fel vid generering",
+                description: "Ett fel uppstod när prompten skulle genereras. Kontrollera dina fält och försök igen.",
                 variant: "destructive"
             });
         } finally {
@@ -135,3 +139,5 @@ export default function PromptomagitorenPage() {
         </div>
     );
 }
+
+    
