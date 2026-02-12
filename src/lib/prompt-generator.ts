@@ -203,50 +203,64 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
     let structurePrompt = "Jag vill att texten skall följa denna struktur med denna information i ordning:\n\n";
     
     const cardOutputs = validatedData.advancedStructure.map(card => {
-      let cardOutput = '';
-      const topic = card.topic?.trim();
+        let cardOutput = '';
+        const topic = card.topic?.trim();
 
-      switch (card.type) {
-        case 'Titel':
-            cardOutput = topic ? `Textens titel ska vara: "${topic}".` : 'Generera en passande och SEO-vänlig titel (H1) för texten.';
-            break;
-        case 'Ingress/inledning':
-            cardOutput = topic ? `Skriv ett inledande stycke (ingress) som handlar om: ${topic}.` : 'Skriv ett kort och engagerande inledande stycke (ingress).';
-            break;
-        case 'Underrubrik & Brödtext':
-            cardOutput = topic ? `Skriv en underrubrik (H2, H3, etc.) följt av brödtext. Detta avsnitt ska handla om: ${topic}.` : 'Skriv en underrubrik följt av tillhörande brödtext.';
-            break;
-        case 'Fristående text':
-            cardOutput = topic ? `Skriv ett fristående textstycke (brödtext utan egen rubrik) om: ${topic}.` : 'Skriv ett fristående textstycke.';
-            break;
-        case 'lista':
-            cardOutput = topic ? `Skapa en punktlista eller numrerad lista som behandlar: ${topic}.` : 'Skapa en relevant lista.';
-            break;
-        case 'CTA':
-            cardOutput = topic ? `Skriv en tydlig "Call to Action". Uppmana läsaren till handling, där målet är: ${topic}.` : 'Skriv en tydlig "Call to Action" som uppmanar läsaren till handling.';
-            break;
-        case 'Anpassat fält':
-            cardOutput = topic ? `Inkludera följande text exakt som den är skriven: "${topic}"` : '';
-            break;
-      }
+        switch (card.type) {
+            case 'Titel':
+                cardOutput = topic 
+                    ? `Textens titel (H1) ska vara: "${topic}".` 
+                    : 'Skapa en passande och SEO-vänlig titel (H1) för texten.';
+                break;
+            case 'Ingress/inledning':
+                cardOutput = topic 
+                    ? `Inled texten med en ingress (inledande stycke) som handlar om: ${topic}.` 
+                    : 'Skriv ett kort och engagerande inledande stycke (ingress).';
+                break;
+            case 'Underrubrik & Brödtext':
+                cardOutput = topic 
+                    ? `Skapa ett avsnitt med en underrubrik (H2, H3, etc.) följt av en brödtext. Detta avsnitt ska handla om: ${topic}.` 
+                    : 'Skapa ett avsnitt med en underrubrik följt av tillhörande brödtext.';
+                break;
+            case 'Fristående text':
+                cardOutput = topic 
+                    ? `Infoga ett fristående textstycke (brödtext utan egen rubrik) som handlar om: ${topic}.` 
+                    : 'Infoga ett fristående textstycke.';
+                break;
+            case 'lista':
+                cardOutput = topic 
+                    ? `Skapa en punktlista eller numrerad lista som behandlar följande: ${topic}.` 
+                    : 'Skapa en relevant lista baserad på textens övriga innehåll.';
+                break;
+            case 'CTA':
+                cardOutput = topic 
+                    ? `Avsluta med en "Call to Action" (uppmaning till handling). Målet med uppmaningen är: ${topic}.` 
+                    : 'Avsluta med en tydlig "Call to Action" som uppmanar läsaren till handling.';
+                break;
+            case 'Anpassat fält':
+                cardOutput = topic 
+                    ? `Infoga följande text exakt som den är skriven, utan ändringar: "${topic}"` 
+                    : '';
+                break;
+        }
 
-      if (card.links && card.links.length > 0) {
-          const linkInstructions = card.links
-            .filter(link => link.url && link.anchorText)
-            .map(link => 
-              `I detta stycke, lägg in hyperlänken "${link.url}" på sökordet "${link.anchorText}".`
-          ).join(' ');
-          if (linkInstructions) {
-            cardOutput += ` ${linkInstructions}`;
-          }
-      }
-      
-      return cardOutput.trim();
+        if (card.links && card.links.length > 0) {
+            const linkInstructions = card.links
+              .filter(link => link.url && link.anchorText)
+              .map(link => 
+                `I detta stycke, bädda in hyperlänken "${link.url}" på ankartexten "${link.anchorText}".`
+            ).join(' ');
+            if (linkInstructions) {
+              cardOutput += ` ${linkInstructions}`;
+            }
+        }
+        
+        return cardOutput.trim();
     }).filter(Boolean);
 
     if (cardOutputs.length > 0) {
-      structurePrompt += cardOutputs.join('\n\n');
-      promptText += structurePrompt + '\n\n';
+        structurePrompt += cardOutputs.map((output, index) => `${index + 1}. ${output}`).join('\n\n');
+        promptText += structurePrompt + '\n\n';
     }
   }
 
@@ -265,3 +279,5 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
 
   return { prompt: promptText };
 }
+
+    

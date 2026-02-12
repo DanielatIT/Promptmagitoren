@@ -18,7 +18,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
-import { X, Plus, Trash2, ArrowUp, ArrowDown, Link as LinkIcon, ChevronsUpDown } from "lucide-react"
+import { X, Plus, Trash2, ArrowUp, ArrowDown, Link as LinkIcon, ChevronDown } from "lucide-react"
 import { FormSection } from './form-section';
 import { cn } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
@@ -52,10 +52,10 @@ export const formSchema = z.object({
     avoidSuperlatives: z.boolean().default(true),
     avoidPraise: z.boolean().default(true),
     avoidAcclaim: z.boolean().default(true),
-    isInformative: z.boolean().default(true),
-    isTechnical: z.boolean().default(true),
-    useWeForm: z.boolean().default(true),
-    addressReaderAsYou: z.boolean().default(true),
+    isInformative: z.boolean().default(false),
+    isTechnical: z.boolean().default(false),
+    useWeForm: z.boolean().default(false),
+    addressReaderAsYou: z.boolean().default(false),
     avoidWords: z.object({
         enabled: z.boolean().default(true),
         words: z.array(z.string()).optional(),
@@ -133,10 +133,10 @@ export const defaultValues: Partial<FormValues> = {
     avoidSuperlatives: true,
     avoidPraise: true,
     avoidAcclaim: true,
-    isInformative: true,
-    isTechnical: true,
-    useWeForm: true,
-    addressReaderAsYou: true,
+    isInformative: false,
+    isTechnical: false,
+    useWeForm: false,
+    addressReaderAsYou: false,
     avoidWords: {
         enabled: true,
         words: ['upptäck', 'utforska', 'oumbärligt', 'särskiljt', 'idealiskt', 'central-del-av'],
@@ -175,9 +175,9 @@ const AdvancedStructureCard = ({ index, onRemove, onMove }: { index: number; onR
         <Collapsible className="border border-accent/30 bg-accent/10 rounded-lg">
             <div className="flex justify-between items-center p-2 pr-3">
                  <CollapsibleTrigger asChild>
-                    <Button variant="ghost" className="flex-1 justify-start p-2 h-auto gap-2">
-                        <ChevronsUpDown className="h-4 w-4 text-muted-foreground" />
+                    <Button variant="ghost" className="flex-1 justify-between p-2 h-auto gap-2 w-full [&[data-state=open]>svg]:rotate-180">
                         <h4 className="font-bold text-foreground">{cardData.type}</h4>
+                        <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0 transition-transform duration-200" />
                     </Button>
                 </CollapsibleTrigger>
                 <div className="flex items-center gap-1">
@@ -740,5 +740,7 @@ export function PromptForm() {
         </div>
     );
 }
+
+    
 
     
