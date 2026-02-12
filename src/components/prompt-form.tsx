@@ -158,22 +158,27 @@ export const defaultValues: Partial<FormValues> = {
 
 const AdvancedStructureCard = ({ index, onRemove, onMove }: { index: number; onRemove: () => void; onMove: (from: number, to: number) => void; }) => {
     const { control } = useFormContext<FormValues>();
-    const { fields, append, remove } = useFieldArray({
+    const { fields: linkFields, append: appendLink, remove: removeLink } = useFieldArray({
         control,
         name: `advancedStructure.${index}.links`
     });
     
     const cardData = useWatch({ control, name: `advancedStructure.${index}`});
+    const allStructureFields = useWatch({ control, name: `advancedStructure` });
+
+    const isThisCardTitle = cardData.type === 'Titel';
+    const isPrecededByTitle = allStructureFields?.[index - 1]?.type === 'Titel';
+    const isLast = allStructureFields ? index === allStructureFields.length - 1 : false;
 
     return (
-        <div className="border bg-card/50 rounded-lg p-4 space-y-4">
+        <div className="border border-accent/30 bg-accent/10 rounded-lg p-4 space-y-4">
             <div className="flex justify-between items-center pb-2 border-b">
                 <h4 className="font-bold text-foreground">{cardData.type}</h4>
                 <div className="flex items-center gap-1">
-                    <Button type="button" variant="ghost" size="icon" onClick={() => onMove(index, index - 1)} disabled={index === 0}>
+                    <Button type="button" variant="ghost" size="icon" onClick={() => onMove(index, index - 1)} disabled={isThisCardTitle || index === 0 || isPrecededByTitle}>
                         <ArrowUp className="h-4 w-4" />
                     </Button>
-                    <Button type="button" variant="ghost" size="icon" onClick={() => onMove(index, index + 1)} >
+                    <Button type="button" variant="ghost" size="icon" onClick={() => onMove(index, index + 1)} disabled={isThisCardTitle || isLast}>
                         <ArrowDown className="h-4 w-4" />
                     </Button>
                     <Button type="button" variant="ghost" size="icon" onClick={onRemove} className="text-destructive hover:text-destructive">
@@ -199,14 +204,14 @@ const AdvancedStructureCard = ({ index, onRemove, onMove }: { index: number; onR
                      <LinkIcon className="h-4 w-4 text-muted-foreground"/>
                      <h5 className="text-sm font-medium">Inbäddade länkar</h5>
                 </div>
-                {fields.map((field, linkIndex) => (
+                {linkFields.map((field, linkIndex) => (
                     <div key={field.id} className="flex items-end gap-2 p-2 border rounded-md bg-background/50">
                         <FormField control={control} name={`advancedStructure.${index}.links.${linkIndex}.url`} render={({ field }) => (<FormItem className="flex-1"><FormLabel>URL</FormLabel><FormControl><Input {...field} placeholder="https://..." /></FormControl><FormMessage /></FormItem>)} />
                         <FormField control={control} name={`advancedStructure.${index}.links.${linkIndex}.anchorText`} render={({ field }) => (<FormItem className="flex-1"><FormLabel>Sökord</FormLabel><FormControl><Input {...field} placeholder="Sökord att länka" /></FormControl><FormMessage /></FormItem>)} />
-                        <Button type="button" variant="destructive" size="icon" onClick={() => remove(linkIndex)}><Trash2 className="h-4 w-4" /></Button>
+                        <Button type="button" variant="destructive" size="icon" onClick={() => removeLink(linkIndex)}><Trash2 className="h-4 w-4" /></Button>
                     </div>
                 ))}
-                <Button type="button" size="sm" variant="outline" onClick={() => append({ url: '', anchorText: '' })}><Plus className="mr-2 h-4 w-4" /> Lägg till länk i stycket</Button>
+                <Button type="button" size="sm" variant="outline" onClick={() => appendLink({ url: '', anchorText: '' })}><Plus className="mr-2 h-4 w-4" /> Lägg till länk i stycket</Button>
              </div>
         </div>
     );
@@ -218,7 +223,7 @@ export function PromptForm() {
     const [newCardType, setNewCardType] = useState(structureCardTypes[0]);
 
     const keywordFields = useFieldArray({ control, name: "primaryKeywords" });
-    const { fields: structureFields, append: appendStructure, remove: removeStructure, move: moveStructure } = useFieldArray({
+    const { fields: structureFields, append: appendStructure, prepend: prependStructure, remove: removeStructure, move: moveStructure } = useFieldArray({
         control,
         name: "advancedStructure"
     });
@@ -239,9 +244,15 @@ export function PromptForm() {
     
     const handleAddStructureCard = () => {
         if (newCardType) {
-            appendStructure({ type: newCardType, topic: '', links: [] });
+            if (newCardType === 'Titel') {
+                prependStructure({ type: 'Titel', topic: '', links: [] });
+            } else {
+                appendStructure({ type: newCardType, topic: '', links: [] });
+            }
         }
     };
+    
+    const titleCardExists = structureFields.some(field => field.type === 'Titel');
 
 
     return (
@@ -428,7 +439,7 @@ export function PromptForm() {
                                     </SelectTrigger>
                                     <SelectContent>
                                         {structureCardTypes.map(type => (
-                                            <SelectItem key={type} value={type}>{type}</SelectItem>
+                                            <SelectItem key={type} value={type} disabled={type === 'Titel' && titleCardExists}>{type}</SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
@@ -726,3 +737,5 @@ export function PromptForm() {
         </div>
     );
 }
+
+    
