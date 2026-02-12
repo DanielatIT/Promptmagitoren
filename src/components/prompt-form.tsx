@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
+import { Label } from "@/components/ui/label"
 import { X, Plus, Trash2, ArrowUp, ArrowDown, Link as LinkIcon } from "lucide-react"
 import { FormSection } from './form-section';
 import { cn } from "@/lib/utils";
