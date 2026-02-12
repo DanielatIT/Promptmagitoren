@@ -214,32 +214,32 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
                 break;
             case 'Ingress/inledning':
                 cardOutput = topic 
-                    ? `Inled texten med en ingress (inledande stycke) som handlar om: ${topic}.` 
+                    ? `Inled texten med ett engagerande stycke (ingress) som handlar om: ${topic}.` 
                     : 'Skriv ett kort och engagerande inledande stycke (ingress).';
                 break;
             case 'Underrubrik & Brödtext':
                 cardOutput = topic 
-                    ? `Skapa ett avsnitt med en underrubrik (H2, H3, etc.) följt av en brödtext. Detta avsnitt ska handla om: ${topic}.` 
-                    : 'Skapa ett avsnitt med en underrubrik följt av tillhörande brödtext.';
+                    ? `Skapa ett avsnitt med en tydlig underrubrik (H2, H3, etc.) och en tillhörande brödtext. Detta avsnitt ska i detalj behandla: ${topic}.` 
+                    : 'Skapa ett avsnitt med en relevant underrubrik följt av tillhörande brödtext.';
                 break;
             case 'Fristående text':
                 cardOutput = topic 
-                    ? `Infoga ett fristående textstycke (brödtext utan egen rubrik) som handlar om: ${topic}.` 
-                    : 'Infoga ett fristående textstycke.';
+                    ? `Infoga ett fristående textstycke, utan egen rubrik, som handlar om: ${topic}.` 
+                    : 'Infoga ett relevant, fristående textstycke som passar in i kontexten.';
                 break;
             case 'lista':
                 cardOutput = topic 
-                    ? `Skapa en punktlista eller numrerad lista som behandlar följande: ${topic}.` 
-                    : 'Skapa en relevant lista baserad på textens övriga innehåll.';
+                    ? `Skapa en punktlista eller numrerad lista som tydligt presenterar följande punkter: ${topic}.` 
+                    : 'Skapa en relevant lista, antingen som punkter eller numrerad, baserat på textens övriga innehåll.';
                 break;
             case 'CTA':
                 cardOutput = topic 
-                    ? `Avsluta med en "Call to Action" (uppmaning till handling). Målet med uppmaningen är: ${topic}.` 
-                    : 'Avsluta med en tydlig "Call to Action" som uppmanar läsaren till handling.';
+                    ? `Avsluta med en tydlig "Call to Action" (uppmaning till handling). Uppmaningen ska leda till detta mål: ${topic}.` 
+                    : 'Avsluta med en tydlig "Call to Action" som inspirerar läsaren till att agera.';
                 break;
             case 'Anpassat fält':
                 cardOutput = topic 
-                    ? `Infoga följande text exakt som den är skriven, utan ändringar: "${topic}"` 
+                    ? `Infoga följande text exakt som den är skriven, utan några ändringar eller tillägg: "${topic}"` 
                     : '';
                 break;
         }
@@ -248,7 +248,7 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
             const linkInstructions = card.links
               .filter(link => link.url && link.anchorText)
               .map(link => 
-                `I detta stycke, bädda in hyperlänken "${link.url}" på ankartexten "${link.anchorText}".`
+                `I detta stycke, se till att bädda in hyperlänken "${link.url}" på den exakta ankartexten "${link.anchorText}".`
             ).join(' ');
             if (linkInstructions) {
               cardOutput += ` ${linkInstructions}`;
@@ -270,8 +270,6 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
       promptText += `Denna text skall innehålla följande sökord/sökfraser: ${keywords.join(', ')}. Fördela dessa naturligt i texten med en densitet på cirka 2.5% av textens totala antal ord för varje sökord.\n\n`;
     }
   }
-  
-  promptText += 'Texten skall skrivas ut ett neutralt perspektiv där vi som skriver inte benämns.\n\n';
   
   if (validatedData.convertToHtml) {
     promptText += "Texten som produceras skall konverteras till inline HTML kod enligt best best practice/bästa praxis för hur HTML kod skall skrivas i SEO syfte. Inline kod i detta fallet menas att denna komma inkluderas på en sida i ett redan implementerat fält så som i ett text fält i wordpress/elementor\n\n";

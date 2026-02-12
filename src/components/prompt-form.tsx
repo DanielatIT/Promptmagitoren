@@ -172,12 +172,12 @@ const AdvancedStructureCard = ({ index, onRemove, onMove }: { index: number; onR
     const isLast = allStructureFields ? index === allStructureFields.length - 1 : false;
 
     return (
-        <Collapsible className="border border-accent/30 bg-accent/10 rounded-lg">
+        <Collapsible className="group border border-accent/30 bg-accent/10 rounded-lg">
             <div className="flex justify-between items-center p-2 pr-3">
                  <CollapsibleTrigger asChild>
-                    <Button variant="ghost" className="flex-1 justify-between p-2 h-auto gap-2 w-full [&[data-state=open]>svg]:rotate-180">
+                    <Button variant="ghost" className="flex-1 justify-start p-2 h-auto gap-2 w-full">
+                        <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180" />
                         <h4 className="font-bold text-foreground">{cardData.type}</h4>
-                        <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0 transition-transform duration-200" />
                     </Button>
                 </CollapsibleTrigger>
                 <div className="flex items-center gap-1">
@@ -428,11 +428,9 @@ export function PromptForm() {
                         </FormItem>
                     )}
                 />
-            </FormSection>
 
-            {useAdvancedStructure && (
-                <FormSection title="Strukturbyggare">
-                    <div className="space-y-4">
+                {useAdvancedStructure && (
+                    <div className="space-y-4 pt-6">
                         <div className="flex gap-2 items-end p-3 border rounded-lg bg-background/30">
                              <div className="flex-1">
                                 <Label>Typ av stycke</Label>
@@ -473,8 +471,8 @@ export function PromptForm() {
                             )}
                         </div>
                     </div>
-                </FormSection>
-            )}
+                )}
+            </FormSection>
 
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
