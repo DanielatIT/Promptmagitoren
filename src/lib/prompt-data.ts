@@ -42,4 +42,17 @@ export const avoidWordsMap: Record<string, string> = {
     'central-del-av': '"central del av"',
 };
 
+export const avoidWordsOptions = Object.entries(avoidWordsMap).map(([id, label]) => ({ id, label }));
+
+export const paragraphTypes = ['Ingress', 'Brödtext & underrubrik', 'Fristående text', 'CTA', 'Titel'];
+
+export const forbiddenWordsForSubjectRule = [
+  "centrala", "viktiga", "nödvändiga", "oumbärliga", "grundläggande", 
+  "bärande", "avgörbara", "primära", "betydelsefulla", "kritiska", 
+  "essentiella", "fundamentala", "ledande", "huvud­rollsinnehavande", 
+  "nyckelbetydande", "styrande", "obligatoriska", "bestämmande", 
+  "tongivande", "konstitutiva"
+];
+    
+
     

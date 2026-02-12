@@ -17,7 +17,8 @@ import {
     tonalityMap, 
     avoidWordsMap,
     serpAnalysisPrompt,
-    aiRoleOptions
+    aiRoleOptions,
+    forbiddenWordsForSubjectRule
 } from './prompt-data';
 
 
@@ -173,13 +174,7 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
       if (validatedData.rules.avoidPhrases.avoidVilket) rules.push('Undvik att använda ",vilket..." och använd bara den där det mest passar. ", vilket" får bara finnas i texten 1 gång och ersätts med "och" "som" "detta" och andra ord');
       if (validatedData.rules.avoidPhrases.avoidKeywordAsSubject) {
         const firstKeyword = validatedData.primaryKeywords?.find(kw => kw.value.trim())?.value;
-        const forbiddenWords = [
-          "centrala", "viktiga", "nödvändiga", "oumbärliga", "grundläggande", 
-          "bärande", "avgörbara", "primära", "betydelsefulla", "kritiska", 
-          "essentiella", "fundamentala", "ledande", "huvud­rollsinnehavande", 
-          "nyckelbetydande", "styrande", "obligatoriska", "bestämmande", 
-          "tongivande", "konstitutiva"
-        ].join('/');
+        const forbiddenWords = forbiddenWordsForSubjectRule.join('/');
         
         const examplePhrase = firstKeyword 
             ? `"${firstKeyword} är ${forbiddenWords} för.."` 
@@ -233,5 +228,7 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
 
   return { prompt: promptText };
 }
+
+    
 
     

@@ -21,18 +21,7 @@ import { X, Plus, Trash2 } from "lucide-react"
 import { FormSection } from './form-section';
 import { cn } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { aiRoleOptions, taskTypeMap, tonalityMap } from '@/lib/prompt-data';
-
-const avoidWordsOptions = [
-    { id: 'upptäck', label: '"Upptäck"' },
-    { id: 'utforska', label: '"Utforska"' },
-    { id: 'oumbärligt', label: '"Oumbärligt"' },
-    { id: 'särskiljt', label: '"Särskiljt"' },
-    { id: 'idealiskt', label: '"idealiskt"' },
-    { id: 'central-del-av', label: '"central del av"' },
-];
-
-const paragraphTypes = ['Ingress', 'Brödtext & underrubrik', 'Fristående text', 'CTA', 'Titel'];
+import { aiRoleOptions, taskTypeMap, tonalityMap, avoidWordsOptions, paragraphTypes } from '@/lib/prompt-data';
 
 export const formSchema = z.object({
   topicGuideline: z.string().min(1, 'Detta fält är obligatoriskt.'),
@@ -662,5 +651,7 @@ export function PromptForm() {
         </div>
     );
 }
+
+    
 
     
