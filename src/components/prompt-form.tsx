@@ -18,11 +18,12 @@ import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
-import { X, Plus, Trash2, ArrowUp, ArrowDown, Link as LinkIcon } from "lucide-react"
+import { X, Plus, Trash2, ArrowUp, ArrowDown, Link as LinkIcon, ChevronsUpDown } from "lucide-react"
 import { FormSection } from './form-section';
 import { cn } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { aiRoleOptions, taskTypeMap, tonalityMap, avoidWordsOptions, structureCardTypes } from '@/lib/prompt-data';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
 
 export const formSchema = z.object({
   topicGuideline: z.string().min(1, 'Detta fält är obligatoriskt.'),
@@ -73,7 +74,7 @@ export const formSchema = z.object({
   primaryKeywords: z.array(z.object({ value: z.string() })).max(3).optional(),
   primaryKeywords_disabled: z.boolean().default(false),
   
-  useAdvancedStructure: z.enum(['Ja', 'Nej']).default('Nej'),
+  useAdvancedStructure: z.boolean().default(false),
   advancedStructure: z.array(z.object({
     type: z.string().min(1),
     topic: z.string().optional(),
@@ -152,7 +153,7 @@ export const defaultValues: Partial<FormValues> = {
   rules_disabled: false,
   primaryKeywords: [{ value: '' }],
   primaryKeywords_disabled: false,
-  useAdvancedStructure: 'Nej',
+  useAdvancedStructure: false,
   advancedStructure: [],
 };
 
@@ -171,9 +172,14 @@ const AdvancedStructureCard = ({ index, onRemove, onMove }: { index: number; onR
     const isLast = allStructureFields ? index === allStructureFields.length - 1 : false;
 
     return (
-        <div className="border border-accent/30 bg-accent/10 rounded-lg p-4 space-y-4">
-            <div className="flex justify-between items-center pb-2 border-b">
-                <h4 className="font-bold text-foreground">{cardData.type}</h4>
+        <Collapsible className="border border-accent/30 bg-accent/10 rounded-lg">
+            <div className="flex justify-between items-center p-2 pr-3">
+                 <CollapsibleTrigger asChild>
+                    <Button variant="ghost" className="flex-1 justify-start p-2 h-auto gap-2">
+                        <ChevronsUpDown className="h-4 w-4 text-muted-foreground" />
+                        <h4 className="font-bold text-foreground">{cardData.type}</h4>
+                    </Button>
+                </CollapsibleTrigger>
                 <div className="flex items-center gap-1">
                     <Button type="button" variant="ghost" size="icon" onClick={() => onMove(index, index - 1)} disabled={isThisCardTitle || index === 0 || isPrecededByTitle}>
                         <ArrowUp className="h-4 w-4" />
@@ -186,34 +192,36 @@ const AdvancedStructureCard = ({ index, onRemove, onMove }: { index: number; onR
                     </Button>
                 </div>
             </div>
-            <FormField
-                control={control}
-                name={`advancedStructure.${index}.topic`}
-                render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Ämne / Instruktion för detta stycke</FormLabel>
-                        <FormControl>
-                            <Textarea {...field} placeholder="Beskriv vad detta stycke ska handla om..." />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}
-            />
-             <div className="space-y-3 pt-2">
-                <div className="flex items-center gap-2">
-                     <LinkIcon className="h-4 w-4 text-muted-foreground"/>
-                     <h5 className="text-sm font-medium">Inbäddade länkar</h5>
-                </div>
-                {linkFields.map((field, linkIndex) => (
-                    <div key={field.id} className="flex items-end gap-2 p-2 border rounded-md bg-background/50">
-                        <FormField control={control} name={`advancedStructure.${index}.links.${linkIndex}.url`} render={({ field }) => (<FormItem className="flex-1"><FormLabel>URL</FormLabel><FormControl><Input {...field} placeholder="https://..." /></FormControl><FormMessage /></FormItem>)} />
-                        <FormField control={control} name={`advancedStructure.${index}.links.${linkIndex}.anchorText`} render={({ field }) => (<FormItem className="flex-1"><FormLabel>Sökord</FormLabel><FormControl><Input {...field} placeholder="Sökord att länka" /></FormControl><FormMessage /></FormItem>)} />
-                        <Button type="button" variant="destructive" size="icon" onClick={() => removeLink(linkIndex)}><Trash2 className="h-4 w-4" /></Button>
+            <CollapsibleContent className="px-4 pb-4 space-y-4 border-t">
+                <FormField
+                    control={control}
+                    name={`advancedStructure.${index}.topic`}
+                    render={({ field }) => (
+                        <FormItem className="pt-4">
+                            <FormLabel>Ämne / Instruktion för detta stycke</FormLabel>
+                            <FormControl>
+                                <Textarea {...field} placeholder="Beskriv vad detta stycke ska handla om..." />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <div className="space-y-3 pt-2">
+                    <div className="flex items-center gap-2">
+                        <LinkIcon className="h-4 w-4 text-muted-foreground"/>
+                        <h5 className="text-sm font-medium">Inbäddade länkar</h5>
                     </div>
-                ))}
-                <Button type="button" size="sm" variant="outline" onClick={() => appendLink({ url: '', anchorText: '' })}><Plus className="mr-2 h-4 w-4" /> Lägg till länk i stycket</Button>
-             </div>
-        </div>
+                    {linkFields.map((field, linkIndex) => (
+                        <div key={field.id} className="flex items-end gap-2 p-2 border rounded-md bg-background/50">
+                            <FormField control={control} name={`advancedStructure.${index}.links.${linkIndex}.url`} render={({ field }) => (<FormItem className="flex-1"><FormLabel>URL</FormLabel><FormControl><Input {...field} placeholder="https://..." /></FormControl><FormMessage /></FormItem>)} />
+                            <FormField control={control} name={`advancedStructure.${index}.links.${linkIndex}.anchorText`} render={({ field }) => (<FormItem className="flex-1"><FormLabel>Sökord</FormLabel><FormControl><Input {...field} placeholder="Sökord att länka" /></FormControl><FormMessage /></FormItem>)} />
+                            <Button type="button" variant="destructive" size="icon" onClick={() => removeLink(linkIndex)}><Trash2 className="h-4 w-4" /></Button>
+                        </div>
+                    ))}
+                    <Button type="button" size="sm" variant="outline" onClick={() => appendLink({ url: '', anchorText: '' })}><Plus className="mr-2 h-4 w-4" /> Lägg till länk i stycket</Button>
+                </div>
+            </CollapsibleContent>
+        </Collapsible>
     );
 };
 
@@ -401,33 +409,28 @@ export function PromptForm() {
             </FormSection>
             
             <FormSection title="Vill du redigera ordningen och inkludera länkar på texten?">
-                 <FormField
+                <FormField
                     control={control}
                     name="useAdvancedStructure"
                     render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                            <FormLabel className="font-normal">Använd avancerad strukturbyggare?</FormLabel>
                             <FormControl>
-                                <RadioGroup
-                                    onValueChange={field.onChange}
-                                    value={field.value}
-                                    className="flex items-center space-x-4"
-                                >
-                                    <FormItem className="flex items-center space-x-2">
-                                        <FormControl><RadioGroupItem value="Nej" id="advanced-no" /></FormControl>
-                                        <FormLabel htmlFor="advanced-no" className="font-normal">Nej</FormLabel>
-                                    </FormItem>
-                                    <FormItem className="flex items-center space-x-2">
-                                        <FormControl><RadioGroupItem value="Ja" id="advanced-yes" /></FormControl>
-                                        <FormLabel htmlFor="advanced-yes" className="font-normal">Ja</FormLabel>
-                                    </FormItem>
-                                </RadioGroup>
+                                <div className="flex items-center gap-2">
+                                    <span className={cn("text-sm", !field.value && "text-muted-foreground")}>Nej</span>
+                                    <Switch
+                                        checked={field.value}
+                                        onCheckedChange={field.onChange}
+                                    />
+                                    <span className={cn("text-sm", field.value && "text-primary font-medium")}>Ja</span>
+                                </div>
                             </FormControl>
                         </FormItem>
                     )}
                 />
             </FormSection>
 
-            {useAdvancedStructure === 'Ja' && (
+            {useAdvancedStructure && (
                 <FormSection title="Strukturbyggare">
                     <div className="space-y-4">
                         <div className="flex gap-2 items-end p-3 border rounded-lg bg-background/30">

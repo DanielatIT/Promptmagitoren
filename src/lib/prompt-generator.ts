@@ -67,7 +67,7 @@ const AdaptivePromptGenerationInputSchema = z.object({
   
   primaryKeywords: z.array(z.object({ value: z.string() })).optional(),
 
-  useAdvancedStructure: z.enum(['Ja', 'Nej']).optional(),
+  useAdvancedStructure: z.boolean().optional(),
   advancedStructure: z.array(z.object({
     type: z.string(),
     topic: z.string().optional(),
@@ -199,7 +199,7 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
     }
   }
 
-  if (validatedData.useAdvancedStructure === 'Ja' && validatedData.advancedStructure && validatedData.advancedStructure.length > 0) {
+  if (validatedData.useAdvancedStructure && validatedData.advancedStructure && validatedData.advancedStructure.length > 0) {
     let structurePrompt = "Jag vill att texten skall följa denna struktur med denna information i ordning:\n\n";
     
     const cardOutputs = validatedData.advancedStructure.map(card => {
@@ -208,26 +208,26 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
 
       switch (card.type) {
         case 'Titel':
-          cardOutput = topic ? `Textens/artikelns titel: ${topic}.` : 'Textens/artikelns titel. Om ej definierat skriv mest lämpad titel enligt tonaliteten angiven.';
-          break;
+            cardOutput = topic ? `Textens titel ska vara: "${topic}".` : 'Generera en passande och SEO-vänlig titel (H1) för texten.';
+            break;
         case 'Ingress/inledning':
-          cardOutput = topic ? `Ingress eller inledning om: ${topic}.` : 'Ingress eller inledning.';
-          break;
+            cardOutput = topic ? `Skriv ett inledande stycke (ingress) som handlar om: ${topic}.` : 'Skriv ett kort och engagerande inledande stycke (ingress).';
+            break;
         case 'Underrubrik & Brödtext':
-          cardOutput = topic ? `Underrubrik med medhavande brödtext om: ${topic}.` : 'Underrubrik med medhavande brödtext.';
-          break;
+            cardOutput = topic ? `Skriv en underrubrik (H2, H3, etc.) följt av brödtext. Detta avsnitt ska handla om: ${topic}.` : 'Skriv en underrubrik följt av tillhörande brödtext.';
+            break;
         case 'Fristående text':
-          cardOutput = topic ? `Fristående text om: ${topic}.` : 'Fristående text.';
-          break;
+            cardOutput = topic ? `Skriv ett fristående textstycke (brödtext utan egen rubrik) om: ${topic}.` : 'Skriv ett fristående textstycke.';
+            break;
         case 'lista':
-           cardOutput = topic ? `En lista gällande ${topic}.` : 'En lista.';
-           break;
+            cardOutput = topic ? `Skapa en punktlista eller numrerad lista som behandlar: ${topic}.` : 'Skapa en relevant lista.';
+            break;
         case 'CTA':
-          cardOutput = topic ? `Call to action: uppmana till textens primära action. Följ tonaliteten men uppmana till denna konvertering: ${topic}.` : 'Call to action: uppmana till textens primära action.';
-          break;
+            cardOutput = topic ? `Skriv en tydlig "Call to Action". Uppmana läsaren till handling, där målet är: ${topic}.` : 'Skriv en tydlig "Call to Action" som uppmanar läsaren till handling.';
+            break;
         case 'Anpassat fält':
-          cardOutput = topic ? `INKLUDERA det som står i text fältet: ${topic}` : '';
-          break;
+            cardOutput = topic ? `Inkludera följande text exakt som den är skriven: "${topic}"` : '';
+            break;
       }
 
       if (card.links && card.links.length > 0) {
