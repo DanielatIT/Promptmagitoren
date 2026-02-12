@@ -1,7 +1,7 @@
 
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useFormContext, Controller, useFieldArray, useWatch } from 'react-hook-form';
 import { z } from 'zod';
 import {
@@ -17,11 +17,11 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
-import { X, Plus, Trash2 } from "lucide-react"
+import { X, Plus, Trash2, ArrowUp, ArrowDown, Link as LinkIcon } from "lucide-react"
 import { FormSection } from './form-section';
 import { cn } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { aiRoleOptions, taskTypeMap, tonalityMap, avoidWordsOptions, paragraphTypes } from '@/lib/prompt-data';
+import { aiRoleOptions, taskTypeMap, tonalityMap, avoidWordsOptions, structureCardTypes } from '@/lib/prompt-data';
 
 export const formSchema = z.object({
   topicGuideline: z.string().min(1, 'Detta fält är obligatoriskt.'),
@@ -69,17 +69,18 @@ export const formSchema = z.object({
   }).optional(),
   rules_disabled: z.boolean().default(false),
   
-  links: z.array(z.object({ url: z.string().url("Invalid URL format"), anchorText: z.string().min(1, "Anchor text is required") })).optional(),
-  links_disabled: z.boolean().default(false),
-
   primaryKeywords: z.array(z.object({ value: z.string() })).max(3).optional(),
   primaryKeywords_disabled: z.boolean().default(false),
   
-  structure: z.array(z.object({
-    type: z.string().min(1, "Styckestyp är obligatoriskt"),
+  useAdvancedStructure: z.enum(['Ja', 'Nej']).default('Nej'),
+  advancedStructure: z.array(z.object({
+    type: z.string().min(1),
     topic: z.string().optional(),
+    links: z.array(z.object({
+      url: z.string().url("Invalid URL format"),
+      anchorText: z.string().min(1, "Anchor text is required"),
+    })).optional(),
   })).optional(),
-  structure_disabled: z.boolean().default(false),
 
 }).superRefine((data, ctx) => {
     if (data.taskTypeRadio === 'custom' && (!data.taskTypeCustom || data.taskTypeCustom.trim() === '')) {
@@ -148,22 +149,81 @@ export const defaultValues: Partial<FormValues> = {
     customRules: '',
   },
   rules_disabled: false,
-  links: [],
-  links_disabled: false,
   primaryKeywords: [{ value: '' }],
   primaryKeywords_disabled: false,
-  structure: [],
-  structure_disabled: false,
+  useAdvancedStructure: 'Nej',
+  advancedStructure: [],
 };
+
+const AdvancedStructureCard = ({ index, onRemove, onMove }: { index: number; onRemove: () => void; onMove: (from: number, to: number) => void; }) => {
+    const { control } = useFormContext<FormValues>();
+    const { fields, append, remove } = useFieldArray({
+        control,
+        name: `advancedStructure.${index}.links`
+    });
+    
+    const cardData = useWatch({ control, name: `advancedStructure.${index}`});
+
+    return (
+        <div className="border bg-card/50 rounded-lg p-4 space-y-4">
+            <div className="flex justify-between items-center pb-2 border-b">
+                <h4 className="font-bold text-foreground">{cardData.type}</h4>
+                <div className="flex items-center gap-1">
+                    <Button type="button" variant="ghost" size="icon" onClick={() => onMove(index, index - 1)} disabled={index === 0}>
+                        <ArrowUp className="h-4 w-4" />
+                    </Button>
+                    <Button type="button" variant="ghost" size="icon" onClick={() => onMove(index, index + 1)} >
+                        <ArrowDown className="h-4 w-4" />
+                    </Button>
+                    <Button type="button" variant="ghost" size="icon" onClick={onRemove} className="text-destructive hover:text-destructive">
+                        <X className="h-4 w-4" />
+                    </Button>
+                </div>
+            </div>
+            <FormField
+                control={control}
+                name={`advancedStructure.${index}.topic`}
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Ämne / Instruktion för detta stycke</FormLabel>
+                        <FormControl>
+                            <Textarea {...field} placeholder="Beskriv vad detta stycke ska handla om..." />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+             <div className="space-y-3 pt-2">
+                <div className="flex items-center gap-2">
+                     <LinkIcon className="h-4 w-4 text-muted-foreground"/>
+                     <h5 className="text-sm font-medium">Inbäddade länkar</h5>
+                </div>
+                {fields.map((field, linkIndex) => (
+                    <div key={field.id} className="flex items-end gap-2 p-2 border rounded-md bg-background/50">
+                        <FormField control={control} name={`advancedStructure.${index}.links.${linkIndex}.url`} render={({ field }) => (<FormItem className="flex-1"><FormLabel>URL</FormLabel><FormControl><Input {...field} placeholder="https://..." /></FormControl><FormMessage /></FormItem>)} />
+                        <FormField control={control} name={`advancedStructure.${index}.links.${linkIndex}.anchorText`} render={({ field }) => (<FormItem className="flex-1"><FormLabel>Sökord</FormLabel><FormControl><Input {...field} placeholder="Sökord att länka" /></FormControl><FormMessage /></FormItem>)} />
+                        <Button type="button" variant="destructive" size="icon" onClick={() => remove(linkIndex)}><Trash2 className="h-4 w-4" /></Button>
+                    </div>
+                ))}
+                <Button type="button" size="sm" variant="outline" onClick={() => append({ url: '', anchorText: '' })}><Plus className="mr-2 h-4 w-4" /> Lägg till länk i stycket</Button>
+             </div>
+        </div>
+    );
+};
+
 
 export function PromptForm() {
     const { control, setValue, getValues } = useFormContext<FormValues>();
+    const [newCardType, setNewCardType] = useState(structureCardTypes[0]);
 
-    const linkFields = useFieldArray({ control, name: "links" });
     const keywordFields = useFieldArray({ control, name: "primaryKeywords" });
-    const structureFields = useFieldArray({ control, name: "structure" });
+    const { fields: structureFields, append: appendStructure, remove: removeStructure, move: moveStructure } = useFieldArray({
+        control,
+        name: "advancedStructure"
+    });
     
     const values = useWatch({ control });
+    const useAdvancedStructure = useWatch({ control, name: "useAdvancedStructure" });
 
     const toggleDisabled = (fieldName: keyof FormValues | `${string}_disabled`) => {
         const currentVal = getValues(fieldName as any);
@@ -175,6 +235,12 @@ export function PromptForm() {
     const taskType = useWatch({ control, name: "taskTypeRadio" });
     const aiRole = useWatch({ control, name: "aiRole" });
     const performSerpAnalysis = useWatch({ control, name: "performSerpAnalysis"});
+    
+    const handleAddStructureCard = () => {
+        if (newCardType) {
+            appendStructure({ type: newCardType, topic: '', links: [] });
+        }
+    };
 
 
     return (
@@ -321,6 +387,80 @@ export function PromptForm() {
                     )}
                 </div>
             </FormSection>
+            
+            <FormSection title="Vill du redigera ordningen och inkludera länkar på texten?">
+                 <FormField
+                    control={control}
+                    name="useAdvancedStructure"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormControl>
+                                <RadioGroup
+                                    onValueChange={field.onChange}
+                                    value={field.value}
+                                    className="flex items-center space-x-4"
+                                >
+                                    <FormItem className="flex items-center space-x-2">
+                                        <FormControl><RadioGroupItem value="Nej" id="advanced-no" /></FormControl>
+                                        <FormLabel htmlFor="advanced-no" className="font-normal">Nej</FormLabel>
+                                    </FormItem>
+                                    <FormItem className="flex items-center space-x-2">
+                                        <FormControl><RadioGroupItem value="Ja" id="advanced-yes" /></FormControl>
+                                        <FormLabel htmlFor="advanced-yes" className="font-normal">Ja</FormLabel>
+                                    </FormItem>
+                                </RadioGroup>
+                            </FormControl>
+                        </FormItem>
+                    )}
+                />
+            </FormSection>
+
+            {useAdvancedStructure === 'Ja' && (
+                <FormSection title="Strukturbyggare">
+                    <div className="space-y-4">
+                        <div className="flex gap-2 items-end p-3 border rounded-lg bg-background/30">
+                             <div className="flex-1">
+                                <Label>Typ av stycke</Label>
+                                <Select value={newCardType} onValueChange={setNewCardType}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Välj en typ" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {structureCardTypes.map(type => (
+                                            <SelectItem key={type} value={type}>{type}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <Button type="button" onClick={handleAddStructureCard}>
+                                <Plus className="mr-2 h-4 w-4" /> Lägg till stycke
+                            </Button>
+                        </div>
+
+                        <div className="space-y-4">
+                            {structureFields.map((field, index) => (
+                                <AdvancedStructureCard 
+                                    key={field.id} 
+                                    index={index} 
+                                    onRemove={() => removeStructure(index)}
+                                    onMove={(from, to) => {
+                                        if (to >= 0 && to < structureFields.length) {
+                                            moveStructure(from, to);
+                                        }
+                                    }}
+                                />
+                            ))}
+                            {structureFields.length === 0 && (
+                                <div className="text-center text-muted-foreground p-8 border-2 border-dashed rounded-lg">
+                                    <p>Strukturbyggaren är tom.</p>
+                                    <p className="text-sm">Börja med att lägga till ett stycke ovan.</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </FormSection>
+            )}
+
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
                 <div className="space-y-6">
@@ -582,76 +722,6 @@ export function PromptForm() {
                     </div>
                 </div>
             </FormSection>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                 <FormSection title="Struktur" description="Ange struktur på texten." onToggle={() => toggleDisabled('structure_disabled')} isDisabled={values.structure_disabled}>
-                    <div className="space-y-4">
-                        {structureFields.fields.map((field, index) => (
-                            <div key={field.id} className="flex items-end gap-2 p-3 border rounded-md bg-background/50">
-                                 <FormField
-                                    control={control}
-                                    name={`structure.${index}.type`}
-                                    render={({ field }) => (
-                                    <FormItem className="flex-1">
-                                        <FormLabel>Styckestyp</FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                        <FormControl>
-                                            <SelectTrigger>
-                                            <SelectValue placeholder="Välj en typ" />
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                            {paragraphTypes.map(type => (
-                                                <SelectItem key={type} value={type}>{type}</SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={control}
-                                    name={`structure.${index}.topic`}
-                                    render={({ field }) => (
-                                        <FormItem className="flex-1">
-                                            <FormLabel>Ämne (frivilligt)</FormLabel>
-                                            <FormControl>
-                                                <Input {...field} placeholder="Beskriv ämnet..." />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <Button type="button" variant="destructive" size="icon" onClick={() => structureFields.remove(index)}>
-                                    <Trash2 className="h-4 w-4" />
-                                </Button>
-                            </div>
-                        ))}
-                        <Button type="button" variant="outline" onClick={() => structureFields.append({ type: '', topic: '' })}>
-                            <Plus className="mr-2 h-4 w-4" /> Lägg till stycke
-                        </Button>
-                    </div>
-                </FormSection>
-
-                <FormSection title="Länkar att inkludera" description="Lägg till hyperlänkar, som kopplas till ett sökord" onToggle={() => toggleDisabled('links_disabled')} isDisabled={values.links_disabled}>
-                    <div className="space-y-4">
-                        {linkFields.fields.map((field, index) => (
-                            <div key={field.id} className="flex items-end gap-2 p-3 border rounded-md">
-                                <FormField control={control} name={`links.${index}.url`} render={({ field }) => (<FormItem className="flex-1"><FormLabel>URL</FormLabel><FormControl><Input {...field} placeholder="https://example.com" /></FormControl><FormMessage /></FormItem>)} />
-                                <FormField control={control} name={`links.${index}.anchorText`} render={({ field }) => (<FormItem className="flex-1"><FormLabel>Sökord</FormLabel><FormControl><Input {...field} placeholder="Sökord att länka" /></FormControl><FormMessage /></FormItem>)} />
-                                <Button type="button" variant="destructive" size="icon" onClick={() => linkFields.remove(index)}><Trash2 className="h-4 w-4" /></Button>
-                            </div>
-                        ))}
-                        <Button type="button" variant="outline" onClick={() => linkFields.append({ url: '', anchorText: '' })}><Plus className="mr-2 h-4 w-4" /> Lägg till länk</Button>
-                    </div>
-                </FormSection>
-            </div>
-            
         </div>
     );
 }
-
-    
-
-    

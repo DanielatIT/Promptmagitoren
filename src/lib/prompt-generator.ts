@@ -65,14 +65,18 @@ const AdaptivePromptGenerationInputSchema = z.object({
     customRules: z.string().optional(),
   }).optional(),
   
-  links: z.array(z.object({ url: z.string().url(), anchorText: z.string() })).optional(),
-
   primaryKeywords: z.array(z.object({ value: z.string() })).optional(),
-  
-  structure: z.array(z.object({
+
+  useAdvancedStructure: z.enum(['Ja', 'Nej']).optional(),
+  advancedStructure: z.array(z.object({
     type: z.string(),
     topic: z.string().optional(),
+    links: z.array(z.object({
+      url: z.string(),
+      anchorText: z.string(),
+    })).optional(),
   })).optional(),
+
 }).passthrough(); // Use passthrough to ignore _disabled fields
 
 export type FormValues = z.infer<typeof AdaptivePromptGenerationInputSchema>;
@@ -173,7 +177,7 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
       if (validatedData.rules.avoidPhrases.avoidXYPhrase) rules.push('skriv aldrig en mening som liknar eller är i närheten av detta “...i en X värld/industri/område är “sökordet” värdefullt för Y anledning”');
       if (validatedData.rules.avoidPhrases.avoidVilket) rules.push('Undvik att använda ",vilket..." och använd bara den där det mest passar. ", vilket" får bara finnas i texten 1 gång och ersätts med "och" "som" "detta" och andra ord');
       if (validatedData.rules.avoidPhrases.avoidKeywordAsSubject) {
-        const firstKeyword = validatedData.primaryKeywords?.find(kw => kw.value.trim())?.value;
+        const firstKeyword = validatedData.primaryKeywords?.find(kw => kw.value.trim())?.value.trim();
         const forbiddenWords = forbiddenWordsForSubjectRule.join('/');
         
         const examplePhrase = firstKeyword 
@@ -195,22 +199,55 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
     }
   }
 
-  if (validatedData.structure && validatedData.structure.length > 0) {
-    const structureIntro = "Detta skall vara strukturen på denna text du har valfrihet att lägga in dessa delar där du vill och där det passar bäst men styckarna skall, Detta är delarna jag vill ha in samt det ämne vardera text ska handla om: ";
-    const structureParts = validatedData.structure.map(item => {
-        if (item.topic && item.topic.trim() !== '') {
-            return `Ha med ett stycke som är en ${item.type} som handlar om ${item.topic}`;
-        }
-        return `Ha med ett stycke som är en ${item.type} där du har fria händer att skriva om det du anser bäst`;
-    }).join('. ');
-    promptText += `${structureIntro}${structureParts}.\n\n`;
-  }
+  if (validatedData.useAdvancedStructure === 'Ja' && validatedData.advancedStructure && validatedData.advancedStructure.length > 0) {
+    let structurePrompt = "Jag vill att texten skall följa denna struktur med denna information i ordning:\n\n";
+    
+    const cardOutputs = validatedData.advancedStructure.map(card => {
+      let cardOutput = '';
+      const topic = card.topic?.trim();
 
-  if (validatedData.links && validatedData.links.length > 0) {
-    validatedData.links.forEach(link => {
-      if (link.url && link.anchorText)
-        promptText += `Lägg in hyperlänkar i texten, länken är: ${link.url}. På detta sökord: ${link.anchorText}\n\n`;
-    });
+      switch (card.type) {
+        case 'Titel':
+          cardOutput = topic ? `Textens/artikelns titel: ${topic}.` : 'Textens/artikelns titel. Om ej definierat skriv mest lämpad titel enligt tonaliteten angiven.';
+          break;
+        case 'Ingress/inledning':
+          cardOutput = topic ? `Ingress eller inledning om: ${topic}.` : 'Ingress eller inledning.';
+          break;
+        case 'Underrubrik & Brödtext':
+          cardOutput = topic ? `Underrubrik med medhavande brödtext om: ${topic}.` : 'Underrubrik med medhavande brödtext.';
+          break;
+        case 'Fristående text':
+          cardOutput = topic ? `Fristående text om: ${topic}.` : 'Fristående text.';
+          break;
+        case 'lista':
+           cardOutput = topic ? `En lista gällande ${topic}.` : 'En lista.';
+           break;
+        case 'CTA':
+          cardOutput = topic ? `Call to action: uppmana till textens primära action. Följ tonaliteten men uppmana till denna konvertering: ${topic}.` : 'Call to action: uppmana till textens primära action.';
+          break;
+        case 'Anpassat fält':
+          cardOutput = topic ? `INKLUDERA det som står i text fältet: ${topic}` : '';
+          break;
+      }
+
+      if (card.links && card.links.length > 0) {
+          const linkInstructions = card.links
+            .filter(link => link.url && link.anchorText)
+            .map(link => 
+              `I detta stycke, lägg in hyperlänken "${link.url}" på sökordet "${link.anchorText}".`
+          ).join(' ');
+          if (linkInstructions) {
+            cardOutput += ` ${linkInstructions}`;
+          }
+      }
+      
+      return cardOutput.trim();
+    }).filter(Boolean);
+
+    if (cardOutputs.length > 0) {
+      structurePrompt += cardOutputs.join('\n\n');
+      promptText += structurePrompt + '\n\n';
+    }
   }
 
   if (validatedData.primaryKeywords && validatedData.primaryKeywords.length > 0) {
@@ -228,7 +265,3 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
 
   return { prompt: promptText };
 }
-
-    
-
-    
