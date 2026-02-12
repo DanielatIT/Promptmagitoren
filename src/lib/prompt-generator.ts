@@ -108,7 +108,8 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
   }
 
 
-  promptText += 'Strukturera texten med tydliga och relevanta rubriker (H2, H3, etc.) för att förbättra läsbarheten och SEO. Dessa rubriker skall alltid börja med stor bokstav var på resten av rubriken skall vara små bokstäver. Rubrikerna får inte innehålla några EM tecken (-).\n\n';
+  promptText += 'Strukturera texten med tydliga och relevanta rubriker (H2, H3, etc.) för att förbättra läsbarheten och SEO. Dessa rubriker skall alltid börja med stor bokstav var på resten av rubriken skall vara små bokstäver. Rubrikerna får inte innehålla några EM tecken (-).\n';
+  promptText += 'Texten skall alltid ha en titel (H1).\n\n';
 
   const taskTypeInstruction = validatedData.taskTypeRadio === 'custom'
     ? validatedData.taskTypeCustom
@@ -171,7 +172,7 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
       if (validatedData.rules.avoidPhrases.avoidXYPhrase) rules.push('skriv aldrig en mening som liknar eller är i närheten av detta “...i en X värld/industri/område är “sökordet” värdefullt för Y anledning”');
       if (validatedData.rules.avoidPhrases.avoidVilket) rules.push('Undvik att använda ",vilket..." och använd bara den där det mest passar. ", vilket" får bara finnas i texten 1 gång och ersätts med "och" "som" "detta" och andra ord');
       if (validatedData.rules.avoidPhrases.avoidKeywordAsSubject) {
-        const firstKeyword = validatedData.primaryKeywords?.find(kw => kw.value.trim())?.value || '[sökord]';
+        const firstKeyword = validatedData.primaryKeywords?.find(kw => kw.value.trim())?.value;
         const forbiddenWords = [
           "centrala", "viktiga", "nödvändiga", "oumbärliga", "grundläggande", 
           "bärande", "avgörbara", "primära", "betydelsefulla", "kritiska", 
@@ -179,7 +180,12 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
           "nyckelbetydande", "styrande", "obligatoriska", "bestämmande", 
           "tongivande", "konstitutiva"
         ].join('/');
-        rules.push(`Du får aldrig använda denna mening eller någon form av denna meningsuppbyggnad, som första mening av en text och skall undvikas att skrivas om det inte är av yttersta vikt för att förstå senare in i texten: "${firstKeyword} är ${forbiddenWords} för.." Sen anledning. Det ord jag inkluderat i outputen är då det ord som skall undvikas i denna specifika mening.`);
+        
+        const examplePhrase = firstKeyword 
+            ? `"${firstKeyword} är ${forbiddenWords} för.."` 
+            : `"...är ${forbiddenWords} för.."`;
+
+        rules.push(`Du får aldrig använda denna mening eller någon form av denna meningsuppbyggnad, som första mening av en text och skall undvikas att skrivas om det inte är av yttersta vikt för att förstå senare in i texten: ${examplePhrase} Sen anledning. Det ord jag inkluderat i outputen är då det ord som skall undvikas i denna specifika mening.`);
       }
     }
     
