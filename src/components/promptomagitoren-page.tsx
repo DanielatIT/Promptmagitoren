@@ -5,12 +5,14 @@ import React, { useState, useEffect } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
-import { Wand2, Loader2, Info } from 'lucide-react';
+import { Wand2, Loader2, Info, Code, Image as ImageIcon } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { PromptForm, formSchema, defaultValues, type FormValues } from './prompt-form';
 import { adaptivePromptGeneration } from '@/lib/prompt-generator';
 import { PromptPreview } from './prompt-preview';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent } from '@/components/ui/card';
 
 export default function PromptomagitorenPage() {
     const [promptText, setPromptText] = useState('');
@@ -46,7 +48,6 @@ export default function PromptomagitorenPage() {
 
         const cleanedData = JSON.parse(JSON.stringify(data));
 
-        // This logic correctly removes sections that the user has disabled via the UI.
         if (cleanedData.tonality_disabled) {
             delete cleanedData.tonality;
             delete cleanedData.tonalityCustom;
@@ -78,7 +79,7 @@ export default function PromptomagitorenPage() {
         try {
             const result = await adaptivePromptGeneration(cleanedData);
             setPromptText(result.prompt);
-            methods.reset(data); // Resets the dirty state after successful generation
+            methods.reset(data);
         } catch (error) {
             console.error(error);
             toast({
@@ -93,7 +94,7 @@ export default function PromptomagitorenPage() {
 
     return (
         <div className="container mx-auto p-4 md:p-8 lg:p-12">
-            <header className="relative text-center mb-8">
+            <header className="relative text-center mb-12">
                 <div className="flex justify-center items-center gap-4">
                     <Wand2 className="h-8 w-8 text-primary" />
                     <h1 className="text-4xl lg:text-5xl font-headline font-bold text-primary">Promptmagitören</h1>
@@ -119,23 +120,65 @@ export default function PromptomagitorenPage() {
                     </Popover>
                 </div>
             </header>
+
             <div className="max-w-4xl mx-auto">
-                <FormProvider {...methods}>
-                    <form onSubmit={methods.handleSubmit(onGenerate)} className="w-full mt-6">
-                        <PromptForm />
-                        <Button type="submit" className="w-full mt-6" disabled={isLoading}>
-                            {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
-                            Magitera prompt
-                            {!isLoading && <Wand2 className="h-4 w-4" />}
-                        </Button>
-                    </form>
-                    <PromptPreview
-                        promptText={promptText}
-                        setPromptText={setPromptText}
-                        isLoading={isLoading}
-                        isInitial={isInitial}
-                    />
-                </FormProvider>
+                <Tabs defaultValue="text" className="w-full">
+                    <TabsList className="grid w-full grid-cols-3 mb-8">
+                        <TabsTrigger value="text" className="flex items-center gap-2">
+                            <Wand2 className="h-4 w-4" />
+                            <span>Text</span>
+                        </TabsTrigger>
+                        <TabsTrigger value="kod" className="flex items-center gap-2">
+                            <Code className="h-4 w-4" />
+                            <span>Kod</span>
+                        </TabsTrigger>
+                        <TabsTrigger value="bild" className="flex items-center gap-2">
+                            <ImageIcon className="h-4 w-4" />
+                            <span>Bild</span>
+                        </TabsTrigger>
+                    </TabsList>
+
+                    <TabsContent value="text" className="mt-0">
+                        <FormProvider {...methods}>
+                            <form onSubmit={methods.handleSubmit(onGenerate)} className="w-full">
+                                <PromptForm />
+                                <Button type="submit" className="w-full mt-6" disabled={isLoading}>
+                                    {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
+                                    Magitera prompt
+                                    {!isLoading && <Wand2 className="h-4 w-4" />}
+                                </Button>
+                            </form>
+                            <PromptPreview
+                                promptText={promptText}
+                                setPromptText={setPromptText}
+                                isLoading={isLoading}
+                                isInitial={isInitial}
+                            />
+                        </FormProvider>
+                    </TabsContent>
+
+                    <TabsContent value="kod">
+                        <Card>
+                            <CardContent className="flex items-center justify-center p-12">
+                                <div className="text-center space-y-4">
+                                    <Code className="h-12 w-12 mx-auto text-muted-foreground opacity-50" />
+                                    <p className="text-xl font-medium text-muted-foreground">Under konstruktion...</p>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </TabsContent>
+
+                    <TabsContent value="bild">
+                        <Card>
+                            <CardContent className="flex items-center justify-center p-12">
+                                <div className="text-center space-y-4">
+                                    <ImageIcon className="h-12 w-12 mx-auto text-muted-foreground opacity-50" />
+                                    <p className="text-xl font-medium text-muted-foreground">Under konstruktion...</p>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </TabsContent>
+                </Tabs>
             </div>
         </div>
     );
