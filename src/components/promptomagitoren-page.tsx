@@ -2,7 +2,8 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { useForm, FormProvider } from 'react-hook-form';
+import { useForm, FormProvider } from 'react-form';
+import { useForm as useHookForm, FormProvider as HookFormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Wand2, Loader2, Info, Code, Image as ImageIcon } from 'lucide-react';
@@ -13,6 +14,7 @@ import { PromptPreview } from './prompt-preview';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 
 export default function PromptomagitorenPage() {
     const [promptText, setPromptText] = useState('');
@@ -20,7 +22,7 @@ export default function PromptomagitorenPage() {
     const [isInitial, setIsInitial] = useState(true);
     const { toast } = useToast();
 
-    const methods = useForm<FormValues>({
+    const methods = useHookForm<FormValues>({
         resolver: zodResolver(formSchema),
         defaultValues,
         mode: 'onSubmit'
@@ -123,29 +125,38 @@ export default function PromptomagitorenPage() {
 
             <div className="max-w-4xl mx-auto">
                 <Tabs defaultValue="text" className="w-full">
-                    <TabsList className="grid w-full grid-cols-3 mb-8">
-                        <TabsTrigger value="text" className="flex items-center gap-2">
+                    <TabsList className="grid w-full grid-cols-3 mb-8 bg-muted/50 p-1.5 rounded-xl border shadow-sm">
+                        <TabsTrigger 
+                            value="text" 
+                            className="flex items-center gap-2 py-3 transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md rounded-lg"
+                        >
                             <Wand2 className="h-4 w-4" />
-                            <span>Text</span>
+                            <span className="font-semibold">Text</span>
                         </TabsTrigger>
-                        <TabsTrigger value="kod" className="flex items-center gap-2">
+                        <TabsTrigger 
+                            value="kod" 
+                            className="flex items-center gap-2 py-3 transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg"
+                        >
                             <Code className="h-4 w-4" />
-                            <span>Kod</span>
+                            <span className="font-semibold">Kod</span>
                         </TabsTrigger>
-                        <TabsTrigger value="bild" className="flex items-center gap-2">
+                        <TabsTrigger 
+                            value="bild" 
+                            className="flex items-center gap-2 py-3 transition-all data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg"
+                        >
                             <ImageIcon className="h-4 w-4" />
-                            <span>Bild</span>
+                            <span className="font-semibold">Bild</span>
                         </TabsTrigger>
                     </TabsList>
 
-                    <TabsContent value="text" className="mt-0">
-                        <FormProvider {...methods}>
+                    <TabsContent value="text" className="mt-0 outline-none">
+                        <HookFormProvider {...methods}>
                             <form onSubmit={methods.handleSubmit(onGenerate)} className="w-full">
                                 <PromptForm />
-                                <Button type="submit" className="w-full mt-6" disabled={isLoading}>
-                                    {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
+                                <Button type="submit" className="w-full mt-6 h-12 text-lg font-semibold shadow-lg hover:shadow-xl transition-all" disabled={isLoading}>
+                                    {isLoading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Wand2 className="h-5 w-5 mr-2" />}
                                     Magitera prompt
-                                    {!isLoading && <Wand2 className="h-4 w-4" />}
+                                    {!isLoading && <Wand2 className="h-5 w-5 ml-2" />}
                                 </Button>
                             </form>
                             <PromptPreview
@@ -154,26 +165,32 @@ export default function PromptomagitorenPage() {
                                 isLoading={isLoading}
                                 isInitial={isInitial}
                             />
-                        </FormProvider>
+                        </HookFormProvider>
                     </TabsContent>
 
-                    <TabsContent value="kod">
-                        <Card>
-                            <CardContent className="flex items-center justify-center p-12">
+                    <TabsContent value="kod" className="mt-0 outline-none">
+                        <Card className="border-2 border-dashed border-blue-200 bg-blue-50/30">
+                            <CardContent className="flex items-center justify-center p-16">
                                 <div className="text-center space-y-4">
-                                    <Code className="h-12 w-12 mx-auto text-muted-foreground opacity-50" />
-                                    <p className="text-xl font-medium text-muted-foreground">Under konstruktion...</p>
+                                    <div className="bg-blue-100 p-4 rounded-full inline-block">
+                                        <Code className="h-12 w-12 text-blue-600" />
+                                    </div>
+                                    <h3 className="text-2xl font-bold text-blue-900">Kodmagitören</h3>
+                                    <p className="text-blue-700/70 font-medium">Denna modul är under konstruktion...</p>
                                 </div>
                             </CardContent>
                         </Card>
                     </TabsContent>
 
-                    <TabsContent value="bild">
-                        <Card>
-                            <CardContent className="flex items-center justify-center p-12">
+                    <TabsContent value="bild" className="mt-0 outline-none">
+                        <Card className="border-2 border-dashed border-purple-200 bg-purple-50/30">
+                            <CardContent className="flex items-center justify-center p-16">
                                 <div className="text-center space-y-4">
-                                    <ImageIcon className="h-12 w-12 mx-auto text-muted-foreground opacity-50" />
-                                    <p className="text-xl font-medium text-muted-foreground">Under konstruktion...</p>
+                                    <div className="bg-purple-100 p-4 rounded-full inline-block">
+                                        <ImageIcon className="h-12 w-12 text-purple-600" />
+                                    </div>
+                                    <h3 className="text-2xl font-bold text-purple-900">Bildmagitören</h3>
+                                    <p className="text-purple-700/70 font-medium">Denna modul är under konstruktion...</p>
                                 </div>
                             </CardContent>
                         </Card>
