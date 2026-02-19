@@ -124,7 +124,7 @@ export default function PromptomagitorenPage() {
 
             <div className="max-w-4xl mx-auto">
                 <Tabs defaultValue="text" className="w-full">
-                    <TabsList className="grid w-full grid-cols-3 mb-10 bg-muted/60 p-2 rounded-2xl border border-border/50 shadow-md h-auto">
+                    <TabsList className="grid w-full grid-cols-3 gap-4 mb-10 bg-muted/60 p-2 rounded-2xl border border-border/50 shadow-md h-auto">
                         <TabsTrigger 
                             value="text" 
                             className="flex items-center justify-center gap-2 py-4 px-4 transition-all bg-primary/10 hover:bg-primary/20 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg rounded-xl border border-transparent data-[state=active]:border-primary/20"
