@@ -124,27 +124,27 @@ export default function PromptomagitorenPage() {
 
             <div className="max-w-4xl mx-auto">
                 <Tabs defaultValue="text" className="w-full">
-                    <TabsList className="grid w-full grid-cols-3 mb-8 bg-muted/30 p-1.5 rounded-xl border border-border/50 shadow-inner">
+                    <TabsList className="grid w-full grid-cols-3 mb-10 bg-muted/60 p-2 rounded-2xl border border-border/50 shadow-md h-auto">
                         <TabsTrigger 
                             value="text" 
-                            className="flex items-center gap-2 py-3 transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg rounded-lg"
+                            className="flex items-center justify-center gap-2 py-4 px-4 transition-all bg-primary/10 hover:bg-primary/20 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg rounded-xl border border-transparent data-[state=active]:border-primary/20"
                         >
-                            <Wand2 className="h-4 w-4" />
-                            <span className="font-bold">Text</span>
+                            <Wand2 className="h-5 w-5" />
+                            <span className="font-bold text-sm md:text-base">Text</span>
                         </TabsTrigger>
                         <TabsTrigger 
                             value="kod" 
-                            className="flex items-center gap-2 py-3 transition-all data-[state=active]:bg-red-900 data-[state=active]:text-white data-[state=active]:shadow-lg rounded-lg"
+                            className="flex items-center justify-center gap-2 py-4 px-4 transition-all bg-red-900/10 hover:bg-red-900/20 data-[state=active]:bg-red-900 data-[state=active]:text-white data-[state=active]:shadow-lg rounded-xl border border-transparent data-[state=active]:border-red-900/20"
                         >
-                            <Code className="h-4 w-4" />
-                            <span className="font-bold">Kod</span>
+                            <Code className="h-5 w-5" />
+                            <span className="font-bold text-sm md:text-base">Kod</span>
                         </TabsTrigger>
                         <TabsTrigger 
                             value="bild" 
-                            className="flex items-center gap-2 py-3 transition-all data-[state=active]:bg-green-900 data-[state=active]:text-white data-[state=active]:shadow-lg rounded-lg"
+                            className="flex items-center justify-center gap-2 py-4 px-4 transition-all bg-green-900/10 hover:bg-green-900/20 data-[state=active]:bg-green-900 data-[state=active]:text-white data-[state=active]:shadow-lg rounded-xl border border-transparent data-[state=active]:border-green-900/20"
                         >
-                            <ImageIcon className="h-4 w-4" />
-                            <span className="font-bold">Bild</span>
+                            <ImageIcon className="h-5 w-5" />
+                            <span className="font-bold text-sm md:text-base">Bild</span>
                         </TabsTrigger>
                     </TabsList>
 
