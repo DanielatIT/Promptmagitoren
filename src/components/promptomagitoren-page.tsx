@@ -2,7 +2,6 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { useForm, FormProvider } from 'react-form';
 import { useForm as useHookForm, FormProvider as HookFormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
@@ -125,27 +124,27 @@ export default function PromptomagitorenPage() {
 
             <div className="max-w-4xl mx-auto">
                 <Tabs defaultValue="text" className="w-full">
-                    <TabsList className="grid w-full grid-cols-3 mb-8 bg-muted/50 p-1.5 rounded-xl border shadow-sm">
+                    <TabsList className="grid w-full grid-cols-3 mb-8 bg-muted/30 p-1.5 rounded-xl border border-border/50 shadow-inner">
                         <TabsTrigger 
                             value="text" 
-                            className="flex items-center gap-2 py-3 transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md rounded-lg"
+                            className="flex items-center gap-2 py-3 transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg rounded-lg"
                         >
                             <Wand2 className="h-4 w-4" />
-                            <span className="font-semibold">Text</span>
+                            <span className="font-bold">Text</span>
                         </TabsTrigger>
                         <TabsTrigger 
                             value="kod" 
-                            className="flex items-center gap-2 py-3 transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg"
+                            className="flex items-center gap-2 py-3 transition-all data-[state=active]:bg-red-900 data-[state=active]:text-white data-[state=active]:shadow-lg rounded-lg"
                         >
                             <Code className="h-4 w-4" />
-                            <span className="font-semibold">Kod</span>
+                            <span className="font-bold">Kod</span>
                         </TabsTrigger>
                         <TabsTrigger 
                             value="bild" 
-                            className="flex items-center gap-2 py-3 transition-all data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg"
+                            className="flex items-center gap-2 py-3 transition-all data-[state=active]:bg-green-900 data-[state=active]:text-white data-[state=active]:shadow-lg rounded-lg"
                         >
                             <ImageIcon className="h-4 w-4" />
-                            <span className="font-semibold">Bild</span>
+                            <span className="font-bold">Bild</span>
                         </TabsTrigger>
                     </TabsList>
 
@@ -169,28 +168,28 @@ export default function PromptomagitorenPage() {
                     </TabsContent>
 
                     <TabsContent value="kod" className="mt-0 outline-none">
-                        <Card className="border-2 border-dashed border-blue-200 bg-blue-50/30">
+                        <Card className="border-2 border-dashed border-red-200 bg-red-50/20">
                             <CardContent className="flex items-center justify-center p-16">
                                 <div className="text-center space-y-4">
-                                    <div className="bg-blue-100 p-4 rounded-full inline-block">
-                                        <Code className="h-12 w-12 text-blue-600" />
+                                    <div className="bg-red-100 p-4 rounded-full inline-block">
+                                        <Code className="h-12 w-12 text-red-800" />
                                     </div>
-                                    <h3 className="text-2xl font-bold text-blue-900">Kodmagitören</h3>
-                                    <p className="text-blue-700/70 font-medium">Denna modul är under konstruktion...</p>
+                                    <h3 className="text-2xl font-bold text-red-900">Kodmagitören</h3>
+                                    <p className="text-red-800/70 font-medium">Denna modul är under konstruktion...</p>
                                 </div>
                             </CardContent>
                         </Card>
                     </TabsContent>
 
                     <TabsContent value="bild" className="mt-0 outline-none">
-                        <Card className="border-2 border-dashed border-purple-200 bg-purple-50/30">
+                        <Card className="border-2 border-dashed border-green-200 bg-green-50/20">
                             <CardContent className="flex items-center justify-center p-16">
                                 <div className="text-center space-y-4">
-                                    <div className="bg-purple-100 p-4 rounded-full inline-block">
-                                        <ImageIcon className="h-12 w-12 text-purple-600" />
+                                    <div className="bg-green-100 p-4 rounded-full inline-block">
+                                        <ImageIcon className="h-12 w-12 text-green-800" />
                                     </div>
-                                    <h3 className="text-2xl font-bold text-purple-900">Bildmagitören</h3>
-                                    <p className="text-purple-700/70 font-medium">Denna modul är under konstruktion...</p>
+                                    <h3 className="text-2xl font-bold text-green-900">Bildmagitören</h3>
+                                    <p className="text-green-800/70 font-medium">Denna modul är under konstruktion...</p>
                                 </div>
                             </CardContent>
                         </Card>
