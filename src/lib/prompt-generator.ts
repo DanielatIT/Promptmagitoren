@@ -1,4 +1,3 @@
-
 'use server';
 
 /**
@@ -77,7 +76,7 @@ const AdaptivePromptGenerationInputSchema = z.object({
     })).optional(),
   })).optional(),
 
-}).passthrough(); // Use passthrough to ignore _disabled fields
+}).passthrough(); 
 
 export type FormValues = z.infer<typeof AdaptivePromptGenerationInputSchema>;
 
@@ -87,7 +86,6 @@ export interface AdaptivePromptGenerationOutput {
 }
 
 export async function adaptivePromptGeneration(data: FormValues): Promise<AdaptivePromptGenerationOutput> {
-  // Validate input data
   const validatedData = AdaptivePromptGenerationInputSchema.parse(data);
 
   let promptText = "Dessa regler nedan skall följas väldigt strikt, kolla konstant att du alltid följer det instruktioner jag ger dig här och återkom med en fråga om vad du skall göra istället för att göra något annat än vad instruktioner hänvisar.\n\n";
@@ -100,7 +98,7 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
   if (validatedData.aiRole === 'custom') {
       roleOutput = validatedData.aiRoleCustom || '';
   } else {
-      roleOutput = roleOutputs[validatedData.aiRole];
+      roleOutput = roleOutputs[validatedData.aiRole as keyof typeof roleOutputs];
   }
   
   if (roleOutput) {
@@ -141,7 +139,7 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
   if (validatedData.textLength) {
     const textLengthNum = parseInt(validatedData.textLength, 10);
     if (!isNaN(textLengthNum)) {
-      const lowerBound = Math.max(0, textLengthNum - 50); // Ensure lower bound isn't negative
+      const lowerBound = Math.max(0, textLengthNum - 50); 
       promptText += `Längd på denna text skall vara ${textLengthNum}, och skall hållas till detta så gott det går. Texten får ej överskridas mer än med 20 ord och får ej vara mindre än ${lowerBound} ord.\n\n`;
     }
   }
@@ -277,5 +275,3 @@ export async function adaptivePromptGeneration(data: FormValues): Promise<Adapti
 
   return { prompt: promptText };
 }
-
-    

@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState } from 'react';
@@ -79,8 +78,8 @@ export const formSchema = z.object({
     type: z.string().min(1),
     topic: z.string().optional(),
     links: z.array(z.object({
-      url: z.string().url("Invalid URL format"),
-      anchorText: z.string().min(1, "Anchor text is required"),
+      url: z.string().url("Ogiltigt URL-format"),
+      anchorText: z.string().min(1, "Sökord krävs"),
     })).optional(),
   })).optional(),
 
@@ -172,27 +171,27 @@ const AdvancedStructureCard = ({ index, onRemove, onMove }: { index: number; onR
     const isLast = allStructureFields ? index === allStructureFields.length - 1 : false;
 
     return (
-        <Collapsible className="group border border-accent/30 bg-accent/10 rounded-lg">
-            <div className="flex justify-between items-center p-2 pr-3">
+        <Collapsible className="group border border-accent/30 bg-accent/10 rounded-lg overflow-hidden">
+            <div className="flex justify-between items-center p-2 pr-3 bg-accent/5">
                  <CollapsibleTrigger asChild>
-                    <Button variant="ghost" className="flex-1 justify-start p-2 h-auto gap-2 w-full">
+                    <Button variant="ghost" className="flex-1 justify-start p-2 h-auto gap-2 w-full hover:bg-transparent">
                         <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180" />
                         <h4 className="font-bold text-foreground">{cardData.type}</h4>
                     </Button>
                 </CollapsibleTrigger>
                 <div className="flex items-center gap-1">
-                    <Button type="button" variant="ghost" size="icon" onClick={() => onMove(index, index - 1)} disabled={isThisCardTitle || index === 0 || isPrecededByTitle}>
+                    <Button type="button" variant="ghost" size="icon" onClick={() => onMove(index, index - 1)} disabled={isThisCardTitle || index === 0 || isPrecededByTitle} className="h-8 w-8">
                         <ArrowUp className="h-4 w-4" />
                     </Button>
-                    <Button type="button" variant="ghost" size="icon" onClick={() => onMove(index, index + 1)} disabled={isThisCardTitle || isLast}>
+                    <Button type="button" variant="ghost" size="icon" onClick={() => onMove(index, index + 1)} disabled={isThisCardTitle || isLast} className="h-8 w-8">
                         <ArrowDown className="h-4 w-4" />
                     </Button>
-                    <Button type="button" variant="ghost" size="icon" onClick={onRemove} className="text-destructive hover:text-destructive">
+                    <Button type="button" variant="ghost" size="icon" onClick={onRemove} className="text-destructive hover:text-destructive h-8 w-8">
                         <X className="h-4 w-4" />
                     </Button>
                 </div>
             </div>
-            <CollapsibleContent className="px-4 pb-4 space-y-4 border-t">
+            <CollapsibleContent className="px-4 pb-4 space-y-4 border-t bg-background/50">
                 <FormField
                     control={control}
                     name={`advancedStructure.${index}.topic`}
@@ -465,7 +464,7 @@ export function PromptForm() {
                             ))}
                             {structureFields.length === 0 && (
                                 <div className="text-center text-muted-foreground p-8 border-2 border-dashed rounded-lg">
-                                    <p>Strukturbyggaren är tom.</p>
+                                    <p>Inga stycken tillagda.</p>
                                     <p className="text-sm">Börja med att lägga till ett stycke ovan.</p>
                                 </div>
                             )}
@@ -738,7 +737,3 @@ export function PromptForm() {
         </div>
     );
 }
-
-    
-
-    

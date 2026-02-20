@@ -63,14 +63,8 @@ export default function PromptomagitorenPage() {
         if (cleanedData.rules_disabled) {
             delete cleanedData.rules;
         }
-        if (cleanedData.links_disabled) {
-            delete cleanedData.links;
-        }
         if (cleanedData.primaryKeywords_disabled) {
             delete cleanedData.primaryKeywords;
-        }
-        if (cleanedData.structure_disabled) {
-            delete cleanedData.structure;
         }
         if (!cleanedData.performSerpAnalysis) {
             delete cleanedData.serpKeyword;
