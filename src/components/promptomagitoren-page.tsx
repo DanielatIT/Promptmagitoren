@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -14,6 +13,7 @@ import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { CodeMagitorenTab } from './code-magitoren-tab';
 
 export default function PromptomagitorenPage() {
     const [promptText, setPromptText] = useState('');
@@ -168,17 +168,7 @@ export default function PromptomagitorenPage() {
                     </TabsContent>
 
                     <TabsContent value="kod" className="mt-0 outline-none">
-                        <Card className="border-2 border-dashed border-red-200 bg-red-50/20">
-                            <CardContent className="flex items-center justify-center p-16">
-                                <div className="text-center space-y-4">
-                                    <div className="bg-red-100 p-4 rounded-full inline-block">
-                                        <Code className="h-12 w-12 text-red-800" />
-                                    </div>
-                                    <h3 className="text-2xl font-bold text-red-900">Kodmagitören</h3>
-                                    <p className="text-red-800/70 font-medium">Denna modul är under konstruktion...</p>
-                                </div>
-                            </CardContent>
-                        </Card>
+                        <CodeMagitorenTab />
                     </TabsContent>
 
                     <TabsContent value="bild" className="mt-0 outline-none">
