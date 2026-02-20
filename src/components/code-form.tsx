@@ -8,6 +8,7 @@ import { Textarea } from './ui/textarea';
 import { Checkbox } from './ui/checkbox';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
+import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import { Plus, Trash2, ExternalLink } from 'lucide-react';
 import { webLanguages, otherLanguages, schemaTypes } from '@/lib/code-data';
 import { CodeFormValues } from '@/lib/code-generator';
@@ -21,6 +22,7 @@ export function CodeForm() {
   });
 
   const selectedLangs = useWatch({ control, name: "languages" }) || [];
+  const implementationPlace = useWatch({ control, name: "implementationPlace" });
   
   const isWebSelected = selectedLangs.some(l => webLanguages.includes(l as any));
   const isOtherSelected = selectedLangs.some(l => otherLanguages.includes(l as any));
@@ -49,6 +51,72 @@ export function CodeForm() {
             </FormItem>
           )}
         />
+        
+        <div className="pt-6 space-y-4">
+          <FormLabel className="text-base font-bold">Vart skall koden implementeras?</FormLabel>
+          <FormField
+            control={control}
+            name="implementationPlace"
+            render={({ field }) => (
+              <FormItem className="space-y-3">
+                <FormControl>
+                  <RadioGroup
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+                  >
+                    <FormItem className="flex items-center space-x-3 space-y-0 p-3 border rounded-md hover:bg-accent/5 transition-colors">
+                      <FormControl>
+                        <RadioGroupItem value="Elementor" />
+                      </FormControl>
+                      <FormLabel className="font-normal cursor-pointer">Elementor HTML widget</FormLabel>
+                    </FormItem>
+                    <FormItem className="flex items-center space-x-3 space-y-0 p-3 border rounded-md hover:bg-accent/5 transition-colors">
+                      <FormControl>
+                        <RadioGroupItem value="Wordpress" />
+                      </FormControl>
+                      <FormLabel className="font-normal cursor-pointer">Wordpress övrig HTML widget</FormLabel>
+                    </FormItem>
+                    <FormItem className="flex items-center space-x-3 space-y-0 p-3 border rounded-md hover:bg-accent/5 transition-colors">
+                      <FormControl>
+                        <RadioGroupItem value="CMS" />
+                      </FormControl>
+                      <FormLabel className="font-normal cursor-pointer">Övrig CMS HTML</FormLabel>
+                    </FormItem>
+                    <FormItem className="flex items-center space-x-3 space-y-0 p-3 border rounded-md hover:bg-accent/5 transition-colors">
+                      <FormControl>
+                        <RadioGroupItem value="IDE" />
+                      </FormControl>
+                      <FormLabel className="font-normal cursor-pointer">IDE</FormLabel>
+                    </FormItem>
+                    <FormItem className="flex items-center space-x-3 space-y-0 p-3 border rounded-md hover:bg-accent/5 transition-colors">
+                      <FormControl>
+                        <RadioGroupItem value="Other" />
+                      </FormControl>
+                      <FormLabel className="font-normal cursor-pointer">Övrigt</FormLabel>
+                    </FormItem>
+                  </RadioGroup>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {implementationPlace === 'Other' && (
+            <FormField
+              control={control}
+              name="implementationOther"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input placeholder="Beskriv implementeringsplats..." {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
+        </div>
       </FormSection>
 
       <FormSection title="2. Vilket programmeringsspråk?">

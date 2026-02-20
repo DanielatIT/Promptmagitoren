@@ -13,10 +13,20 @@ import { generateCodePrompt, CodeFormValues } from '@/lib/code-generator';
 
 const codeFormSchema = z.object({
   whatToCreate: z.string().min(1, 'Beskrivning är obligatorisk'),
+  implementationPlace: z.enum(['Elementor', 'Wordpress', 'CMS', 'IDE', 'Other']).optional(),
+  implementationOther: z.string().optional(),
   languages: z.array(z.string()).optional(),
   colors: z.array(z.object({ value: z.string() })).default([{ value: "#2c3e50" }]),
   font: z.string().optional(),
   schemas: z.array(z.string()).optional(),
+}).superRefine((data, ctx) => {
+  if (data.implementationPlace === 'Other' && (!data.implementationOther || data.implementationOther.trim() === '')) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Beskriv var koden ska implementeras",
+      path: ['implementationOther'],
+    });
+  }
 });
 
 export function CodeMagitorenTab() {
@@ -29,6 +39,8 @@ export function CodeMagitorenTab() {
     resolver: zodResolver(codeFormSchema),
     defaultValues: {
       whatToCreate: '',
+      implementationPlace: 'Elementor',
+      implementationOther: '',
       languages: [],
       colors: [{ value: "#223b53" }],
       font: '',
